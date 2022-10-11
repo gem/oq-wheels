@@ -107,6 +107,8 @@ function build_proj {
     -DBUILD_GIE:BOOL=OFF \
     -DBUILD_GMOCK:BOOL=OFF \
     -DBUILD_PROJINFO:BOOL=OFF \
+	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
+    -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_TESTING:BOOL=OFF 
     cmake --build . -j4
 	sudo cmake --install .)
