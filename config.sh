@@ -356,6 +356,8 @@ function build_wheel_cmd {
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
+	pwd
+	ls -lrt
     (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
     if [ -n "$IS_OSX" ]; then
 	:
