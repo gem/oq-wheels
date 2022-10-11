@@ -296,9 +296,9 @@ function pre_build {
     #suppress build_proj
 	env
 	#
-    build_proj
-    build_expat
-    build_geos
+    suppress build_proj
+    suppress build_expat
+    suppress build_geos
 
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
@@ -307,13 +307,14 @@ function pre_build {
        echo " LDFLAGS.2: ${LDFLAGS}"
     fi
 
-    build_gdal
+    suppress build_gdal
 }
 
 
 function run_tests {
     unset GDAL_DATA
     unset PROJ_LIB
+    unset PROJ_DATA
     if [ -n "$IS_OSX" ]; then
         export PATH=$PATH:${BUILD_PREFIX}/bin
         export LC_ALL=en_US.UTF-8
