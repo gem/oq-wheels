@@ -434,6 +434,7 @@ function install_delocate {
 function repair_wheelhouse {
 	PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
     local wheelhouse=$1
+	echo "+++++++ LDFLAGS: ${LDFLAGS} "
     install_delocate
     delocate-wheel $wheelhouse/*.whl # copies library dependencies into wheel
 }
