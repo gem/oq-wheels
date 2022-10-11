@@ -26,7 +26,4 @@ echo "::group::Get code of project: $REPO_DIR"
       tar -xvzf GDAL-${BUILD_COMMIT}.tar.gz
       mv GDAL-${BUILD_COMMIT} gdal
   fi
-  if [[ "$REPO_DIR" == "Fiona" ]]; then
-     clean_code $REPO_DIR $BUILD_COMMIT
-  fi
 echo "::endgroup::"
