@@ -138,8 +138,7 @@ function build_expat {
     #        && make -j4 \
     #        && sudo make install)
     #fi
-	# curl -o expat.tar.gz -L https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-2.4.9.tar.gz
-    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-${EXPAT_VERSION}.tar.bz2
+    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-${EXPAT_VERSION}.tar.bz2
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -307,7 +306,7 @@ function pre_build {
     suppress build_geos
 
     if [ -n "$IS_OSX" ]; then
-        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib,${PROJ_DIR}/lib"
     fi
 
     build_gdal
