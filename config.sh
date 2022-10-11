@@ -97,7 +97,7 @@ function build_proj {
     mkdir build
 	cd build
 	cmake .. \
-	-DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
+	-DCMAKE_INSTALL_PREFIX=$PROJ_DIR \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
