@@ -1,0 +1,74 @@
+---
+name: GDAL Arm64
+
+on: [pull_request, workflow_dispatch]
+
+env:
+  REPO_DIR: gdal
+  WHEEL_SDIR: wheelhouse
+  SETUPTOOLS_USE_DISTUTILS: stdlib
+
+jobs:
+  build:
+    name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ARM64" ]
+        python: [ "3.9" ]
+        platform: [ "arm64"]
+        macos-target: [ "11" ]
+        os-name: ["osx"]
+    env:
+      BUILD_COMMIT: 1.8.21
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
+      TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+      PIP_CMD: pip3
+      PYTHON_EXE: python3
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Python and cmake
+        run: |
+          brew install python@${MB_PYTHON_VERSION}
+          brew install cmake
+          PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+          python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+      - name: Build Library
+        env:
+          REPO_DIR: gdal
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.3
+          PIP_CMD: pip
+          PYTHON_EXE: python
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip3
+            bash -x .github/workflows/build.sh
+      - name: Build Wheel of Fiona
+        env:
+          REPO_DIR: gdal
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.3
+          PIP_CMD: pip
+          PYTHON_EXE: python
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip
+            which python
+            bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: wheels
+          path: wheelhouse/*.whl
