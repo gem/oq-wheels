@@ -97,7 +97,7 @@ function build_proj {
     mkdir build
 	cd build
 	cmake .. \
-	-DCMAKE_INSTALL_PREFIX=$PROJ_DIR \
+	-DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
@@ -108,7 +108,6 @@ function build_proj {
     -DBUILD_GMOCK:BOOL=OFF \
     -DBUILD_PROJINFO:BOOL=OFF \
 	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
-    -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_TESTING:BOOL=OFF 
     cmake --build . -j4
 	sudo cmake --install .)
