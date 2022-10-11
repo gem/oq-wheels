@@ -303,7 +303,7 @@ function pre_build {
 	#
     build_proj
     build_expat
-    suppress build_geos
+    build_geos
 
     if [ -n "$IS_OSX" ]; then
         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib,${PROJ_DIR}/lib"
