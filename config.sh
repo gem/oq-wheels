@@ -302,9 +302,9 @@ function pre_build {
 
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
-       echo " LDFLAGS.1: ${LDFLAGS}"
-       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
-       echo " LDFLAGS.2: ${LDFLAGS}"
+       if [[ "$REPO_DIR" == "pyproj" ]]; then
+         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+       fi
     fi
 
     suppress build_gdal
