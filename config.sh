@@ -112,6 +112,8 @@ function build_proj {
     sudo cmake --install .
 	#
     touch proj-stamp
+	cd ../../
+	ls -lrt
 }
 
 
