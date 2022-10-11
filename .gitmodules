@@ -1,3 +1,0 @@
-[submodule "Fiona"]
-	path = Fiona
-	url = https://github.com/Toblerity/Fiona.git
