@@ -93,7 +93,7 @@ function build_proj {
     if [ -e proj-stamp ]; then return; fi
     build_sqlite
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
-    cd proj-${PROJ_VERSION}
+	(cd proj-${PROJ_VERSION}
     mkdir build
 	cd build
 	cmake .. \
@@ -109,11 +109,9 @@ function build_proj {
     -DBUILD_PROJINFO:BOOL=OFF \
     -DBUILD_TESTING:BOOL=OFF 
     cmake --build . -j4
-    sudo cmake --install .
+	sudo cmake --install .)
 	#
     touch proj-stamp
-	cd ../../
-	ls -lrt
 }
 
 
