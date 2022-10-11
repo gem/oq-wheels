@@ -229,9 +229,7 @@ function build_gdal {
             --with-proj=${PROJ_DIR} \
             --with-sqlite3=${BUILD_PREFIX} \
             --with-threads \
-            --without-bsb \
             --without-cfitsio \
-            --without-dwgdirect \
             --without-ecw \
             --without-fme \
             --without-freexl \
@@ -244,7 +242,6 @@ function build_gdal {
             --without-kakadu \
             --without-libgrass \
             --without-libkml \
-            --without-mrf \
             --without-mrsid \
             --without-mysql \
             --without-odbc \
@@ -253,10 +250,8 @@ function build_gdal {
             --without-pcraster \
             --without-perl \
             --without-pg \
-            --without-php \
             --without-python \
             --without-qhull \
-            --without-sde \
             --without-xerces \
             --without-xml2 \
         && make -j4 \
@@ -306,7 +301,10 @@ function pre_build {
     build_geos
 
     if [ -n "$IS_OSX" ]; then
-        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib,${PROJ_DIR}/lib"
+       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+       echo " LDFLAGS.1: ${LDFLAGS}"
+       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+       echo " LDFLAGS.2: ${LDFLAGS}"
     fi
 
     build_gdal

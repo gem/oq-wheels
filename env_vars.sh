@@ -16,8 +16,13 @@ OPENSSL_HASH=0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1
 export MACOSX_DEPLOYMENT_TARGET=10.10
 export GDAL_CONFIG=/usr/local/bin/gdal-config
 export PACKAGE_DATA=1
+#from PROJ 9.x
 export PROJ_DIR=/usr/local/share/proj/proj_dir
-#export PROJ_DATA=/usr/local/share/proj/proj_dir/
+export PROJ_DATA=${PROJ_DIR}/share/proj
 export PROJ_WHEEL=true
 export PROJ_NETWORK=ON
 export SETUPTOOLS_USE_DISTUTILS=stdlib
+if [[ "$REPO_DIR" == "pyproj" ]]; then
+ export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/proj_dir
+ export PROJ_DATA=${PROJ_DIR}/share/proj
+fi
