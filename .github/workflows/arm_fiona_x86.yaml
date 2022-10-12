@@ -1,26 +1,27 @@
 ---
-name: Wheels Intel
+name: Fiona x86_64
 
 on: [pull_request, workflow_dispatch]
 
+env:
+  REPO_DIR: Fiona
+  WHEEL_SDIR: wheelhouse
+  SETUPTOOLS_USE_DISTUTILS: stdlib
+
 jobs:
   build:
-    name: ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ "macos-latest" ]
+        os: [ "macos-12" ]
         python: [ "3.9" ]
         platform: [ "x86_64"]
         macos-target: [ "11" ]
-        exclude:
-          - os: "macos-latest"
-            platform: "i686"
-        include:
-          - os: "macos-latest"
-            os-name: "osx"
+        os-name: ["osx"]
     env:
+      BUILD_COMMIT: 1.8.21
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -34,27 +35,39 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install python3.9 with brew
-        run: brew install python@${MB_PYTHON_VERSION}
-      - name: Build Library
+      - name: Setup Python and cmake
+        run: |
+          brew install python@${MB_PYTHON_VERSION}
+          brew install cmake
+          PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+          python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+      - name: Get Library
         env:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 1.8.21
-        run: bash -x .github/workflows/build.sh
+          PIP_CMD: pip3
+          PYTHON_EXE: python3
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip3
+            bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 1.8.21
-        run: bash -x .github/workflows/wheel.sh
-          #env:
-          #REPO_DIR: GDAL
-          #WHEEL_SDIR: wheelhouse
-          #SETUPTOOLS_USE_DISTUTILS: stdlib
-          #BUILD_COMMIT: v3.4.3
+          PIP_CMD: pip
+          PYTHON_EXE: python
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip
+            which python
+            bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v2
         with:
           name: wheels
