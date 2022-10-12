@@ -1,5 +1,8 @@
 echo "::group::Build wheel"
-  echo "check python of venv"
+  before_install
+  echo "+++++++++++++++++++++++++++++++++++++++++"
+  echo "check python of venv after before_install"
+  echo "+++++++++++++++++++++++++++++++++++++++++"
   which python
   python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
   echo $PIP_CMD
