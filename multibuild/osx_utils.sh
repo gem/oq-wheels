@@ -434,7 +434,7 @@ function install_delocate {
 function repair_wheelhouse {
 	PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
 	#DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib"
-	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib"
+	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:${PROJ_DIR}lib"
 	echo "run env to check environment"
 	env
     local wheelhouse=$1
