@@ -22,8 +22,9 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git checkout ${BUILD_COMMIT}
   fi
   if [[ "$REPO_DIR" == "gdal" ]]; then
-      pip3 download GDAL==${BUILD_COMMIT}
-      tar -xvzf GDAL-${BUILD_COMMIT}.tar.gz
-      mv GDAL-${BUILD_COMMIT} gdal
+	  git clone https://github.com/OSGeo/gdal.git
+	  cd gdal
+	  git checkout ${BUILD_COMMIT}
+	  ls gdal/swig/python
   fi
 echo "::endgroup::"

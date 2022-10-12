@@ -21,7 +21,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BUILD_COMMIT: 1.8.21
+      BUILD_COMMIT: v3.4.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -41,12 +41,12 @@ jobs:
           brew install cmake
           PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
           python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-      - name: Build Library
+      - name: Get Library
         env:
           REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.3
+          BUILD_COMMIT: v3.4.3
           PIP_CMD: pip
           PYTHON_EXE: python
         run: |
@@ -56,10 +56,10 @@ jobs:
             bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         env:
-          REPO_DIR: gdal
+          REPO_DIR: gdal/gdal/swig/python
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.3
+          BUILD_COMMIT: v3.4.3
           PIP_CMD: pip
           PYTHON_EXE: python
         run: |
