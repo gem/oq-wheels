@@ -54,7 +54,7 @@ jobs:
             python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             which pip3
             bash -x .github/workflows/build.sh
-      - name: Build Wheel of Fiona
+      - name: Build Wheel of GDAL
         env:
           REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
