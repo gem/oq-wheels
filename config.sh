@@ -108,7 +108,7 @@ function build_proj {
     -DBUILD_GMOCK:BOOL=OFF \
     -DBUILD_PROJINFO:BOOL=OFF \
 	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
-    -DBUILD_TESTING:BOOL=OFF 
+    -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
 	sudo cmake --install .)
 	#
@@ -337,31 +337,24 @@ function run_tests {
 
 
 function build_wheel_cmd {
-    # Update the container's auditwheel with our patched version.
-    if [ -n "$IS_OSX" ]; then
-	:
-    else  # manylinux
-        /opt/python/cp37-cp37m/bin/pip install -I "git+https://github.com/sgillies/auditwheel.git#egg=auditwheel"
-    fi
-
     local cmd=${1:-pip_wheel_cmd}
     local repo_dir=${2:-$REPO_DIR}
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
+	echo "print value of cmd and repo_dir"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$cmd"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$repo_dir"
     start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
     stop_spinner
     if [ -n "$BUILD_DEPENDS" ]; then
-        pip install $(pip_opts) $BUILD_DEPENDS
+        $cmd install $(pip_opts) $BUILD_DEPENDS
     fi
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
 	pwd
 	ls -lrt
     (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
-    if [ -n "$IS_OSX" ]; then
-	:
-    else  # manylinux
-        /opt/python/cp37-cp37m/bin/pip install -I "git+https://github.com/sgillies/auditwheel.git#egg=auditwheel"
-    fi
     repair_wheelhouse $wheelhouse
 }
