@@ -76,18 +76,18 @@ function stop_spinner {
 
 function abspath {
     # Can work with any Python; need not be our installed Python.
-    python -c "import os.path; print(os.path.abspath('$1'))"
+    python3 -c "import os.path; print(os.path.abspath('$1'))"
 }
 
 function relpath {
     # Path of first input relative to second (or $PWD if not specified)
     # Can work with any Python; need not be our installed Python.
-    python -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))"
+    python3 -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))"
 }
 
 function realpath {
     # Can work with any Python; need not be our installed Python.
-    python -c "import os; print(os.path.realpath('$1'))"
+    python3 -c "import os; print(os.path.realpath('$1'))"
 }
 
 function lex_ver {
@@ -399,13 +399,13 @@ function pip_opts {
 function get_os {
     # Report OS as given by uname
     # Use any Python that comes to hand.
-    python -c 'import platform; print(platform.uname()[0])'
+    python3 -c 'import platform; print(platform.uname()[0])'
 }
 
 function get_platform {
     # Report platform as given by uname
     # Use any Python that comes to hand.
-    python -c 'import platform; print(platform.uname()[4])'
+    python3 -c 'import platform; print(platform.uname()[4])'
 }
 
 if [ "$(get_platform)" == x86_64 ] || \

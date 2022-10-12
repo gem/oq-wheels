@@ -18,8 +18,8 @@ LATEST_3p5=3.5.4
 LATEST_3p6=3.6.8
 LATEST_3p7=3.7.9
 LATEST_3p8=3.8.10
-LATEST_3p9=3.9.9
-LATEST_3p10=3.10.1
+LATEST_3p9=3.9.13
+LATEST_3p10=3.10.7
 
 
 function check_python {
@@ -427,12 +427,14 @@ function get_macpython_environment {
 }
 
 function install_delocate {
+	env
     check_pip
     $PIP_CMD install delocate
 }
 
 function repair_wheelhouse {
-	PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+	which pip
+	which pip3
 	#DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib"
 	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:${PROJ_DIR}lib"
 	echo "run env to check environment"
@@ -441,6 +443,7 @@ function repair_wheelhouse {
     install_delocate
 	echo "after install delocate run env to check environment"
 	env
+	which delocate-listdeps
     #DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib" delocate-wheel $wheelhouse/*.whl # copies library dependencies into wheel
 	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib" delocate-listdeps $wheelhouse/*.whl # copies library dependencies into wheel
 	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib" delocate-wheel -v $wheelhouse/*.whl # copies library dependencies into wheel

@@ -7,8 +7,6 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 fi
 
 echo "::group::Get code of project: $REPO_DIR"
-  PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-  python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh
   if [[ "$REPO_DIR" == "Fiona" ]]; then

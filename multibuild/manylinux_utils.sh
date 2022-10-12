@@ -6,7 +6,7 @@ source $MULTIBUILD_DIR/common_utils.sh
 
 function get_platform {
     # Report platform as given by uname
-    python -c 'import platform; print(platform.uname()[4])'
+    python3 -c 'import platform; print(platform.uname()[4])'
 }
 
 function repair_wheelhouse {

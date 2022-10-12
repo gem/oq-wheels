@@ -109,5 +109,5 @@ cmd_notexit good_cmd || ingest
     exit 1
 
 # Crudest possible check for get_distutils_platform
-expected=$(python -c "import distutils.util as du; print(du.get_platform())")
+expected=$(python3 -c "import distutils.util as du; print(du.get_platform())")
 [ "$(get_distutils_platform)" == "$expected" ] || ingest "bad distutils platform"
