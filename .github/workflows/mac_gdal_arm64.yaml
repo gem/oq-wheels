@@ -31,13 +31,10 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Setup Python and cmake
+      - name: Setup cmake
         run: |
           brew install cmake
-          python3 -c "import sys; print(sys.version)" 
-      - name: Get Library
+      - name: Get code of gdal
         env:
           REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
