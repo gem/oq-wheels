@@ -39,11 +39,9 @@ jobs:
         run: |
           brew install python@${MB_PYTHON_VERSION}
           brew install cmake
-          PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-          python -c "import sys; print(sys.version)" 
-          python${MB_PYTHON_VERSION} -c "import sys; print(sys.version)" 
           #setup venv to use for action
           python${MB_PYTHON_VERSION} -m venv ~/openquake
+          python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
       - name: Get Library
         env:
           REPO_DIR: Fiona
@@ -56,10 +54,7 @@ jobs:
             #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             source ~/openquake/bin/activate
-            echo "check if venv work"
-            which pip3
-            which pip
-            which python
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             bash -x .github/workflows/build.sh
             deactivate
       - name: Build Wheel of Fiona
@@ -68,16 +63,14 @@ jobs:
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 1.8.21
-          PIP_CMD: pip
-          PYTHON_EXE: python
+          BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
+          TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
+          PIP_CMD: pip3
+          PYTHON_EXE: python3
         run: |
             #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             source ~/openquake/bin/activate
-            echo "check if venv work also on Build"
-            which pip3
-            which pip
-            which python
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v2
         with:
