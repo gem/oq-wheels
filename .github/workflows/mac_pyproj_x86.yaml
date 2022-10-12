@@ -1,5 +1,5 @@
 ---
-name: pyproj Arm64
+name: MacOS pyproj x86_64
 
 on: [pull_request, workflow_dispatch]
 

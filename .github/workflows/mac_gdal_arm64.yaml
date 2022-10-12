@@ -1,5 +1,5 @@
 ---
-name: GDAL Arm64
+name: MacOS GDAL Arm64
 
 on: [pull_request, workflow_dispatch]
 
