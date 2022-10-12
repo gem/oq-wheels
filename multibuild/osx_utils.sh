@@ -434,12 +434,12 @@ function install_delocate {
 function repair_wheelhouse {
 	PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
 	#DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib"
-	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIR/lib"
+	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib"
     local wheelhouse=$1
 	echo "+++++++ LDFLAGS: ${LDFLAGS} "
     install_delocate
     #DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib" delocate-wheel $wheelhouse/*.whl # copies library dependencies into wheel
-    delocate-listdeps -v $wheelhouse/*.whl # copies library dependencies into wheel
+    delocate-listdeps $wheelhouse/*.whl # copies library dependencies into wheel
     delocate-wheel -v $wheelhouse/*.whl # copies library dependencies into wheel
 }
 
