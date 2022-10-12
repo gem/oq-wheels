@@ -25,6 +25,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
+      BUILD_DEPENDS: "cython wheel"
+      TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
