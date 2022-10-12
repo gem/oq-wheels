@@ -18,7 +18,7 @@ export GDAL_CONFIG=/usr/local/bin/gdal-config
 export PACKAGE_DATA=1
 #from PROJ 9.x
 export PROJ_DIR=/usr/local/
-export PROJ_DATA=${PROJ_DIR}/share/proj
+export PROJ_DATA=${PROJ_DIR}share/proj
 export PROJ_WHEEL=true
 export PROJ_NETWORK=ON
 export SETUPTOOLS_USE_DISTUTILS=stdlib
