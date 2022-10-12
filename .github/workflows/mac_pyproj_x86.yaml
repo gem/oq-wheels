@@ -39,7 +39,7 @@ jobs:
           brew install cmake
           #setup venv to use for action
           python${MB_PYTHON_VERSION} -m venv ~/openquake
-          python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+          python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
       - name: Get code of pyproj
         env:
           REPO_DIR: pyproj
@@ -52,7 +52,7 @@ jobs:
             #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             source ~/openquake/bin/activate
-            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             bash -x .github/workflows/build.sh
             deactivate
       - name: Build Wheel of pyproj
