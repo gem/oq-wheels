@@ -71,7 +71,7 @@ jobs:
         run: |
             #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            source ~/openquake/bin/activate
+            #source ~/openquake/bin/activate
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v2
         with:

@@ -353,8 +353,15 @@ function build_wheel_cmd {
         $cmd install $(pip_opts) $BUILD_DEPENDS
     fi
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
+	echo "print value of cmd and repo_dir"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$cmd"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$repo_dir"
 	pwd
 	ls -lrt
+	echo "cd $repo_dir"
+	echo "command: $cmd and $wheelhouse"
     (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
     repair_wheelhouse $wheelhouse
 }
