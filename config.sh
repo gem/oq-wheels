@@ -346,12 +346,25 @@ function build_wheel_cmd {
 	echo "$cmd"
 	echo "+++++++++++++++++++++++++++++++"
 	echo "$repo_dir"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "local wheelhouse"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$wheelhouse"
+	echo "+++++++++++++++++++++++++++++++"
+	echo "$wheelhouse"
+	sleep 5
+	echo "pause"
     start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
     stop_spinner
+	sleep 5
+    echo " pip3 install $(pip_opts) $BUILD_DEPENDS"
+	echo " pause"
+	which pip3
     if [ -n "$BUILD_DEPENDS" ]; then
-        $cmd install $(pip_opts) $BUILD_DEPENDS
+        pip3 install $(pip_opts) $BUILD_DEPENDS
     fi
+	sleep 5
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
 	echo "print value of cmd and repo_dir"
 	echo "+++++++++++++++++++++++++++++++"

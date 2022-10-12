@@ -9,6 +9,8 @@ echo "::group::Build wheel"
   python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
   echo $PIP_CMD
   echo $PYTHON_EXE
+  echo $REPO_DIR
+  echo $PLAT
   build_wheel $REPO_DIR $PLAT
   ls -l "${GITHUB_WORKSPACE}/${WHEEL_SDIR}/"
 echo "::endgroup::"
