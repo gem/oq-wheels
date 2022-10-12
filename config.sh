@@ -363,6 +363,5 @@ function build_wheel_cmd {
     else  # manylinux
         /opt/python/cp37-cp37m/bin/pip install -I "git+https://github.com/sgillies/auditwheel.git#egg=auditwheel"
     fi
-	echo"------------LDFLAGS: ${LDFLAGS}"
     repair_wheelhouse $wheelhouse
 }
