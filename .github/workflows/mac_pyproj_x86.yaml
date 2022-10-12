@@ -1,7 +1,7 @@
 ---
 name: MacOS pyproj x86_64
 
-on: [pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 env:
   REPO_DIR: pyproj
@@ -27,46 +27,26 @@ jobs:
       MB_ML_VER: "2014"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
-      PIP_CMD: pip3
-      PYTHON_EXE: python3
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Setup Python and cmake
+      - name: Setup cmake
         run: |
-          brew install python@${MB_PYTHON_VERSION}
           brew install cmake
-          #setup venv to use for action
-          python${MB_PYTHON_VERSION} -m venv ~/openquake
-          python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
       - name: Get code of pyproj
         env:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.4.0
-          PIP_CMD: pip3
-          PYTHON_EXE: python3
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            source ~/openquake/bin/activate
-            python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             bash -x .github/workflows/build.sh
-            deactivate
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.4.0
-          PIP_CMD: pip3
-          PYTHON_EXE: python3
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            source ~/openquake/bin/activate
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v2
         with:
