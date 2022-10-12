@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ARM64" ]
-        python: [ "3.9" ]
+        python: [ "3.9", "3.10" ]
         platform: [ "arm64"]
         macos-target: [ "11" ]
         os-name: ["osx"]
