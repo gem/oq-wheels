@@ -12,7 +12,7 @@ echo "::group::Get code of project: $REPO_DIR"
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh
   if [[ "$REPO_DIR" == "Fiona" ]]; then
-	  git https://github.com/Toblerity/Fiona.git
+	  git clone https://github.com/Toblerity/Fiona.git
 	  cd Fiona
 	  git checkout ${BUILD_COMMIT}
   fi
@@ -22,11 +22,9 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git checkout ${BUILD_COMMIT}
   fi
   if [[ "$REPO_DIR" == "gdal" ]]; then
-      pip3 download GDAL==${BUILD_COMMIT}
-      tar -xvzf GDAL-${BUILD_COMMIT}.tar.gz
-      mv GDAL-${BUILD_COMMIT} gdal
-  fi
-  if [[ "$REPO_DIR" == "Fiona" ]]; then
-     clean_code $REPO_DIR $BUILD_COMMIT
+	  git clone https://github.com/OSGeo/gdal.git
+	  cd gdal
+	  git checkout ${BUILD_COMMIT}
+	  ls gdal/swig/python
   fi
 echo "::endgroup::"

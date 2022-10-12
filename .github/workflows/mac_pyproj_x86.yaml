@@ -1,0 +1,74 @@
+---
+name: pyproj Arm64
+
+on: [pull_request, workflow_dispatch]
+
+env:
+  REPO_DIR: pyproj
+  WHEEL_SDIR: wheelhouse
+  SETUPTOOLS_USE_DISTUTILS: stdlib
+
+jobs:
+  build:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "macos-12" ]
+        python: [ "3.9" ]
+        platform: [ "x86_64"]
+        macos-target: [ "11" ]
+        os-name: ["osx"]
+    env:
+      BUILD_COMMIT: 3.4.0
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+      PIP_CMD: pip3
+      PYTHON_EXE: python3
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Python and cmake
+        run: |
+          brew install python@${MB_PYTHON_VERSION}
+          brew install cmake
+          PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+          python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+      - name: Get code of pyproj
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.0
+          PIP_CMD: pip
+          PYTHON_EXE: python
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip3
+            bash -x .github/workflows/build.sh
+      - name: Build Wheel of pyproj 
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.0
+          BUILD_DEPENDS: "cython oldest-supported-numpy pandas xarray numpy==1.23.3"
+          TEST_DEPENDS: "cython pytest oldest-supported-numpy pandas xarray"
+          PIP_CMD: pip
+          PYTHON_EXE: python
+        run: |
+            PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
+            python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            which pip
+            which python
+            bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: wheels
+          path: wheelhouse/*.whl

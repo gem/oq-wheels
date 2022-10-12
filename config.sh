@@ -93,7 +93,7 @@ function build_proj {
     if [ -e proj-stamp ]; then return; fi
     build_sqlite
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
-    cd proj-${PROJ_VERSION}
+	(cd proj-${PROJ_VERSION}
     mkdir build
 	cd build
 	cmake .. \
@@ -107,9 +107,10 @@ function build_proj {
     -DBUILD_GIE:BOOL=OFF \
     -DBUILD_GMOCK:BOOL=OFF \
     -DBUILD_PROJINFO:BOOL=OFF \
+	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
     -DBUILD_TESTING:BOOL=OFF 
     cmake --build . -j4
-    sudo cmake --install .
+	sudo cmake --install .)
 	#
     touch proj-stamp
 }
@@ -137,8 +138,7 @@ function build_expat {
     #        && make -j4 \
     #        && sudo make install)
     #fi
-	# curl -o expat.tar.gz -L https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-2.4.9.tar.gz
-    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-${EXPAT_VERSION}.tar.bz2
+    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-${EXPAT_VERSION}.tar.bz2
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -229,9 +229,7 @@ function build_gdal {
             --with-proj=${PROJ_DIR} \
             --with-sqlite3=${BUILD_PREFIX} \
             --with-threads \
-            --without-bsb \
             --without-cfitsio \
-            --without-dwgdirect \
             --without-ecw \
             --without-fme \
             --without-freexl \
@@ -244,7 +242,6 @@ function build_gdal {
             --without-kakadu \
             --without-libgrass \
             --without-libkml \
-            --without-mrf \
             --without-mrsid \
             --without-mysql \
             --without-odbc \
@@ -253,10 +250,8 @@ function build_gdal {
             --without-pcraster \
             --without-perl \
             --without-pg \
-            --without-php \
             --without-python \
             --without-qhull \
-            --without-sde \
             --without-xerces \
             --without-xml2 \
         && make -j4 \
@@ -301,21 +296,25 @@ function pre_build {
     #suppress build_proj
 	env
 	#
-    build_proj
-    build_expat
+    suppress build_proj
+    suppress build_expat
     suppress build_geos
 
     if [ -n "$IS_OSX" ]; then
-        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+       if [[ "$REPO_DIR" == "pyproj" ]]; then
+         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+       fi
     fi
 
-    build_gdal
+    suppress build_gdal
 }
 
 
 function run_tests {
     unset GDAL_DATA
     unset PROJ_LIB
+    unset PROJ_DATA
     if [ -n "$IS_OSX" ]; then
         export PATH=$PATH:${BUILD_PREFIX}/bin
         export LC_ALL=en_US.UTF-8
@@ -356,6 +355,8 @@ function build_wheel_cmd {
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
+	pwd
+	ls -lrt
     (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
     if [ -n "$IS_OSX" ]; then
 	:
