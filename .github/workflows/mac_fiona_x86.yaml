@@ -61,6 +61,7 @@ jobs:
             which pip
             which python
             bash -x .github/workflows/build.sh
+            deactivate
       - name: Build Wheel of Fiona
         env:
           REPO_DIR: Fiona
@@ -72,6 +73,9 @@ jobs:
         run: |
             #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
+            source ~/openquake/bin/activate
+            echo "check if venv work also on Build"
+            which pip3
             which pip
             which python
             bash -x .github/workflows/wheel.sh
