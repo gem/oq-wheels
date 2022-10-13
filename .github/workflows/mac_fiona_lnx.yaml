@@ -32,14 +32,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Setup Python and cmake
-        run: |
-          #brew install python@${MB_PYTHON_VERSION}
-          brew install cmake
-          #setup venv to use for action
-          #python${MB_PYTHON_VERSION} -m venv ~/openquake
-          echo "check python3"
-          python3 -c "import sys; print(sys.version)" 
       - name: Get Library
         env:
           REPO_DIR: Fiona
