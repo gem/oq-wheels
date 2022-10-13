@@ -58,7 +58,6 @@ jobs:
           name: wheels
           path: wheelhouse/*.whl
 
-jobs:
   build_Fiona:
     name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
@@ -112,7 +111,6 @@ jobs:
           name: wheels
           path: wheelhouse/*.whl
 
-jobs:
   build_GDAL:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
