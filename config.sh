@@ -165,8 +165,9 @@ function build_openssl {
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
         && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX \
-        && make -j4 \
-        && if [ -n "$IS_OSX" ]; then sudo make install; else sudo make install; fi)
+        && make -j4
+        echo "check sudo for : ${IS_OSX}"
+		(if [ -n "$IS_OSX" ]; then sudo make install; else sudo make install; fi))
     touch openssl-stamp
 }
 
@@ -268,12 +269,8 @@ function pre_build {
 
     suppress build_nghttp2
 
-	# Must add if on PLAT
-    #if [ -n "$IS_OSX" ]; then
-    #    rm /usr/local/lib/libpng*
-    #fi
 
-    suppress build_openssl
+    build_openssl
 
 
     # Remove previously installed curl.
