@@ -1,7 +1,7 @@
 ---
 name: MacOS Fiona x86_64
 
-on: [push, pull_request, workflow_dispatch]
+on: [pull_request, workflow_dispatch]
 
 env:
   REPO_DIR: Fiona
@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "macos-12" ]
-        python: [ "3.9" ]
+        python: [ "3.8", "3.9", "3.10" ]
         platform: [ "x86_64"]
         macos-target: [ "11" ]
         os-name: ["osx"]
@@ -67,7 +67,7 @@ jobs:
             #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             #source ~/openquake/bin/activate
             bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: wheelhouse/*.whl

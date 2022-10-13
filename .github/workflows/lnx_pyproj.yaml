@@ -1,7 +1,7 @@
 ---
-name: MacOS pyproj Arm64
+name: Linux pyproj x86_64
 
-on: [pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 env:
   REPO_DIR: pyproj
@@ -15,11 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ARM64" ]
-        python: [ "3.9", "3.10" ]
-        platform: [ "arm64"]
-        macos-target: [ "11" ]
-        os-name: ["osx"]
+        os: [ "ubuntu-22.04" ]
+        python: [ "3.8", "3.9", "3.10" ]
+        platform: [ "x86_64"]
+        os-name: ["jammy"]
     env:
       BUILD_COMMIT: 3.4.0
       PLAT: "${{ matrix.platform }}"
@@ -31,24 +30,28 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v3
-      - name: Setup cmake
-        run: |
-          brew install cmake
-      - name: Get code of pyproj
+        with:
+          submodules: true
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: get code of pyproj
         env:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.4.0
         run: |
+            echo $PATH
             bash -x .github/workflows/build.sh
-      - name: Build Wheel of pyproj 
+      - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.4.0
         run: |
+            sudo apt install python3-virtualenv
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
