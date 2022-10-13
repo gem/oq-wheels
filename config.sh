@@ -265,17 +265,11 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
-
     suppress build_nghttp2
-
-
-    build_openssl
-
-
+    suppress build_openssl
     # Remove previously installed curl.
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
-
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     suppress build_curl
     suppress build_jpeg
@@ -286,14 +280,12 @@ function pre_build {
     suppress build_proj
     suppress build_expat
     suppress build_geos
-
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
        if [[ "$REPO_DIR" == "pyproj" ]]; then
          export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
        fi
     fi
-
     suppress build_gdal
 }
 
