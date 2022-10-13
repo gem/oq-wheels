@@ -15,10 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-20.04" ]
+        os: [ "ubuntu-22.04" ]
         python: [ "3.8", "3.9", "3.10" ]
         platform: [ "x86_64"]
-        os-name: ["focal"]
+        os-name: ["jammy"]
     env:
       BUILD_COMMIT: 1.8.21
       PLAT: "${{ matrix.platform }}"

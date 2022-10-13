@@ -54,7 +54,7 @@ function build_jsonc {
     (cd json-c-${JSONC_VERSION} \
         && cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX . \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -n "$IS_OSX" ]; then
         for lib in $(ls ${BUILD_PREFIX}/lib/libjson-c.5*.dylib); do
             sudo install_name_tool -id $lib $lib
@@ -82,7 +82,7 @@ function build_tiff {
         && (patch -u --force < ../patches/libtiff-rename-VERSION.patch || true) \
         && ./configure \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch tiff-stamp
 }
 
@@ -110,7 +110,8 @@ function build_proj {
 	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
     -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
-	sudo cmake --install .)
+	(if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
+#	sudo cmake --install .)
 	#
     touch proj-stamp
 }
@@ -122,7 +123,7 @@ function build_sqlite {
     (cd sqlite-autoconf-${SQLITE_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch sqlite-stamp
 }
 
@@ -142,7 +143,7 @@ function build_expat {
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch expat-stamp
 }
 
@@ -153,7 +154,7 @@ function build_nghttp2 {
     (cd nghttp2-${NGHTTP2_VERSION}  \
         && ./configure --enable-lib-only --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch nghttp2-stamp
 }
 
@@ -194,17 +195,9 @@ function build_gdal {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
 
-   # if [ -n "$IS_OSX" ]; then
-   #     EXPAT_PREFIX=/usr
-   #     GEOS_CONFIG="--without-geos"
-   # else
-   #     EXPAT_PREFIX=$BUILD_PREFIX
-   #     GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
-   # fi
     EXPAT_PREFIX=$BUILD_PREFIX
     GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
 
-    #    && (patch -u -p2 --force < ../patches/5740.patch || true) \
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
     (cd gdal-${GDAL_VERSION} \
         && ./configure \
@@ -255,7 +248,7 @@ function build_gdal {
             --without-xerces \
             --without-xml2 \
         && make -j4 \
-        && sudo make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -n "$IS_OSX" ]; then
         :
     else
@@ -284,7 +277,8 @@ function pre_build {
 
 
     # Remove previously installed curl.
-    sudo rm -rf /usr/local/lib/libcurl*
+    #sudo rm -rf /usr/local/lib/libcurl*
+    if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
 
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     suppress build_curl
@@ -293,9 +287,6 @@ function pre_build {
     suppress build_jsonc
     suppress build_tiff
     suppress build_sqlite
-    #suppress build_proj
-	env
-	#
     suppress build_proj
     suppress build_expat
     suppress build_geos
@@ -341,40 +332,13 @@ function build_wheel_cmd {
     local repo_dir=${2:-$REPO_DIR}
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-	echo "print value of cmd and repo_dir"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$cmd"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$repo_dir"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "local wheelhouse"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$wheelhouse"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$wheelhouse"
-	sleep 5
-	echo "pause"
     start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
     stop_spinner
-	sleep 5
-    echo " pip3 install $(pip_opts) $BUILD_DEPENDS"
-	echo " pause"
-	which pip3
     if [ -n "$BUILD_DEPENDS" ]; then
         pip3 install $(pip_opts) $BUILD_DEPENDS
     fi
-	sleep 5
     # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
-	echo "print value of cmd and repo_dir"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$cmd"
-	echo "+++++++++++++++++++++++++++++++"
-	echo "$repo_dir"
-	pwd
-	ls -lrt
-	echo "cd $repo_dir"
-	echo "command: $cmd and $wheelhouse"
     (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
     repair_wheelhouse $wheelhouse
 }
