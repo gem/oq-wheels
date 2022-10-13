@@ -57,7 +57,7 @@ jobs:
             #which pip
             #which python
             bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: wheelhouse/*.whl
