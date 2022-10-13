@@ -1,16 +1,16 @@
 ---
-name: Linux Fiona x86_64
+name: Linux pyproj x86_64
 
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  REPO_DIR: Fiona
+  REPO_DIR: pyproj
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
 
 jobs:
   build:
-    name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,12 +20,12 @@ jobs:
         platform: [ "x86_64"]
         os-name: ["jammy"]
     env:
-      BUILD_COMMIT: 1.8.21
+      BUILD_COMMIT: 3.4.0
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
-      TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
+      BUILD_DEPENDS: "cython wheel"
+      TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -35,25 +35,22 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
-      - name: get code of Fiona
+      - name: get code of pyproj
         env:
-          REPO_DIR: Fiona
+          REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 3.4.0
         run: |
             echo $PATH
             bash -x .github/workflows/build.sh
-      - name: Build Wheel of Fiona
+      - name: Build Wheel of pyproj
         env:
-          REPO_DIR: Fiona
+          REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
-          BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
-          TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
+          BUILD_COMMIT: 3.4.0
         run: |
-            echo $PATH
             sudo apt install python3-virtualenv
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3

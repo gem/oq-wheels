@@ -1,7 +1,7 @@
 ---
 name: MacOS pyproj x86_64
 
-on: [pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 env:
   REPO_DIR: pyproj
