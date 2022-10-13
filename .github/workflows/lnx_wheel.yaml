@@ -161,9 +161,7 @@ jobs:
           path: wheelhouse/*.whl
 
   test_wheel:
-    needs: build_GDAL
-    needs: build_pyproj
-    needs: build_Fiona
+    needs: [build_GDAL, build_pyproj, build_Fiona]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
