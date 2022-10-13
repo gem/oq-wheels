@@ -42,12 +42,7 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 1.8.21
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            #source ~/openquake/bin/activate
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
             bash -x .github/workflows/build.sh
-            #deactivate
       - name: Build Wheel of Fiona
         env:
           REPO_DIR: Fiona
@@ -57,9 +52,8 @@ jobs:
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            #source ~/openquake/bin/activate
+            apt install python3-virtualenv
+            echo $PATH
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
