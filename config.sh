@@ -183,7 +183,7 @@ function build_curl {
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
         && make -j4 \
-        && if [ -n "$IS_OSX" ]; then sudo make install; else sudo make install; fi)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch curl-stamp
 }
 
