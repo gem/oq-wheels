@@ -1,5 +1,5 @@
 ---
-name: MacOS Fiona x86_64
+name: Linux Fiona x86_64
 
 on: [push, pull_request, workflow_dispatch]
 
