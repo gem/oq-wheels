@@ -22,7 +22,7 @@ ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
 echo "env before source"
 env
 ls -lrt ${ENV_VARS_PATH}
-source ${ENV_VARS_PATH}
+bash -x ${ENV_VARS_PATH}
 echo "env after source"
 env
 # Always pull in common and library builder utils
