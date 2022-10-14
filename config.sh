@@ -325,6 +325,7 @@ function build_wheel_cmd {
     start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
     stop_spinner
+	echo "print PROJ_DIR before to build: ${PROJ_DIR}"
     if [ -n "$BUILD_DEPENDS" ]; then
         pip3 install $(pip_opts) $BUILD_DEPENDS
     fi
