@@ -331,6 +331,8 @@ function build_wheel_cmd {
 	echo "list files and folder"
 	pwd
 	ls -lrt 
+	echo "try to run proj"
+	proj 
     if [ -n "$BUILD_DEPENDS" ]; then
         pip3 install $(pip_opts) $BUILD_DEPENDS
     fi
