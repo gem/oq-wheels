@@ -19,6 +19,11 @@ CONFIG_PATH=${CONFIG_PATH:-config.sh}
 
 # Path is relative to repository from which we ran
 ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
+
+echo "print variable"
+echo "if [[ "$REPO_DIR" == "pyproj" ]]; then "
+echo " if [  "$IS_OSX" ]; then "
+#
 echo "env before source"
 env
 ls -lrt ${ENV_VARS_PATH}
