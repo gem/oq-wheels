@@ -20,6 +20,8 @@ CONFIG_PATH=${CONFIG_PATH:-config.sh}
 # Path is relative to repository from which we ran
 ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
 echo "TEST ENV_VARS_PATH ${ENV_VARS_PATH}"
+ls -lrt
+ls -lrt ${ENV_VARS_PATH}
 
 # Always pull in common and library builder utils
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
