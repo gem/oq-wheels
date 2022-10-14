@@ -25,7 +25,7 @@ export SETUPTOOLS_USE_DISTUTILS=stdlib
 if [[ "$REPO_DIR" == "pyproj" ]]; then
  export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/pyproj/proj_dir
  export PROJ_DATA=${PROJ_DIR}/share/proj
- if [  "$IS_OSX" ]; then 
+ if [ -z "$IS_OSX" ]; then 
 	 echo "PROJ_DIR on ML2014  "
      export PROJ_DIR=/io/pyproj/pyproj/proj_dir
      export PROJ_DATA=${PROJ_DIR}/share/proj
