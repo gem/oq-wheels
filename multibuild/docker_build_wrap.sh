@@ -21,15 +21,10 @@ CONFIG_PATH=${CONFIG_PATH:-config.sh}
 ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
 
 echo "print variable"
-echo "if [[ "$REPO_DIR" == "pyproj" ]]; then "
-echo " if [  "$IS_OSX" ]; then "
+env
+echo "PROJ_DIR: ${PROJ_DIR}"
+echo "PROJ_DATA: ${PROJ_DATA}"
 #
-echo "env before source"
-env
-ls -lrt ${ENV_VARS_PATH}
-bash -x ${ENV_VARS_PATH}
-echo "env after source"
-env
 # Always pull in common and library builder utils
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 # These routines also source common_utils.sh
