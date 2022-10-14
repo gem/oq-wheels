@@ -81,6 +81,7 @@ function build_multilinux {
     docker_image=$(eval echo "$docker_image")
     retry docker pull $docker_image
     docker run --rm \
+        --privileged \
         -e BUILD_COMMANDS="$build_cmds" \
         -e PYTHON_VERSION="$MB_PYTHON_VERSION" \
         -e MB_PYTHON_VERSION="$MB_PYTHON_VERSION" \
