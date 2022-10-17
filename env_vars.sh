@@ -29,8 +29,5 @@ if [[ "$REPO_DIR" == "pyproj" ]]; then
 	 echo "PROJ_DIR on ML2014  "
      export PROJ_DIR=/io/pyproj/pyproj/proj_dir
      export PROJ_DATA=${PROJ_DIR}/share/proj
-	 echo "print PROJ_DIR: ${PROJ_DIR}"
-	 echo "print PROJ_DATA: ${PROJ_DATA}"
-	 echo $LD_LIBRARY_PATH
  fi
 fi

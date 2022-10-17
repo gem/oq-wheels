@@ -277,23 +277,17 @@ function pre_build {
         echo $LD_LIBRARY_PATH
 		export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
-    build_nghttp2
-    build_openssl
+    suppress build_nghttp2
+    suppress build_openssl
     # Remove previously installed curl.
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-	build_zlib
-    build_curl
-    build_sqlite
-    build_tiff
-    build_proj
-    if [ -n "$IS_OSX" ]; then
-       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
-       if [[ "$REPO_DIR" == "pyproj" ]]; then
-         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
-       fi
-    fi
+	suppress build_zlib
+    suppress build_curl
+    suppress build_sqlite
+    suppress build_tiff
+    suppress build_proj
     if [[ "$REPO_DIR" != "pyproj" ]]; then
       suppress build_jpeg
       suppress build_libpng
@@ -301,6 +295,12 @@ function pre_build {
       suppress build_expat
       suppress build_geos
       suppress build_gdal
+    fi
+    if [ -n "$IS_OSX" ]; then
+       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+       if [[ "$REPO_DIR" == "pyproj" ]]; then
+         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+       fi
     fi
 }
 
