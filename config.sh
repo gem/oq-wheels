@@ -114,7 +114,7 @@ function build_proj {
 #	sudo cmake --install .)
 	#
     if [[ "$REPO_DIR" == "pyproj" ]]; then
-		$PROJ_DIR/pyproj -v
+		$PROJ_DIR/bin/pyproj -v
     fi
     touch proj-stamp
 }
