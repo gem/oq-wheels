@@ -276,7 +276,7 @@ function pre_build {
         echo "print PROJ_DATA: ${PROJ_DATA}"
         echo $LD_LIBRARY_PATH
 		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
-		export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
         echo $LD_LIBRARY_PATH
     fi
     build_nghttp2
