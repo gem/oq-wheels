@@ -59,6 +59,15 @@ fi
 # `common_utils.sh` via `manylinux_utils.sh`.
 source "$CONFIG_PATH"
 
+#
+echo "DEBUG: print variable"
+env
+echo "PROJ_DIR: ${PROJ_DIR}"
+echo "PROJ_DATA: ${PROJ_DATA}"
+#
+echo "ADD PROJ_DIR to $PATH"
+export PATH=$PROJ_DIR:$PATH
+echo "PATH with export ${PATH}"
 echo "PATH before of BUILD_COMMANDS: ${PATH}"
 #
 $BUILD_COMMANDS
