@@ -289,6 +289,7 @@ function pre_build {
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     build_curl
     build_sqlite
+    build_tiff
     build_proj
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
@@ -300,7 +301,6 @@ function pre_build {
       suppress build_jpeg
       suppress build_libpng
       suppress build_jsonc
-      suppress build_tiff
       suppress build_expat
       suppress build_geos
       suppress build_gdal
