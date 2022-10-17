@@ -64,6 +64,8 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.8", "3.9", "3.10" ]
+    env:
+      BRANCH_TEST: ae-fiona
 
     steps:
     - name: Set up Python  ${{ matrix.python-version }}
@@ -89,7 +91,9 @@ jobs:
         pip install install pytest
         cd $HOME
         git clone https://github.com/gem/oq-engine.git
-        cd oq-engine && pip install -e .
+        cd oq-engine && git checkout ${BRANCH_TEST}
+        git status
+        pip install -e .
         cd $HOME/oq-engine
         cd ${{steps.download.outputs.download-path}}
         pwd
