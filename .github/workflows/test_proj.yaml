@@ -1,0 +1,111 @@
+---
+name: Linux short x86_64
+
+on: [pull_request, workflow_dispatch]
+
+env:
+  WHEEL_SDIR: wheelhouse
+  SETUPTOOLS_USE_DISTUTILS: stdlib
+
+jobs:
+  build_pyproj:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-22.04" ]
+        python: [ "3.8", "3.9", "3.10" ]
+        platform: [ "x86_64"]
+        os-name: ["jammy"]
+    env:
+      REPO_DIR: pyproj
+      BUILD_COMMIT: 3.4.0
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "cython wheel"
+      TEST_DEPENDS: "cython"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: get code of pyproj
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.0
+        run: |
+            echo $PATH
+            bash -x .github/workflows/build.sh
+      - name: Build Wheel of pyproj
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.4.0
+        run: |
+            sudo apt install python3-virtualenv
+            bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheelhouse/
+
+  test_wheel:
+    needs: [build_pyproj]
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10" ]
+    env:
+      BRANCH_TEST: ae-fiona
+
+    steps:
+    - name: Set up Python  ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: download artifact
+      uses: actions/download-artifact@v3
+      id: download
+      with:
+        name: wheels
+        path: wheelhouse/
+    - name: 'Echo artifact download path'
+      run: echo ${{steps.download.outputs.download-path}}
+    - name: Test wheels with python ${{ matrix.python-version }}
+      shell: bash
+      run: |
+        set -x
+        echo "engine installation to test wheel"
+        python3 -m venv $HOME/openquake
+        source $HOME/openquake/bin/activate
+        pip install -U pip wheel setuptools
+        pip install install pytest
+        cd $HOME
+        git clone https://github.com/gem/oq-engine.git
+        cd oq-engine && git checkout ${BRANCH_TEST}
+        git status
+        pip install -e .
+        cd $HOME/oq-engine
+        cd ${{steps.download.outputs.download-path}}
+        pwd
+        ls -lrt
+        wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
+        echo ${wheel}
+        pip install --force-reinstall ${wheel}
+        cd $HOME/oq-engine
+        oq dbserver start
+        sleep 5
+        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
+        pytest -vsx --color=yes openquake/sep/tests/test_utils.py
+        pytest -vsx --color=yes openquake/sep
+        pytest -vsx --color=yes openquake/calculators
+        oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
