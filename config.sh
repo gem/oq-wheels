@@ -114,6 +114,7 @@ function build_proj {
 #	sudo cmake --install .)
 	#
     if [[ "$REPO_DIR" == "pyproj" ]]; then
+		find / -name libtiff.so.* -ls
 		$PROJ_DIR/bin/proj -v
     fi
     touch proj-stamp
@@ -278,6 +279,7 @@ function pre_build {
 		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
         echo $LD_LIBRARY_PATH
+		export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
     build_nghttp2
     build_openssl
@@ -286,10 +288,6 @@ function pre_build {
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     build_curl
-    build_jpeg
-    build_libpng
-    build_jsonc
-    build_tiff
     build_sqlite
     build_proj
     if [ -n "$IS_OSX" ]; then
@@ -299,6 +297,10 @@ function pre_build {
        fi
     fi
     if [[ "$REPO_DIR" != "pyproj" ]]; then
+      suppress build_jpeg
+      suppress build_libpng
+      suppress build_jsonc
+      suppress build_tiff
       suppress build_expat
       suppress build_geos
       suppress build_gdal
