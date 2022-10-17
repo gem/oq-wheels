@@ -287,6 +287,7 @@ function pre_build {
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
+	build_zlib
     build_curl
     build_sqlite
     build_tiff
