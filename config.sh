@@ -268,6 +268,17 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
+    if [ -z "$IS_OSX" ]; then 
+        echo "PROJ_DIR on ML2014  "
+        export PROJ_DIR=/io/pyproj/pyproj/proj_dir
+        export PROJ_DATA=${PROJ_DIR}/share/proj
+        echo "print PROJ_DIR: ${PROJ_DIR}"
+        echo "print PROJ_DATA: ${PROJ_DATA}"
+        echo $LD_LIBRARY_PATH
+		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
+		export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+        echo $LD_LIBRARY_PATH
+    fi
     build_nghttp2
     build_openssl
     # Remove previously installed curl.
