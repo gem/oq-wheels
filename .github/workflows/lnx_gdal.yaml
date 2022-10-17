@@ -43,7 +43,7 @@ jobs:
           BUILD_COMMIT: v3.4.3
         run: |
             bash -x .github/workflows/build.sh
-      - name: Build Wheel of Fiona
+      - name: Build Wheel of GDAL
         env:
           REPO_DIR: gdal/gdal/swig/python
           WHEEL_SDIR: wheelhouse
