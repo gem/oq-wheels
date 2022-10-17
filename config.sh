@@ -71,10 +71,10 @@ function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
-	# Error: Failed to download resource "libzip"
+    # Error: Failed to download resource "libzip"
     # Download failed:
-	# Homebrew-installed `curl` is not installed for: https://libzip.org/download/libzip-1.9.2.tar.xz
-	if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
+    # Homebrew-installed `curl` is not installed for: https://libzip.org/download/libzip-1.9.2.tar.xz
+    if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
     ensure_xz
     fetch_unpack https://download.osgeo.org/libtiff/tiff-${TIFF_VERSION}.tar.gz
     (cd tiff-${TIFF_VERSION} \
@@ -95,9 +95,9 @@ function build_proj {
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
 	(cd proj-${PROJ_VERSION}
     mkdir build
-	cd build
-	cmake .. \
-	-DCMAKE_INSTALL_PREFIX=$PROJ_DIR \
+    cd build
+    cmake .. \
+    -DCMAKE_INSTALL_PREFIX=$PROJ_DIR \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
@@ -107,12 +107,10 @@ function build_proj {
     -DBUILD_GIE:BOOL=OFF \
     -DBUILD_GMOCK:BOOL=OFF \
     -DBUILD_PROJINFO:BOOL=OFF \
-	-DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
+    -DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
     -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
-	(if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
-#	sudo cmake --install .)
-	#
+    (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     touch proj-stamp
 }
 
@@ -191,7 +189,6 @@ function build_curl {
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
 
-
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
 
@@ -269,10 +266,10 @@ function pre_build {
         echo "print PROJ_DIR: ${PROJ_DIR}"
         echo "print PROJ_DATA: ${PROJ_DATA}"
         echo $LD_LIBRARY_PATH
-		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
-		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+	echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
         echo $LD_LIBRARY_PATH
-		export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
+	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
     suppress build_nghttp2
     suppress build_openssl
@@ -280,7 +277,7 @@ function pre_build {
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-	suppress build_zlib
+    suppress build_zlib
     suppress build_curl
     suppress build_sqlite
     suppress build_tiff
