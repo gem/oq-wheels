@@ -114,6 +114,7 @@ function build_proj {
 #	sudo cmake --install .)
 	#
     if [[ "$REPO_DIR" == "pyproj" ]]; then
+		find / -name libtiff.so.5 -ls
 		$PROJ_DIR/bin/proj -v
     fi
     touch proj-stamp
@@ -268,7 +269,7 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
-    if [ -z "$IS_OSX" ]; then 
+    if [ -z "$IS_OSX" ]; then
         echo "PROJ_DIR on ML2014  "
         export PROJ_DIR=/io/pyproj/pyproj/proj_dir
         export PROJ_DATA=${PROJ_DIR}/share/proj
@@ -279,7 +280,9 @@ function pre_build {
 		echo $PREFIX
 		#echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
 		#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-
+        export LIBRARY_PATH_BACKUP="$LIBRARY_PATH"
+        export LIBRARY_PATH="$BUILD_PREFIX/lib64:$LIBRARY_PATH_BACKUP"
+        export PATH="$BUILD_PREFIX/bin:$PATH"
     fi
     build_nghttp2
     build_openssl

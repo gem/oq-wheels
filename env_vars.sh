@@ -31,7 +31,5 @@ if [[ "$REPO_DIR" == "pyproj" ]]; then
      export PROJ_DATA=${PROJ_DIR}/share/proj
 	 echo "print PROJ_DIR: ${PROJ_DIR}"
 	 echo "print PROJ_DATA: ${PROJ_DATA}"
-	 echo $LD_LIBRARY_PATH
-	 BUILD_PREFIX=/usr/local/lib64
  fi
 fi
