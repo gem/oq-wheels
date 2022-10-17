@@ -265,28 +265,43 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
+    if [ -z "$IS_OSX" ]; then 
+        echo "PROJ_DIR on ML2014  "
+        export PROJ_DIR=/io/pyproj/pyproj/proj_dir
+        export PROJ_DATA=${PROJ_DIR}/share/proj
+        echo "print PROJ_DIR: ${PROJ_DIR}"
+        echo "print PROJ_DATA: ${PROJ_DATA}"
+        echo $LD_LIBRARY_PATH
+		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+        echo $LD_LIBRARY_PATH
+		export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
+    fi
     suppress build_nghttp2
     suppress build_openssl
     # Remove previously installed curl.
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
+	suppress build_zlib
     suppress build_curl
-    suppress build_jpeg
-    suppress build_libpng
-    suppress build_jsonc
-    suppress build_tiff
     suppress build_sqlite
+    suppress build_tiff
     suppress build_proj
-    suppress build_expat
-    suppress build_geos
+    if [[ "$REPO_DIR" != "pyproj" ]]; then
+      suppress build_jpeg
+      suppress build_libpng
+      suppress build_jsonc
+      suppress build_expat
+      suppress build_geos
+      suppress build_gdal
+    fi
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
        if [[ "$REPO_DIR" == "pyproj" ]]; then
          export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
        fi
     fi
-    suppress build_gdal
 }
 
 

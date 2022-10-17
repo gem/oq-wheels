@@ -19,7 +19,7 @@ CONFIG_PATH=${CONFIG_PATH:-config.sh}
 
 # Path is relative to repository from which we ran
 ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
-
+#
 # Always pull in common and library builder utils
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 # These routines also source common_utils.sh
@@ -49,5 +49,5 @@ fi
 # Configuration for this package, possibly overriding `build_wheel` defined in
 # `common_utils.sh` via `manylinux_utils.sh`.
 source "$CONFIG_PATH"
-
+#
 $BUILD_COMMANDS
