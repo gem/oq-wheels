@@ -275,9 +275,11 @@ function pre_build {
         echo "print PROJ_DIR: ${PROJ_DIR}"
         echo "print PROJ_DATA: ${PROJ_DATA}"
         echo $LD_LIBRARY_PATH
-		echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
-		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-        echo $LD_LIBRARY_PATH
+        echo "SET PREFIX to /usr/local/lib64 on env-vars.sh"
+		echo $PREFIX
+		#echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
+		#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
     fi
     build_nghttp2
     build_openssl
