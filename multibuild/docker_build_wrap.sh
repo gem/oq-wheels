@@ -20,15 +20,6 @@ CONFIG_PATH=${CONFIG_PATH:-config.sh}
 # Path is relative to repository from which we ran
 ENV_VARS_PATH=${ENV_VARS_PATH:-env_vars.sh}
 #
-echo "print variable"
-env
-echo "PROJ_DIR: ${PROJ_DIR}"
-echo "PROJ_DATA: ${PROJ_DATA}"
-#
-echo "ADD PROJ_DIR to $PATH"
-export PATH=$PROJ_DIR:$PATH
-echo "PATH with export ${PATH}"
-#
 # Always pull in common and library builder utils
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 # These routines also source common_utils.sh
@@ -58,16 +49,5 @@ fi
 # Configuration for this package, possibly overriding `build_wheel` defined in
 # `common_utils.sh` via `manylinux_utils.sh`.
 source "$CONFIG_PATH"
-
-#
-echo "DEBUG: print variable"
-env
-echo "PROJ_DIR: ${PROJ_DIR}"
-echo "PROJ_DATA: ${PROJ_DATA}"
-#
-echo "ADD PROJ_DIR to $PATH"
-export PATH=$PROJ_DIR:$PATH
-echo "PATH with export ${PATH}"
-echo "PATH before of BUILD_COMMANDS: ${PATH}"
 #
 $BUILD_COMMANDS

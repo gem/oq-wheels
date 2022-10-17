@@ -113,6 +113,9 @@ function build_proj {
 	(if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
 #	sudo cmake --install .)
 	#
+    if [[ "$REPO_DIR" == "pyproj" ]]; then
+		$PROJ_DIR/pyproj -v
+    fi
     touch proj-stamp
 }
 
