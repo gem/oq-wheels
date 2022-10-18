@@ -168,6 +168,7 @@ jobs:
         python-version: [ "3.8", "3.9", "3.10" ]
     env:
       BRANCH_TEST: ae-fiona
+      PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
     - name: Set up Python  ${{ matrix.python-version }}
@@ -200,9 +201,9 @@ jobs:
         cd ${{steps.download.outputs.download-path}}
         pwd
         ls -lrt
-        wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
-        echo ${wheel}
-        pip install --force-reinstall ${wheel}
+        PYCUT=`echo "${PYTHON_VERSION//.}"`
+        ls *${PYCUT}*
+        pip install --force-reinstall *${PYCUT}*
         cd $HOME/oq-engine
         oq dbserver start
         sleep 5

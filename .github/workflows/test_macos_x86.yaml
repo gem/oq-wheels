@@ -82,7 +82,7 @@ jobs:
         run: |
           brew install cmake
           echo "check python3"
-          python3 -c "import sys; print(sys.version)" 
+          python3 -c "import sys; print(sys.version)"
       - name: Get Library
         env:
           REPO_DIR: Fiona
@@ -165,12 +165,12 @@ jobs:
         os-name: ["osx"]
     env:
       BRANCH_TEST: ae-fiona
-      PYTHON_VERSION: "${{ matrix.python-version }}"
+      PYTHON_VERSION: "${{ matrix.python }}"
     steps:
-    - name: Set up Python  ${{ matrix.python-version }}
+    - name: Set up Python  ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python }}
     - name: download artifact
       uses: actions/download-artifact@v3
       id: download
@@ -179,7 +179,7 @@ jobs:
         path: wheelhouse
     - name: 'Echo artifact download path'
       run: echo ${{steps.download.outputs.download-path}}
-    - name: Test wheels with python ${{ matrix.python-version }}
+    - name: Test wheels with python ${{ matrix.python }}
       shell: bash
       run: |
         set -x

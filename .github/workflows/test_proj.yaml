@@ -100,9 +100,6 @@ jobs:
         ls -lrt
         PYCUT=`echo "${PYTHON_VERSION//.}"`
         ls *${PYCUT}*
-        #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
-        #echo ${wheel}
-        #pip install --force-reinstall ${wheel}
         pip install --force-reinstall *${PYCUT}*
         cd $HOME/oq-engine
         oq dbserver start
