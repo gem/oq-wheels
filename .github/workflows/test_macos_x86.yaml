@@ -193,12 +193,11 @@ jobs:
         cd oq-engine && git checkout ${BRANCH_TEST}
         git status
         pip install -e .
-        cd $HOME/oq-engine
         cd ${{steps.download.outputs.download-path}}
         pwd
         ls -lrt
         PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}"`*
+        ls *${PYCUT}*
         #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
         #echo ${wheel}
         #pip install --force-reinstall ${wheel}
