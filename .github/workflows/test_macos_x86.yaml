@@ -165,7 +165,7 @@ jobs:
         os-name: ["osx"]
     env:
       BRANCH_TEST: ae-fiona
-
+      PYTHON_VERSION: "${{ matrix.python-version }}"
     steps:
     - name: Set up Python  ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -197,9 +197,12 @@ jobs:
         cd ${{steps.download.outputs.download-path}}
         pwd
         ls -lrt
-        wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
-        echo ${wheel}
-        pip install --force-reinstall ${wheel}
+        PYCUT=`echo "${PYTHON_VERSION//.}"`
+        ls *${PYCUT}"`*
+        #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
+        #echo ${wheel}
+        #pip install --force-reinstall ${wheel}
+        pip install --force-reinstall *${PYCUT}*
         cd $HOME/oq-engine
         oq dbserver start
         sleep 5
