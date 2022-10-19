@@ -263,13 +263,8 @@ function pre_build {
     #    build_new_zlib
     #fi
     if [ -z "$IS_OSX" ]; then 
-        echo "print PROJ_DIR: ${PROJ_DIR}"
-        echo "print PROJ_DATA: ${PROJ_DATA}"
-        echo $LD_LIBRARY_PATH
-	echo "ADD /usr/local/lib to LD_LIBRARY_PATH "
-	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-        echo $LD_LIBRARY_PATH
-	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
+    	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+    	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
     suppress build_nghttp2
     suppress build_openssl
