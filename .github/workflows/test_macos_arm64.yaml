@@ -167,46 +167,47 @@ jobs:
       BRANCH_TEST: ae-fiona
       PYTHON_VERSION: "${{ matrix.python }}"
     steps:
-    - name: Set up Python  ${{ matrix.python }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - name: download artifact
-      uses: actions/download-artifact@v3
-      id: download
-      with:
-        name: wheels
-        path: wheelhouse
-    - name: 'Echo artifact download path'
-      run: echo ${{steps.download.outputs.download-path}}
-    - name: Test wheels with python ${{ matrix.python }}
-      shell: bash
-      run: |
-        set -x
-        echo "engine installation to test wheel"
-        python3 -m venv $HOME/openquake
-        source $HOME/openquake/bin/activate
-        pip install -U pip wheel setuptools
-        pip install install pytest
-        cd $HOME
-        git clone https://github.com/gem/oq-engine.git
-        cd oq-engine && git checkout ${BRANCH_TEST}
-        git status
-        pip install -e .
-        cd ${{steps.download.outputs.download-path}}
-        pwd
-        ls -lrt
-        PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}*
-        #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
-        #echo ${wheel}
-        #pip install --force-reinstall ${wheel}
-        pip install --force-reinstall *${PYCUT}*
-        cd $HOME/oq-engine
-        oq dbserver start
-        sleep 5
-        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
-        pytest -vsx --color=yes openquake/sep/tests/test_utils.py
-        pytest -vsx --color=yes openquake/sep
-        pytest -vsx --color=yes openquake/calculators
-        oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
+      - name: Install cmake and print python version
+        run: |
+          brew install python@${PYTHON_VERSION}
+          echo "check python3"
+          python${PYTHON_VERSION} -c "import sys; print(sys.version)"
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: wheels
+          path: wheelhouse
+      - name: 'Echo artifact download path'
+        run: echo ${{steps.download.outputs.download-path}}
+      - name: Test wheels with python ${{ matrix.python }}
+        shell: bash
+        run: |
+          set -x
+          echo "engine installation to test wheel"
+          python${PYTHON_VERSION} -m venv $HOME/openquake
+          source $HOME/openquake/bin/activate
+          pip install -U pip wheel setuptools
+          pip install install pytest
+          cd $HOME
+          git clone https://github.com/gem/oq-engine.git
+          cd oq-engine && git checkout ${BRANCH_TEST}
+          git status
+          pip install -e .
+          cd ${{steps.download.outputs.download-path}}
+          pwd
+          ls -lrt
+          PYCUT=`echo "${PYTHON_VERSION//.}"`
+          ls *${PYCUT}*
+          #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
+          #echo ${wheel}
+          #pip install --force-reinstall ${wheel}
+          pip install --force-reinstall *${PYCUT}*
+          cd $HOME/oq-engine
+          oq dbserver start
+          sleep 5
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
+          pytest -vsx --color=yes openquake/sep/tests/test_utils.py
+          pytest -vsx --color=yes openquake/sep
+          pytest -vsx --color=yes openquake/calculators
+          oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
