@@ -41,9 +41,6 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: v3.4.3
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            #which pip3
             bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         env:
@@ -52,12 +49,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: v3.4.3
         run: |
-            #PATH=/opt/homebrew/opt/python@${MB_PYTHON_VERSION}/libexec/bin:$PATH
-            #python -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
-            #which pip
-            #which python
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: wheelhouse/*.whl
+          path: wheelhouse

@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Setup Python and cmake
+      - name: Install cmake and print python version
         run: |
           brew install cmake
       - name: Get Library
@@ -55,4 +55,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: wheelhouse/*.whl
+          path: wheelhouse

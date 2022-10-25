@@ -42,7 +42,7 @@ jobs:
           BUILD_COMMIT: 3.4.0
         run: |
             bash -x .github/workflows/build.sh
-      - name: Build Wheel of pyproj 
+      - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
@@ -53,4 +53,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: wheelhouse/*.whl
+          path: wheelhouse
