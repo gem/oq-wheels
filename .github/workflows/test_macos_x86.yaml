@@ -164,7 +164,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: ae-fiona
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python }}"
     steps:
     - name: Set up Python  ${{ matrix.python }}
