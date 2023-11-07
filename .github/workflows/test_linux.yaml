@@ -70,7 +70,7 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.8.21
+      BUILD_COMMIT: 1.8.22
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -90,7 +90,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.8.22
         run: |
             echo $PATH
             bash -x .github/workflows/build.sh
@@ -99,7 +99,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.8.22
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
