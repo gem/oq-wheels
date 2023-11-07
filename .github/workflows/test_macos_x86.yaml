@@ -1,7 +1,7 @@
 ---
 name: MacOS wheels and test x86_64
 
-on: [push, pull_request, workflow_dispatch]
+on: [workflow_dispatch]
 
 env:
   WHEEL_SDIR: wheelhouse
