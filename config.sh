@@ -201,9 +201,8 @@ function build_curl {
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-
-	CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
-    CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
+    CFLAGS="$CFLAGS -g -O2"
+    CXXFLAGS="$CXXFLAGS -g -O2"
 
     EXPAT_PREFIX=$BUILD_PREFIX
 	if [ -n "$IS_OSX" ]; then
