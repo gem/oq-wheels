@@ -196,14 +196,14 @@ function build_gdal {
     GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
 
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
-    (cd gdal-${GDAL_VERSION} 
-	mkdir build 
-	cd build 
+    (cd gdal-${GDAL_VERSION}
+	mkdir build
+	cd build
 	# build using cmake
     cmake .. \
     -DCMAKE_INSTALL_PREFIX=$GDAL_DIR \
     -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
+	-DSQLite3_INCLUDE_DIR=${BUILD_PREFIX}
     -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
     -DGDAL_ENABLE_DRIVER_MBTILES=OFF \
     -DOGR_BUILD_OPTIONAL_DRIVERS=OFF \
@@ -225,9 +225,9 @@ function build_gdal {
     -DOGR_ENABLE_DRIVER_VRT=ON \
     -DBUILD_CSHARP_BINDINGS=OFF \
     -DBUILD_PYTHON_BINDINGS=OFF \
-    -DBUILD_JAVA_BINDINGS=OFF 
-    cmake --build . -j4 
-    if [ -n "$IS_OSX" ]; then sudo cmake --install .; else cmake --install .; fi)
+    -DBUILD_JAVA_BINDINGS=OFF
+    cmake --build . -j4
+    if [ -n "$IS_OSX" ]; then sudo cmake . --install ; else cmake . --install ; fi)
     if [ -n "$IS_OSX" ]; then
         :
     else
