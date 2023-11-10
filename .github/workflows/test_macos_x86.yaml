@@ -20,7 +20,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BUILD_COMMIT: 3.4.0
+      BUILD_COMMIT: 3.6.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -38,7 +38,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
@@ -46,7 +46,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -66,7 +66,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BUILD_COMMIT: 1.8.21
+      BUILD_COMMIT: 1.9.5
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -88,7 +88,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.9.5
         run: |
             bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
@@ -96,7 +96,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.9.5
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
@@ -118,7 +118,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BUILD_COMMIT: v3.4.3
+      BUILD_COMMIT: v3.6.4
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -136,7 +136,7 @@ jobs:
           REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.4.3
+          BUILD_COMMIT: v3.6.4
         run: |
             bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
@@ -144,7 +144,7 @@ jobs:
           REPO_DIR: gdal/gdal/swig/python
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.4.3
+          BUILD_COMMIT: v3.6.4
         run: |
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
