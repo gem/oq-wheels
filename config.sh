@@ -40,13 +40,26 @@ function fetch_unpack {
         rsync --delete -ah * ..)
 }
 
-
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
-    build_simple geos $GEOS_VERSION https://download.osgeo.org/geos tar.bz2
+    if [ -e geos-stamp ]; then return; fi
+    local cmake=cmake
+    fetch_unpack http://download.osgeo.org/geos/geos-${GEOS_VERSION}.tar.bz2
+    (cd geos-${GEOS_VERSION} \
+        && mkdir build && cd build \
+        && $cmake .. \
+        -DCMAKE_INSTALL_PREFIX:PATH=$BUILD_PREFIX \
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DENABLE_IPO=ON \
+        -DBUILD_APPS:BOOL=OFF \
+        -DBUILD_TESTING:BOOL=OFF \
+        && $cmake --build . -j4 \
+        && $cmake --install .)
+    touch geos-stamp
 }
-
 
 function build_jsonc {
     if [ -e jsonc-stamp ]; then return; fi
@@ -162,7 +175,7 @@ function build_openssl {
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
-        && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX \
+        && ./config no-ssl2 -fPIC --prefix=$BUILD_PREFIX \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openssl-stamp
@@ -189,11 +202,16 @@ function build_curl {
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
 
-    CFLAGS="$CFLAGS -g -O2"
-    CXXFLAGS="$CXXFLAGS -g -O2"
+	CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
+    CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
     EXPAT_PREFIX=$BUILD_PREFIX
-    GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
+	#if [ -n "$IS_OSX" ]; then
+    #    GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
+    #else
+        GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
+	#fi
+
 
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
     (cd gdal-${GDAL_VERSION}
@@ -201,39 +219,46 @@ function build_gdal {
 	cd build
 	# build using cmake
     cmake .. \
-    -DCMAKE_INSTALL_PREFIX=${BUILD_PREFIX} \
+    -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
+    -DCMAKE_INCLUDE_PATH=$BUILD_PREFIX/include \
+    -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
+    -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DBUILD_SHARED_LIBS=ON \
-	-DSQLite3_INCLUDE_DIR=${BUILD_PREFIX} \
+    -DCMAKE_BUILD_TYPE=Release \
 	-DPROJ_ROOT=${PROJ_DIR} \
 	-DTIFF_INCLUDE_DIR=${BUILD_PREFIX} \
     -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
     -DGDAL_ENABLE_DRIVER_MBTILES=OFF \
-    -DOGR_BUILD_OPTIONAL_DRIVERS=OFF \
-    -DOGR_ENABLE_DRIVER_CSV=ON \
-    -DOGR_ENABLE_DRIVER_DGN=ON \
-    -DOGR_ENABLE_DRIVER_DXF=ON \
-    -DOGR_ENABLE_DRIVER_FLATGEOBUF=ON \
-    -DOGR_ENABLE_DRIVER_GEOJSON=ON \
-    -DOGR_ENABLE_DRIVER_GML=ON \
-    -DOGR_ENABLE_DRIVER_GMT=ON \
+    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
+	${GEOS_CONFIG} \
+    -DGDAL_USE_TIFF=ON \
+    -DGDAL_USE_TIFF_INTERNAL=OFF \
+    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
+    -DGDAL_ENABLE_DRIVER_GIF=ON \
+    -DGDAL_ENABLE_DRIVER_GRIB=ON \
+    -DGDAL_ENABLE_DRIVER_JPEG=ON \
+    -DGDAL_USE_ICONV=ON \
+    -DGDAL_USE_JSONC=ON \
+    -DGDAL_USE_JSONC_INTERNAL=OFF \
+    -DGDAL_USE_ZLIB=ON \
+    -DGDAL_USE_ZLIB_INTERNAL=OFF \
+    -DGDAL_ENABLE_DRIVER_PNG=ON \
+    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
     -DOGR_ENABLE_DRIVER_GPKG=ON \
-    -DOGR_ENABLE_DRIVER_GPX=ON \
-    -DOGR_ENABLE_DRIVER_OPENFILEGDB=ON \
-    -DGDAL_ENABLE_DRIVER_PCIDSK=ON \
-    -DOGR_ENABLE_DRIVER_S57=ON \
-    -DOGR_ENABLE_DRIVER_SHAPE=ON \
-    -DOGR_ENABLE_DRIVER_SQLITE=ON \
-    -DOGR_ENABLE_DRIVER_TAB=ON \
-    -DOGR_ENABLE_DRIVER_VRT=ON \
-    -DBUILD_CSHARP_BINDINGS=OFF \
     -DBUILD_PYTHON_BINDINGS=OFF \
-    -DBUILD_JAVA_BINDINGS=OFF
+    -DBUILD_JAVA_BINDINGS=OFF \
+    -DBUILD_CSHARP_BINDINGS=OFF \
+    -DGDAL_USE_SFCGAL=OFF \
+    -DGDAL_USE_XERCESC=OFF \
+    -DGDAL_USE_LIBXML2=OFF 
     cmake --build . -j4
     if [ -n "$IS_OSX" ]; then sudo cmake . --install ; else cmake . --install ; fi)
     if [ -n "$IS_OSX" ]; then
         :
     else
-        strip -v --strip-unneeded ${BUILD_PREFIX}/lib/libgdal.so.*
+	    strip -v --strip-unneeded ${BUILD_PREFIX}/lib/libgdal.so.* || true
+        strip -v --strip-unneeded ${BUILD_PREFIX}/lib64/libgdal.so.* || true
     fi
     touch gdal-stamp
 }
