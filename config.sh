@@ -197,55 +197,37 @@ function build_gdal {
 
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
     (cd gdal-${GDAL_VERSION} \
-        && ./configure \
-	        --with-crypto=yes \
-	        --with-hide-internal-symbols \
-            --disable-debug \
-            --disable-static \
-	        --disable-driver-elastic \
-            --prefix=$BUILD_PREFIX \
-            --with-curl=curl-config \
-            --with-expat=${EXPAT_PREFIX} \
-            ${GEOS_CONFIG} \
-            --with-geotiff=internal \
-            --with-gif \
-            --with-jpeg \
-            --with-libiconv-prefix=/usr \
-            --with-libjson-c=${BUILD_PREFIX} \
-            --with-libtiff=${BUILD_PREFIX} \
-            --with-libz=/usr \
-            --with-pam \
-            --with-png \
-            --with-proj=${PROJ_DIR} \
-            --with-sqlite3=${BUILD_PREFIX} \
-            --with-threads \
-            --without-cfitsio \
-            --without-ecw \
-            --without-fme \
-            --without-freexl \
-            --without-gnm \
-            --without-grass \
-            --without-ingres \
-            --without-jasper \
-            --without-jp2mrsid \
-            --without-jpeg12 \
-            --without-kakadu \
-            --without-libgrass \
-            --without-libkml \
-            --without-mrsid \
-            --without-mysql \
-            --without-odbc \
-            --without-ogdi \
-            --without-pcidsk \
-            --without-pcraster \
-            --without-perl \
-            --without-pg \
-            --without-python \
-            --without-qhull \
-            --without-xerces \
-            --without-xml2 \
-        && make -j4 \
-        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+		mkdir build \
+		cd build \
+		# build using cmake
+        cmake .. \
+            -DCMAKE_INSTALL_PREFIX=$GDAL_DIR \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
+            -DGDAL_ENABLE_DRIVER_MBTILES=OFF \
+            -DOGR_BUILD_OPTIONAL_DRIVERS=OFF \
+            -DOGR_ENABLE_DRIVER_CSV=ON \
+            -DOGR_ENABLE_DRIVER_DGN=ON \
+            -DOGR_ENABLE_DRIVER_DXF=ON \
+            -DOGR_ENABLE_DRIVER_FLATGEOBUF=ON \
+            -DOGR_ENABLE_DRIVER_GEOJSON=ON \
+            -DOGR_ENABLE_DRIVER_GML=ON \
+            -DOGR_ENABLE_DRIVER_GMT=ON \
+            -DOGR_ENABLE_DRIVER_GPKG=ON \
+            -DOGR_ENABLE_DRIVER_GPX=ON \
+            -DOGR_ENABLE_DRIVER_OPENFILEGDB=ON \
+            -DGDAL_ENABLE_DRIVER_PCIDSK=ON \
+            -DOGR_ENABLE_DRIVER_S57=ON \
+            -DOGR_ENABLE_DRIVER_SHAPE=ON \
+            -DOGR_ENABLE_DRIVER_SQLITE=ON \
+            -DOGR_ENABLE_DRIVER_TAB=ON \
+            -DOGR_ENABLE_DRIVER_VRT=ON \
+            -DBUILD_CSHARP_BINDINGS=OFF \
+            -DBUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_JAVA_BINDINGS=OFF \
+        && cmake --build . -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo cmake --install .; else cmake --install .; fi)
     if [ -n "$IS_OSX" ]; then
         :
     else
@@ -262,7 +244,7 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
-    if [ -z "$IS_OSX" ]; then 
+    if [ -z "$IS_OSX" ]; then
     	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
