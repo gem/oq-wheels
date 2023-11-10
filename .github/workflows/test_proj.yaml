@@ -20,7 +20,7 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: pyproj
-      BUILD_COMMIT: 3.4.0
+      BUILD_COMMIT: 3.6.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -40,7 +40,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             echo $PATH
             bash -x .github/workflows/build.sh
@@ -49,7 +49,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             sudo apt install python3-virtualenv
             bash -x .github/workflows/wheel.sh
