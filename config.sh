@@ -331,7 +331,11 @@ function build_wheel_cmd {
     if [ -n "$BUILD_DEPENDS" ]; then
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
-    (cd $repo_dir $cmd $wheelhouse)
+	if [ "$REPO_DIR" == "Fiona" ]
+    	(cd $repo_dir && GDAL_VERSION=$GDAL_FIONA $cmd $wheelhouse)
+	else
+    	(cd $repo_dir && $cmd $wheelhouse)
+	fi
     repair_wheelhouse $wheelhouse
 }
 

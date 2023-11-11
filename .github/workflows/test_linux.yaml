@@ -71,6 +71,7 @@ jobs:
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.9.5
+      GDAL_FIONA: 3.7.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
