@@ -73,7 +73,7 @@ jobs:
       BUILD_COMMIT: 1.9.5
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "_2_28"
+      MB_ML_VER: "2014"
       BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
       TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
@@ -126,7 +126,7 @@ jobs:
       BUILD_COMMIT: v3.7.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "_2_28"
+      MB_ML_VER: "2014"
       BUILD_DEPENDS: "numpy==1.23.3 wheel"
       TEST_DEPENDS: "numpy==1.23.3"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
