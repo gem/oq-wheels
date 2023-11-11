@@ -250,7 +250,7 @@ function build_gdal {
 #    -DGDAL_USE_XERCESC=OFF \
 #    -DGDAL_USE_LIBXML2=OFF 
     cmake --build . -j4
-    if [ -n "$IS_OSX" ]; then sudo cmake . --install ; else cmake . --install ; fi)
+    (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
         :
     else

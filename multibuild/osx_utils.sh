@@ -10,16 +10,18 @@ MACPYTHON_URL=https://www.python.org/ftp/python
 MACPYTHON_PY_PREFIX=/Library/Frameworks/Python.framework/Versions
 WORKING_SDIR=working
 
-# As of 7 December 2021 - latest Python of each version with binary download
+# As of 3 Oct 2023 - latest Python of each version with binary download
 # available.
-# See: https://www.python.org/downloads/mac-osx/
+# See: https://www.python.org/downloads/macos/
 LATEST_2p7=2.7.18
 LATEST_3p5=3.5.4
 LATEST_3p6=3.6.8
 LATEST_3p7=3.7.9
 LATEST_3p8=3.8.10
 LATEST_3p9=3.9.13
-LATEST_3p10=3.10.7
+LATEST_3p10=3.10.11
+LATEST_3p11=3.11.6
+LATEST_3p12=3.12.0
 
 
 function check_python {
@@ -76,7 +78,11 @@ function fill_pyver {
         echo $ver
     elif [ $ver == 2 ] || [ $ver == "2.7" ]; then
         echo $LATEST_2p7
-    elif [ $ver == 3 ] || [ $ver == "3.10" ]; then
+    elif [ $ver == 3 ] || [ $ver == "3.12" ]; then
+        echo $LATEST_3p12
+    elif [ $ver == "3.11" ]; then
+        echo $LATEST_3p11
+    elif [ $ver == "3.10" ]; then
         echo $LATEST_3p10
     elif [ $ver == "3.9" ]; then
         echo $LATEST_3p9
@@ -427,26 +433,14 @@ function get_macpython_environment {
 }
 
 function install_delocate {
-	env
     check_pip
     $PIP_CMD install delocate
 }
 
 function repair_wheelhouse {
-	which pip
-	which pip3
-	#DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib"
-	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:${PROJ_DIR}lib"
-	echo "run env to check environment"
-	env
     local wheelhouse=$1
     install_delocate
-	echo "after install delocate run env to check environment"
-	env
-	which delocate-listdeps
-    #DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib" delocate-wheel $wheelhouse/*.whl # copies library dependencies into wheel
-	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib" delocate-listdeps $wheelhouse/*.whl # copies library dependencies into wheel
-	DYLD_LIBRARY_PATH="$BUILD_PREFIX/lib:$PROJ_DIRlib" delocate-wheel -v $wheelhouse/*.whl # copies library dependencies into wheel
+    delocate-wheel $wheelhouse/*.whl # copies library dependencies into wheel
 }
 
 function install_pkg_config {
@@ -472,7 +466,7 @@ function macos_intel_native_build_setup {
     export _PYTHON_HOST_PLATFORM="macosx-${MB_PYTHON_OSX_VER}-x86_64"
     export CFLAGS+=" -arch x86_64"
     export CXXFLAGS+=" -arch x86_64"
-    export ARCHFLAGS+=" -arch x86_64"
+    [[ $ARCHFLAGS =~ "-arch x86_64" ]] || export ARCHFLAGS+=" -arch x86_64"
     export CPPFLAGS+=" -arch x86_64"
     export LDFLAGS+=" -arch x86_64"
 }
@@ -493,7 +487,7 @@ function macos_arm64_cross_build_setup {
     export CFLAGS+=" -arch arm64"
     export CXXFLAGS+=" -arch arm64"
     export CPPFLAGS+=" -arch arm64"
-    export ARCHFLAGS+=" -arch arm64"
+    [[ $ARCHFLAGS =~ "-arch arm64" ]] || export ARCHFLAGS+=" -arch arm64"
     export FCFLAGS+=" -arch arm64"
     export FC=$FC_ARM64
     export F90=${F90_ARM64:-${FC}}
@@ -510,18 +504,17 @@ function macos_arm64_native_build_setup {
     export PLAT="arm64"
     # We don't want universal2 builds and only want an arm64 build
     export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
-    export ARCHFLAGS="-arch arm64"
-    export PIP_CMD=pip3
+    export ARCHFLAGS+=" -arch arm64"
     $@
 }
 
 function fuse_macos_intel_arm64 {
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    local py_osx_ver=$(echo ${MB_PYTHON_OSX_VER} | sed "s/\./_/g")
+    local py_osx_ver=$(echo ${MACOSX_DEPLOYMENT_TARGET} | sed "s/\./_/g")
     mkdir -p tmp_fused_wheelhouse
     for whl in $wheelhouse/*.whl; do
        if [[ "$whl" == *macosx_${py_osx_ver}_x86_64.whl ]]; then
-           whl_base=$(echo $whl | rev | cut -c 23- | rev)
+           whl_base=$(sed "s/macosx_${py_osx_ver}_x86_64.whl//" <<< $whl)
            if [[ -f "${whl_base}macosx_11_0_arm64.whl" ]]; then
                delocate-fuse $whl "${whl_base}macosx_11_0_arm64.whl" -w tmp_fused_wheelhouse
                mv tmp_fused_wheelhouse/$(basename $whl) $wheelhouse/$(basename ${whl_base})macosx_${py_osx_ver}_universal2.whl
