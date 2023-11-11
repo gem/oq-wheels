@@ -41,9 +41,9 @@ function fetch_unpack {
 }
 
 function build_geos {
+    if [ -e geos-stamp ]; then return; fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
-    if [ -e geos-stamp ]; then return; fi
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/geos/geos-${GEOS_VERSION}.tar.bz2
     (cd geos-${GEOS_VERSION} \
@@ -63,9 +63,10 @@ function build_geos {
 
 function build_jsonc {
     if [ -e jsonc-stamp ]; then return; fi
+    local cmake=cmake
     fetch_unpack https://s3.amazonaws.com/json-c_releases/releases/json-c-${JSONC_VERSION}.tar.gz
     (cd json-c-${JSONC_VERSION} \
-        && cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX . \
+        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET . \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -n "$IS_OSX" ]; then
@@ -84,16 +85,13 @@ function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
-    # Error: Failed to download resource "libzip"
-    # Download failed:
-    # Homebrew-installed `curl` is not installed for: https://libzip.org/download/libzip-1.9.2.tar.xz
     if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
     ensure_xz
     fetch_unpack https://download.osgeo.org/libtiff/tiff-${TIFF_VERSION}.tar.gz
     (cd tiff-${TIFF_VERSION} \
         && mv VERSION VERSION.txt \
         && (patch -u --force < ../patches/libtiff-rename-VERSION.patch || true) \
-        && ./configure \
+        && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch tiff-stamp
@@ -101,9 +99,10 @@ function build_tiff {
 
 
 function build_proj {
-    CFLAGS="$CFLAGS -g -O2"
-    CXXFLAGS="$CXXFLAGS -g -O2"
+    CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
+    CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
     if [ -e proj-stamp ]; then return; fi
+    local cmake=cmake
     build_sqlite
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
 	(cd proj-${PROJ_VERSION}
@@ -111,16 +110,11 @@ function build_proj {
     cd build
     cmake .. \
     -DCMAKE_INSTALL_PREFIX=$PROJ_DIR \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
-    -DBUILD_CCT:BOOL=OFF \
-    -DBUILD_CS2CS:BOOL=OFF \
-    -DBUILD_GEOD:BOOL=OFF \
-    -DBUILD_GIE:BOOL=OFF \
-    -DBUILD_GMOCK:BOOL=OFF \
-    -DBUILD_PROJINFO:BOOL=OFF \
-    -DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
+    -DBUILD_APPS:BOOL=OFF \
     -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
@@ -141,15 +135,6 @@ function build_sqlite {
 
 function build_expat {
     if [ -e expat-stamp ]; then return; fi
-    #if [ -n "$IS_OSX" ]; then
-    #    :
-    #else
-    #    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-${EXPAT_VERSION}.tar.bz2
-    #    (cd expat-${EXPAT_VERSION} \
-    #        && ./configure --prefix=$BUILD_PREFIX \
-    #        && make -j4 \
-    #        && sudo make install)
-    #fi
     fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-${EXPAT_VERSION}.tar.bz2
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
@@ -188,8 +173,8 @@ function build_curl {
     CXXFLAGS="$CXXFLAGS -g -O2"
     build_nghttp2
     build_openssl
-    #local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
-    local flags="--prefix=$BUILD_PREFIX --with-libz --with-ssl"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
+    #local flags="--prefix=$BUILD_PREFIX --with-libz --with-ssl"
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
@@ -201,8 +186,18 @@ function build_curl {
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-    CFLAGS="$CFLAGS -g -O2"
-    CXXFLAGS="$CXXFLAGS -g -O2"
+    build_curl
+    build_jpeg
+    build_libpng
+    build_jsonc
+    build_tiff
+    build_proj
+    build_sqlite
+    build_expat
+    build_geos
+
+    CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
+    CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
     EXPAT_PREFIX=$BUILD_PREFIX
 	if [ -n "$IS_OSX" ]; then
@@ -211,7 +206,7 @@ function build_gdal {
         GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
 	fi
 
-
+    local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
     (cd gdal-${GDAL_VERSION}
 	mkdir build
@@ -299,7 +294,6 @@ function pre_build {
     fi
 }
 
-
 function run_tests {
     unset GDAL_DATA
     unset PROJ_LIB
@@ -312,31 +306,47 @@ function run_tests {
         export LC_ALL=C.UTF-8
         export LANG=C.UTF-8
         export CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-        sudo apt-get update
-        sudo apt-get install -y ca-certificates
+        apt-get update
+        apt-get install -y ca-certificates
     fi
     cp -R ../Fiona/tests ./tests
+    python -m pip install "shapely;python_version<'3.12'" $TEST_DEPENDS
     GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
     fio --version
     fio env --formats
-    if [[ $MB_PYTHON_VERSION != "3.10" ]]; then
-        pip install shapely && python ../test_fiona_issue383.py
-    fi
+    python ../test_fiona_issue383.py
 }
 
 
 function build_wheel_cmd {
-    local cmd=${1:-pip_wheel_cmd}
+    local cmd=${1:-build_cmd}
     local repo_dir=${2:-$REPO_DIR}
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
     start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
     stop_spinner
+    pip install -U pip
+    pip install -U build
     if [ -n "$BUILD_DEPENDS" ]; then
-        pip3 install $(pip_opts) $BUILD_DEPENDS
+        pip install $(pip_opts) $BUILD_DEPENDS
     fi
-    # for pyproj (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 PIP_USE_PEP517=0 $cmd $wheelhouse)
-    (cd $repo_dir && PIP_NO_BUILD_ISOLATION=0 $cmd $wheelhouse)
+    (cd $repo_dir $cmd $wheelhouse)
     repair_wheelhouse $wheelhouse
+}
+
+
+function build_cmd {
+    local abs_wheelhouse=$1
+    python -m build -o $abs_wheelhouse
+}
+
+
+function macos_arm64_native_build_setup {
+    # Setup native build for single arch arm_64 wheels
+    export PLAT="arm64"
+    # We don't want universal2 builds and only want an arm64 build
+    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export ARCHFLAGS+=" -arch arm64"
+    $@
 }
