@@ -344,13 +344,15 @@ function build_wheel_cmd {
     fi
 	if [ "$REPO_DIR" == "Fiona" ]; then
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
-	elif [ "$REPO_DIR" == "gdal" ]; then
+    fi
+	if [ "$REPO_DIR" == "gdal" ]; then
     	cd $repo_dir/swig/python
-		cat >pyproject.toml <<EOF
-        [build-system]
-        requires = ["setuptools>=40.8.0", "wheel"]
-        build-backend = "setuptools.build_meta"
-        EOF
+
+		cat >pyproject.toml<<-EOF
+        	[build-system]
+        	requires = ["setuptools", "wheel"]
+        	build-backend = "setuptools.build_meta"
+        	EOF
 		$cmd $wheelhouse 
 	else
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
