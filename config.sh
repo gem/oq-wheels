@@ -351,7 +351,7 @@ function build_wheel_cmd {
         	[build-system]
         	requires = ["setuptools", "wheel"]
         	build-backend = "setuptools.build_meta"
-       	EOF
+EOF
 		$cmd $wheelhouse
 	else
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
