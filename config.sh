@@ -114,7 +114,13 @@ function build_proj {
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
-    -DBUILD_APPS:BOOL=OFF \
+    -DBUILD_CCT:BOOL=OFF \
+    -DBUILD_CS2CS:BOOL=OFF \
+    -DBUILD_GEOD:BOOL=OFF \
+    -DBUILD_GIE:BOOL=OFF \
+    -DBUILD_GMOCK:BOOL=OFF \
+    -DBUILD_PROJINFO:BOOL=OFF \
+    -DCMAKE_PREFIX_PATH=$BUILD_PREFIX \
     -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
@@ -218,7 +224,7 @@ function build_gdal {
     -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
     -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-	${GEOS_CONFIG} 
+	${GEOS_CONFIG}
 #    -DBUILD_SHARED_LIBS=ON \
 #    -DCMAKE_BUILD_TYPE=Release \
 #    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
@@ -243,7 +249,7 @@ function build_gdal {
 #    -DBUILD_CSHARP_BINDINGS=OFF \
 #    -DGDAL_USE_SFCGAL=OFF \
 #    -DGDAL_USE_XERCESC=OFF \
-#    -DGDAL_USE_LIBXML2=OFF 
+#    -DGDAL_USE_LIBXML2=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -332,7 +338,8 @@ function build_wheel_cmd {
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
 	if [ "$REPO_DIR" == "Fiona" ]; then
-    	(cd $repo_dir && GDAL_VERSION=$GDAL_FIONA $cmd $wheelhouse)
+    	echo "(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse) "
+    	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
 	else
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
