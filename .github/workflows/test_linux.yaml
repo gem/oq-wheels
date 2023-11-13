@@ -149,7 +149,7 @@ jobs:
             bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         env:
-          REPO_DIR: gdal/swig/python
+          REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: v3.7.3

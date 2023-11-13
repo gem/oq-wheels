@@ -124,6 +124,11 @@ function build_proj {
     -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
+
+	# https://github.com/OSGeo/PROJ-data
+	cd $PROJ_DATA
+    fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz
+	ls -lrt 
     touch proj-stamp
 }
 
@@ -338,10 +343,17 @@ function build_wheel_cmd {
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
 	if [ "$REPO_DIR" == "Fiona" ]; then
-    	echo "(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse) "
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+	elif [ "$REPO_DIR" == "gdal" ]; then
+    	cd $repo_dir/swig/python
+		cat >pyproject.toml <<EOF
+        [build-system]
+        requires = ["setuptools>=40.8.0", "wheel"]
+        build-backend = "setuptools.build_meta"
+        EOF
+		$cmd $wheelhouse 
 	else
-    	(cd $repo_dir && $cmd $wheelhouse)
+    	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
 	fi
     repair_wheelhouse $wheelhouse
 }
