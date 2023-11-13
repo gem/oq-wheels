@@ -346,13 +346,8 @@ function build_wheel_cmd {
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
     fi
 	if [ "$REPO_DIR" == "gdal" ]; then
-    	cd $repo_dir/swig/python
-#		cat >pyproject.toml <<EOF
-#        	[build-system]
-#        	requires = ["setuptools", "wheel"]
-#        	build-backend = "setuptools.build_meta"
-#EOF
-		cp setup.py.in setup.py
+		pip download GDAL==${GDAL_VERSION}
+		cd GDAL-${GDAL_VERSION}
 		$cmd $wheelhouse
 	else
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
