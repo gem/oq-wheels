@@ -347,6 +347,7 @@ function build_wheel_cmd {
     fi
 	if [ "$REPO_DIR" == "gdal" ]; then
 		pip download GDAL==${GDAL_VERSION}
+		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
 		cd GDAL-${GDAL_VERSION}
 		$cmd $wheelhouse
 	else
