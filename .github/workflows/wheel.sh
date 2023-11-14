@@ -1,7 +1,6 @@
 echo "::group::Build wheel"
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh
-  source env_vars.sh
   before_install
   echo "+++++++++++++++++++++++++++++++++++++++++"
   echo "check python of venv after before_install"
