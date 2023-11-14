@@ -290,16 +290,16 @@ function pre_build {
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     suppress build_zlib
     suppress build_curl
-    suppress build_sqlite
+    build_sqlite
     suppress build_tiff
-    suppress build_proj
+    build_proj
     if [[ "$REPO_DIR" != "pyproj" ]]; then
       suppress build_jpeg
       suppress build_libpng
       suppress build_jsonc
       suppress build_expat
       suppress build_geos
-      suppress build_gdal
+      build_gdal
     fi
     if [ -n "$IS_OSX" ]; then
        export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
