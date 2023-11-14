@@ -164,7 +164,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: master
+      BRANCH_TEST: ae-fiona-newwhl
       PYTHON_VERSION: "${{ matrix.python }}"
     steps:
       - name: Install cmake and print python version
