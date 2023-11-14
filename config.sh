@@ -101,7 +101,7 @@ function build_tiff {
 function build_proj {
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
-    env	
+    env
 	sleep 3
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
@@ -133,10 +133,7 @@ function build_proj {
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
 	# https://github.com/OSGeo/PROJ-data
-	cd ${PROJ_DATA}
 	echo "fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz "
-	curl --insecure -L https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz
-	sleep 2
 	ls -lrt
     touch proj-stamp
 }
