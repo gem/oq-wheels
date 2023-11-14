@@ -185,29 +185,24 @@ jobs:
         run: |
           set -x
           echo "engine installation to test wheel"
-          python${PYTHON_VERSION} -m venv $HOME/openquake
+          python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          pip install install pytest
+          pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-new_whl_fiona/requirements-py311.txt
+          cd ${{steps.download.outputs.download-path}}
+          PYCUT=`echo "${PYTHON_VERSION//.}"`
+          ls *${PYCUT}*
+          pip install --force-reinstall *${PYCUT}*
           cd $HOME
           git clone https://github.com/gem/oq-engine.git
           cd oq-engine && git checkout ${BRANCH_TEST}
           git status
           pip install -e .
-          cd ${{steps.download.outputs.download-path}}
-          pwd
-          ls -lrt
-          PYCUT=`echo "${PYTHON_VERSION//.}"`
-          ls *${PYCUT}*
-          #wheel="$(ls *`echo ${{ matrix.python-version }} | tr -d .`*.whl)"
-          #echo ${wheel}
-          #pip install --force-reinstall ${wheel}
-          pip install --force-reinstall *${PYCUT}*
           cd $HOME/oq-engine
           oq dbserver start
           sleep 5
-          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/calculators
           oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py

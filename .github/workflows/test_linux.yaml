@@ -192,7 +192,7 @@ jobs:
         python3 -m venv $HOME/openquake
         source $HOME/openquake/bin/activate
         pip install -U pip wheel setuptools
-        pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-python311/requirements-py311-linux.txt
+        pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-new_whl_fiona/requirements-py311.txt
         cd ${{steps.download.outputs.download-path}}
         PYCUT=`echo "${PYTHON_VERSION//.}"`
         ls *${PYCUT}*
