@@ -23,7 +23,7 @@ jobs:
       BUILD_COMMIT: 3.6.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "_2_28"
+      MB_ML_VER: "2014"
       BUILD_DEPENDS: "cython wheel"
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
