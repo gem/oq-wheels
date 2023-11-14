@@ -338,9 +338,9 @@ function build_wheel_cmd {
     local repo_dir=${2:-$REPO_DIR}
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    start_spinner
+    #start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    stop_spinner
+    #stop_spinner
     pip install -U pip
     pip install -U build
     if [ -n "$BUILD_DEPENDS" ]; then
