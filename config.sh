@@ -115,6 +115,9 @@ function build_proj {
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
+    -DBUILD_APPS:BOOL=OFF \
+    -DBUILD_TESTING:BOOL=OFF \
+    -DCMAKE_INSTALL_LIBDIR=lib
 #    -DBUILD_CCT:BOOL=ON \
 #    -DBUILD_CS2CS:BOOL=ON \
 #    -DBUILD_GEOD:BOOL=ON \
@@ -122,9 +125,6 @@ function build_proj {
 #    -DBUILD_GMOCK:BOOL=ON \
 #    -DBUILD_PROJINFO:BOOL=ON \
 #    -DBUILD_TESTING:BOOL=OFF
-     -DBUILD_APPS:BOOL=OFF \
-     -DBUILD_TESTING:BOOL=OFF \
-     -DCMAKE_INSTALL_LIBDIR=lib \
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
 
