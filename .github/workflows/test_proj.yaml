@@ -102,7 +102,7 @@ jobs:
         ls *${PYCUT}*
         pip install --force-reinstall *${PYCUT}*
         cd $HOME/oq-engine
-        oq dbserver start
+        oq dbserver upgrade
         sleep 5
         pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
         pytest -vsx --color=yes openquake/sep/tests/test_utils.py
