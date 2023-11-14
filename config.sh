@@ -135,7 +135,7 @@ function build_proj {
 	# https://github.com/OSGeo/PROJ-data
 	echo "fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz "
 	ls -lrt
-	which  projsync
+	echo "ls -lrt ${PROJ_DATA}"
 	ls -lrt ${PROJ_DATA}
 	#projsync --all
     touch proj-stamp
