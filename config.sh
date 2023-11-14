@@ -104,6 +104,8 @@ function build_proj {
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
     build_sqlite
+	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
+	#
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
 	(cd proj-${PROJ_VERSION}
     mkdir build
@@ -117,7 +119,7 @@ function build_proj {
     -DENABLE_IPO=ON \
     -DBUILD_APPS:BOOL=OFF \
     -DBUILD_TESTING:BOOL=OFF \
-    -DCMAKE_INSTALL_LIBDIR=lib
+#    -DCMAKE_INSTALL_LIBDIR=lib
 #    -DBUILD_CCT:BOOL=ON \
 #    -DBUILD_CS2CS:BOOL=ON \
 #    -DBUILD_GEOD:BOOL=ON \
@@ -127,11 +129,10 @@ function build_proj {
 #    -DBUILD_TESTING:BOOL=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
-
 	# https://github.com/OSGeo/PROJ-data
-	cd $PROJ_DATA
+	cd ${PROJ_DATA}
+	echo "fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz "
     fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz
-	ls -lrt
     touch proj-stamp
 }
 
