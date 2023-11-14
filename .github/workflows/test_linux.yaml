@@ -197,14 +197,15 @@ jobs:
         git clone https://github.com/gem/oq-engine.git
         cd oq-engine && git checkout ${BRANCH_TEST}
         git status
+        pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-python311/requirements-py311-linux.txt
+        PYCUT=`echo "${PYTHON_VERSION//.}"`
+        ls *${PYCUT}*
+        pip install --force-reinstall *${PYCUT}*
         pip install -e .
         cd $HOME/oq-engine
         cd ${{steps.download.outputs.download-path}}
         pwd
         ls -lrt
-        PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}*
-        pip install --force-reinstall *${PYCUT}*
         cd $HOME/oq-engine
         oq dbserver start
         sleep 5
