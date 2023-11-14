@@ -121,7 +121,7 @@ function build_proj {
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_IPO=ON \
     -DBUILD_APPS:BOOL=ON \
-    -DBUILD_TESTING:BOOL=OFF 
+    -DBUILD_TESTING:BOOL=OFF
 #    -DCMAKE_INSTALL_LIBDIR=lib
 #    -DBUILD_CCT:BOOL=ON \
 #    -DBUILD_CS2CS:BOOL=ON \
@@ -135,6 +135,9 @@ function build_proj {
 	# https://github.com/OSGeo/PROJ-data
 	echo "fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz "
 	ls -lrt
+	which  projsync
+	/io/pyproj/pyproj/proj_dir/bin/projsync --all
+	ls -lrt ${PROJ_DATA}
 	#projsync --all
     touch proj-stamp
 }
