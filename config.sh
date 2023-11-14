@@ -107,6 +107,7 @@ function build_proj {
     local cmake=cmake
     build_sqlite
 	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
+	echo "env: $PROJ_DATA and build prefix ${BUILD_PREFIX}"
 	#
     fetch_unpack http://download.osgeo.org/proj/proj-${PROJ_VERSION}.tar.gz
 	(cd proj-${PROJ_VERSION}
@@ -134,7 +135,9 @@ function build_proj {
 	# https://github.com/OSGeo/PROJ-data
 	cd ${PROJ_DATA}
 	echo "fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz "
-    fetch_unpack https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz
+	curl --insecure -L https://github.com/OSGeo/PROJ-data/archive/refs/tags/${PROJ_DATA_VER}.tar.gz
+	sleep 2
+	ls -lrt
     touch proj-stamp
 }
 
@@ -345,6 +348,8 @@ function build_wheel_cmd {
     #stop_spinner
     pip install -U pip
     pip install -U build
+	echo "REPO_DIR:: $REPO_DIR"
+
     if [ -n "$BUILD_DEPENDS" ]; then
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
@@ -356,8 +361,12 @@ function build_wheel_cmd {
 		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
 		cd GDAL-${GDAL_VERSION}
 		$cmd $wheelhouse
-	else
-    	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+	fi
+	if [ "$REPO_DIR" == "pyproj" ]; then
+		pwd
+		ls -lrt
+		sleep 10
+    	(cd $repo_dir && $cmd $wheelhouse)
 	fi
     repair_wheelhouse $wheelhouse
 }
