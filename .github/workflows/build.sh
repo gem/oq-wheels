@@ -9,6 +9,7 @@ fi
 echo "::group::Get code of project: $REPO_DIR"
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh
+  source env_vars.sh
   if [[ "$REPO_DIR" == "Fiona" ]]; then
 	  git clone https://github.com/Toblerity/Fiona.git
 	  cd Fiona

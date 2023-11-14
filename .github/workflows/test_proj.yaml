@@ -52,8 +52,6 @@ jobs:
           BUILD_COMMIT: 3.6.1
         run: |
             sudo apt install python3-virtualenv
-            echo " ${PROJ_DIR} \n ${PROJ_DATA}"
-            echo " ${PROJ_WHEEL} \n ${PROJ_NETWORK}"
             bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
