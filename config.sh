@@ -101,6 +101,8 @@ function build_tiff {
 function build_proj {
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
+    env	
+	sleep 3
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
     build_sqlite
