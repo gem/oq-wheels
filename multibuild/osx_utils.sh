@@ -22,6 +22,9 @@ LATEST_3p9=3.9.13
 LATEST_3p10=3.10.11
 LATEST_3p11=3.11.6
 LATEST_3p12=3.12.0
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
+echo $PATH
 
 
 function check_python {
