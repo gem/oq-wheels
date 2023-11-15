@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "macos-arm" ]
+        os: [ "self-hosted" ]
         python: [ "3.9", "3.10", "3.11" ]
         platform: [ "arm64"]
         macos-target: [ "12" ]
