@@ -316,15 +316,12 @@ function install_mac_cpython {
     local py_inst=$(pyinst_fname_for_version $py_version $py_osx_ver)
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     local retval=""
-	echo " REMOVE INSTALL_SDIR: $inst_path"
-	rm -rf $inst_path
-	echo "rm -rf $DOWNLOADS_SDIR"
-	rm -rf $DOWNLOADS_SDIR
     mkdir -p $DOWNLOADS_SDIR
 	cd $DOWNLOADS_SDIR
 	echo " WORKING DIR : $PWD"
     # exit early on curl errors, but don't let it exit the shell
-    cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
+    #cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
+    curl -v -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
     if [ ${retval:-0} -ne 0 ]; then
       echo "Python download failed! Check ${py_inst} exists on the server."
       exit $retval
@@ -342,8 +339,6 @@ function install_mac_cpython {
     if [ -e "$inst_cmd" ]; then
         sh "$inst_cmd"
     fi
-	# Add remove folder to avoid error on multiple runs
-	rm -rf $DOWNLOADS_SDIR
 }
 
 function install_virtualenv {
