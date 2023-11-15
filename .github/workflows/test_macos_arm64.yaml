@@ -16,8 +16,8 @@ jobs:
       matrix:
         os: [ "macos-arm" ]
         python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
-        macos-target: [ "11" ]
+        platform: [ "arm64"]
+        macos-target: [ "12" ]
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
@@ -63,8 +63,8 @@ jobs:
       matrix:
         os: [ "macos-arm" ]
         python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
-        macos-target: [ "11" ]
+        platform: [ "arm64"]
+        macos-target: [ "12" ]
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
@@ -117,8 +117,8 @@ jobs:
       matrix:
         os: [ "macos-arm" ]
         python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
-        macos-target: [ "11" ]
+        platform: [ "arm64"]
+        macos-target: [ "12" ]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
@@ -164,8 +164,8 @@ jobs:
       matrix:
         os: [ "macos-arm" ]
         python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
-        macos-target: [ "11" ]
+        platform: [ "arm64"]
+        macos-target: [ "12" ]
         os-name: ["osx"]
     env:
       BRANCH_TEST: ae-new_whl_fiona
