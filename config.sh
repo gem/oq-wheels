@@ -85,7 +85,7 @@ function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
-    if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
+    #if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
     ensure_xz
     fetch_unpack https://download.osgeo.org/libtiff/tiff-${TIFF_VERSION}.tar.gz
     (cd tiff-${TIFF_VERSION} \
@@ -294,7 +294,7 @@ function pre_build {
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     suppress build_zlib
-    suppress build_curl
+    build_curl
     build_sqlite
     suppress build_tiff
     build_proj
