@@ -57,7 +57,7 @@ function build_geos {
         -DBUILD_APPS:BOOL=OFF \
         -DBUILD_TESTING:BOOL=OFF \
         && $cmake --build . -j4 \
-        && $cmake --install .)
+        && sudo $cmake --install .)
     touch geos-stamp
 }
 
