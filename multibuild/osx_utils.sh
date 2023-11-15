@@ -318,6 +318,8 @@ function install_mac_cpython {
     local retval=""
 	echo " INSTALL_SDIR: $inst_path"
 	echo " WORKING DIR : $PWD"
+	rm -rf $DOWNLOADS_SDIR
+	echo "rm -rf $DOWNLOADS_SDIR"
     mkdir -p $DOWNLOADS_SDIR
     # exit early on curl errors, but don't let it exit the shell
     cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
