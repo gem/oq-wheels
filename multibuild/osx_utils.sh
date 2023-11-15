@@ -317,12 +317,9 @@ function install_mac_cpython {
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     local retval=""
     mkdir -p $DOWNLOADS_SDIR
-	cd $DOWNLOADS_SDIR
 	echo " WORKING DIR : $PWD"
     # exit early on curl errors, but don't let it exit the shell
     #cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
-	whoami
-	id
     curl -v -f $MACPYTHON_URL/$py_stripped/${py_inst} --output $inst_path || retval=$?
     if [ ${retval:-0} -ne 0 ]; then
       echo "Python download failed! Check ${py_inst} exists on the server."
