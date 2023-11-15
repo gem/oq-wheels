@@ -316,6 +316,8 @@ function install_mac_cpython {
     local py_inst=$(pyinst_fname_for_version $py_version $py_osx_ver)
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     local retval=""
+	echo " INSTALL_SDIR: $inst_path"
+	echo " WORKING DIR : $PWD"
     mkdir -p $DOWNLOADS_SDIR
     # exit early on curl errors, but don't let it exit the shell
     cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
@@ -336,6 +338,8 @@ function install_mac_cpython {
     if [ -e "$inst_cmd" ]; then
         sh "$inst_cmd"
     fi
+	# Add remove folder to avoid error on multiple runs
+	rm -rf $DOWNLOADS_SDIR
 }
 
 function install_virtualenv {
