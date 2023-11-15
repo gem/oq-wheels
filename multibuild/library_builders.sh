@@ -158,7 +158,8 @@ function build_jpeg {
     (cd jpeg-${JPEG_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && make install)
+        #&& make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch jpeg-stamp
 }
 
