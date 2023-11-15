@@ -70,7 +70,7 @@ function build_simple {
     (cd $name_version \
         && ./configure --prefix=$BUILD_PREFIX $configure_args \
         && make -j4 \
-        && make install)
+        && sudo make install)
     touch "${name}-stamp"
 }
 
