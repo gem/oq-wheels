@@ -316,11 +316,13 @@ function install_mac_cpython {
     local py_inst=$(pyinst_fname_for_version $py_version $py_osx_ver)
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     local retval=""
-	echo " INSTALL_SDIR: $inst_path"
-	echo " WORKING DIR : $PWD"
-	rm -rf $DOWNLOADS_SDIR
+	echo " REMOVE INSTALL_SDIR: $inst_path"
+	rm -rf $inst_path
 	echo "rm -rf $DOWNLOADS_SDIR"
+	rm -rf $DOWNLOADS_SDIR
     mkdir -p $DOWNLOADS_SDIR
+	cd $DOWNLOADS_SDIR
+	echo " WORKING DIR : $PWD"
     # exit early on curl errors, but don't let it exit the shell
     cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
     if [ ${retval:-0} -ne 0 ]; then
@@ -335,7 +337,7 @@ function install_mac_cpython {
     sudo installer -pkg $inst_path -target /
     local py_mm=${py_version%.*}
     PYTHON_EXE=$MACPYTHON_PY_PREFIX/$py_mm/bin/python$py_mm
-    # Install certificates for Python 3.6
+    # Install certificates for Python 3.x
     local inst_cmd="/Applications/Python ${py_mm}/Install Certificates.command"
     if [ -e "$inst_cmd" ]; then
         sh "$inst_cmd"
