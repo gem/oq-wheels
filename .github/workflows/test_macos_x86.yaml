@@ -1,12 +1,9 @@
 ---
 name: MacOS wheels and test x86_64
-
-on: [workflow_dispatch]
-
+on: [pull_request, workflow_dispatch]   
 env:
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
-
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -168,7 +165,7 @@ jobs:
         macos-target: [ "11" ]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: ae-new_whl_fiona
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python }}"
     steps:
     - name: Set up Python  ${{ matrix.python }}

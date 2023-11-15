@@ -1,12 +1,9 @@
 ---
 name: Linux wheels and test x86_64
-
-on: [workflow_dispatch]
-
+on: [pull_request, workflow_dispatch]   
 env:
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
-
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -168,7 +165,7 @@ jobs:
       matrix:
         python-version: [ "3.9", "3.10", "3.11" ]
     env:
-      BRANCH_TEST: ae-new_whl_fiona
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
