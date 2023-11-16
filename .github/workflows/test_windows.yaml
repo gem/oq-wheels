@@ -129,7 +129,7 @@ jobs:
           git pull > nul
           ./bootstrap-vcpkg.bat -disableMetrics
           ## simple usage is to copy over the file based 
-          cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          cp ${GITHUB_WORKSPACE}/windows/vcpkg_gdal.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
