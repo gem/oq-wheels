@@ -57,8 +57,9 @@ function build_geos {
         -DBUILD_APPS:BOOL=OFF \
         -DBUILD_TESTING:BOOL=OFF \
         && $cmake --build . -j4 \
-        && sudo $cmake --install .)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch geos-stamp
+        #&& sudo $cmake --install .)
 }
 
 function build_jsonc {
