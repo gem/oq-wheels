@@ -67,11 +67,10 @@ function build_simple {
     local name_version="${name}-${version}"
     local archive=${name_version}.${ext}
     fetch_unpack $url/$archive
-    cd $name_version
-    ./configure --prefix=$BUILD_PREFIX $configure_args \
-    make -j4
-    # && sudo make install)
-	if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi
+	(cd $name_version \
+    && ./configure --prefix=$BUILD_PREFIX $configure_args \
+    && make -j4 \
+    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
