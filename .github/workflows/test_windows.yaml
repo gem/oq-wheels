@@ -45,7 +45,10 @@ jobs:
           ls ${GITHUB_WORKSPACE}
           ls ${GITHUB_WORKSPACE}/windows
           cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
-          vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows/vcpkg.json --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          ls ${GITHUB_WORKSPACE}/windows
+          ls ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
           cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
 
