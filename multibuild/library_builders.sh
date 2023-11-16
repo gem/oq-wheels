@@ -70,7 +70,8 @@ function build_simple {
     (cd $name_version \
         && ./configure --prefix=$BUILD_PREFIX $configure_args \
         && make -j4 \
-        && sudo make install)
+       # && sudo make install)
+	    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
@@ -158,8 +159,8 @@ function build_jpeg {
     (cd jpeg-${JPEG_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && sudo make install)
-        #&& if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+        #&& sudo make install)
+	    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch jpeg-stamp
 }
 
@@ -273,7 +274,7 @@ function build_xz {
 function ensure_xz {
 	if [[ ! $(type -P "xz") ]]; then
 	    if [ -n "$IS_MACOS" ]; then
-	        /opt/homebrew/bin/brew install xz
+	        brew install xz
 	    else
 	        build_xz
 	    fi
