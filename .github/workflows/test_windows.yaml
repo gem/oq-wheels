@@ -8,12 +8,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: "windows-2022"
-        arch: "auto64"
+        os: [ "windows-2022" ]
+        arch: [ "auto64" ]
         python: [ "3.9", "3.10", "3.11" ]
-        triplet: "x64-windows"
-        vcpkg_cache: "c:\\vcpkg\\installed"
-        vcpkg_logs: "c:\\vcpkg\\buildtrees\\**\\*.log"
+        triplet: [ "x64-windows" ]
+        vcpkg_cache: [ "c:\\vcpkg\\installed" ]
+        vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
     env:
       REPO_DIR: pyproj
       PROJ_VERSION: "9.1.0"
