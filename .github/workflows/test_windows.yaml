@@ -3,7 +3,7 @@ name: Windows wheels and test x86_64
 on: [pull_request, workflow_dispatch]   
 jobs:
   build_pyproj:
-    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    name: pyproj ${{ matrix.python }} ${{ matrix.os }} ${{ matrix.triplet }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,7 +16,7 @@ jobs:
         vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
     env:
       REPO_DIR: pyproj
-      PROJ_VERSION: "9.3.0"
+      PROJ_VERSION: "9.1.0"
       BUILD_COMMIT: 3.6.1
     steps:
       - uses: actions/checkout@v4
@@ -88,3 +88,49 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
           retention-days: 5
+
+  build_GDAL:
+    name: GDAL ${{ matrix.python }} ${{ matrix.os }} ${{ matrix.triplet }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "windows-2022" ]
+        arch: [ "auto64" ]
+        python: [ "3.9", "3.10", "3.11" ]
+        triplet: [ "x64-windows" ]
+        vcpkg_cache: [ "c:\\vcpkg\\installed" ]
+        vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
+    env:
+      REPO_DIR: pyproj
+      PROJ_VERSION: "9.3.0"
+      BUILD_COMMIT: 3.6.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "${{ matrix.python }}"
+
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        id: vcpkgcache
+        with:
+          path: |
+            ${{ matrix.vcpkg_cache }}
+          # bump the last digit to avoid using previous build cache
+          key: ${{ matrix.os }}-${{ matrix.triplet }}-vcpkg-proj${{ env.PROJ_VERSION }}-cache0
+
+      - name: Install PROJ with vcpkg
+        env:
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+        shell: bash
+        run: |
+          cd "$VCPKG_INSTALLATION_ROOT"
+          git pull > nul
+          ./bootstrap-vcpkg.bat -disableMetrics
+          ## simple usage is to copy over the file based 
+          cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
+          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
