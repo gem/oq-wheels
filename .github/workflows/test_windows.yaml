@@ -27,15 +27,6 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
 
-            #- name: Cache vcpkg
-            #  uses: actions/cache@v3
-            #  id: vcpkgcache
-            #  with:
-            #    path: |
-            #      ${{ matrix.vcpkg_cache }}
-            #    # bump the last digit to avoid using previous build cache
-            #    key: ${{ matrix.os }}-${{ matrix.triplet }}-vcpkg-proj${{ env.PROJ_VERSION }}-cache0
-
       - name: Install PROJ with vcpkg
         env:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
