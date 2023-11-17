@@ -33,7 +33,7 @@ jobs:
           PROJ_NETWORK: ON
           PROJ_VERSION: 9.1.0
           PROJ_DIR: c:/vcpkg/installed/${{ matrix.triplet }}
-          PROJ_DATA: ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          PROJ_DATA: d:/a/oq-wheels/oq-wheels/bin/pyproj/proj_dir/share/proj/
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
