@@ -33,6 +33,7 @@ jobs:
           PROJ_NETWORK: ON
           PROJ_VERSION: 9.1.0
           PROJ_DIR: c:/vcpkg/installed/${{ matrix.triplet }}
+          PROJ_DATA: ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
@@ -53,13 +54,13 @@ jobs:
             python -m pytest test -v -s
         shell: bash
         run: |
+          echo ${GITHUB_WORKSPACE}
           ls -lrt ${GITHUB_WORKSPACE}
           cd "$VCPKG_INSTALLATION_ROOT"
           git pull > nul
           ./bootstrap-vcpkg.bat -disableMetrics
           ## simple usage is to copy over the file based
           cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
-          cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           git clone https://github.com/pyproj4/pyproj.git
           cd pyproj
@@ -68,7 +69,9 @@ jobs:
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
           cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
           #
-          ls ${GITHUB_WORKSPACE}/pyproj/proj_dir/
+          export PROJ_DATA=${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          echo ${PROJ_DATA}
+          ls ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
           python -m pip install delvewheel
           python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
           cd ${GITHUB_WORKSPACE}/wheels_torepair
