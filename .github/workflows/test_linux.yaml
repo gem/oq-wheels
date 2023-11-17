@@ -190,10 +190,10 @@ jobs:
         source $HOME/openquake/bin/activate
         pip install -U pip wheel setuptools
         pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
-        cd ${{steps.download.outputs.download-path}}
-        PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}*
-        pip install --force-reinstall *${PYCUT}*
+        #cd ${{steps.download.outputs.download-path}}
+        #PYCUT=`echo "${PYTHON_VERSION//.}"`
+        #ls *${PYCUT}*
+        #pip install --force-reinstall *${PYCUT}*
         cd $HOME
         git clone https://github.com/gem/oq-engine.git
         cd oq-engine && git checkout ${BRANCH_TEST}
