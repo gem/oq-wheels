@@ -16,7 +16,7 @@ jobs:
         vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
     env:
       REPO_DIR: pyproj
-      PROJ_VERSION: "9.1.0"
+      PYPROJ_VERSION: 3.6.1
     steps:
       - uses: actions/checkout@v4
         #      - uses: actions/checkout@v4
@@ -39,7 +39,6 @@ jobs:
       - name: Install PROJ with vcpkg
         env:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
-          PYPROJ_VERSION: 3.6.1
         shell: bash
         run: |
           ls -lrt ${GITHUB_WORKSPACE}
@@ -53,15 +52,16 @@ jobs:
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
           ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
           cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
-      	  git clone https://github.com/pyproj4/pyproj.git
-          cd pyproj
-          git checkout ${PYPROJ_VERSION}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16
         env:
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BEFORE_ALL: >
+      	    git clone https://github.com/pyproj4/pyproj.git
+            cd pyproj
+            git checkout ${PYPROJ_VERSION}
           CIBW_ENVIRONMENT_WINDOWS:
             PROJ_WHEEL=true
             PROJ_NETWORK=ON
