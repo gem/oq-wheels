@@ -68,9 +68,9 @@ jobs:
             cp -r {package}/test . &&
             python -m pytest test -v -s
         run: |
-          pwd
-          ls
           python -m pip install pybind11 cibuildwheel==2.16.2 delvewheel
+          cd pyproj
+          git log
           cibuildwheel
 
       - name: Upload artifacts
