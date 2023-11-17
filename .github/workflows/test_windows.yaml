@@ -71,6 +71,8 @@ jobs:
             python -c "import pyproj; pyproj.Proj(init='epsg:4269')"  &&
             cp -r {package}/test . &&
             python -m pytest test -v -s
+        with:
+          package-dir: pyproj
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
