@@ -1,6 +1,6 @@
 ---
 name: Linux wheels and test x86_64
-on: [workflow_dispatch]   
+on: [pull_request, workflow_dispatch]   
 env:
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
@@ -163,7 +163,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: [ "3.9", "3.10", "3.11" ]
+        python-version: [ "3.10" ]
     env:
       BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
@@ -189,7 +189,7 @@ jobs:
         python3 -m venv $HOME/openquake
         source $HOME/openquake/bin/activate
         pip install -U pip wheel setuptools
-        pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-new_whl_fiona/requirements-py311.txt
+        pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
         cd ${{steps.download.outputs.download-path}}
         PYCUT=`echo "${PYTHON_VERSION//.}"`
         ls *${PYCUT}*
