@@ -29,6 +29,10 @@ jobs:
 
       - name: Install PROJ with vcpkg adn build wheel with cibuildwheel
         env:
+          PROJ_WHEEL: true
+          PROJ_NETWORK: ON
+          PROJ_VERSION: 9.1.0
+          PROJ_DIR: $VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
