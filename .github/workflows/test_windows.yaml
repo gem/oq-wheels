@@ -17,7 +17,6 @@ jobs:
     env:
       REPO_DIR: pyproj
       PROJ_VERSION: "9.1.0"
-      BUILD_COMMIT: 3.6.1
     steps:
       - uses: actions/checkout@v4
         #      - uses: actions/checkout@v4
@@ -54,12 +53,9 @@ jobs:
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
           ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
           cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
-          pip download pyproj==${PYPROJ_VERSION}
-          ls
-          ls PYPROJ-${PYPROJ_VERSION}.tar.gz
-          tar xzvf PYPROJ-${PYPROJ_VERSION}.tar.gz                                    
-          cd PYPROJ-${PYPROJ_VERSION}
-
+      	  git clone https://github.com/pyproj4/pyproj.git
+          cd pyproj
+          git checkout ${PYPROJ_VERSION}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16
