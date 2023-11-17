@@ -1,6 +1,6 @@
 ---
 name: Windows wheels and test x86_64
-on: [pull_request, workflow_dispatch]   
+on: [pull_request, workflow_dispatch]
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os }} ${{ matrix.triplet }}
@@ -20,53 +20,46 @@ jobs:
       BUILD_COMMIT: 3.6.1
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: https://github.com/pyproj4/pyproj
+          ref: '3.6.1'
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
 
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        id: vcpkgcache
-        with:
-          path: |
-            ${{ matrix.vcpkg_cache }}
-          # bump the last digit to avoid using previous build cache
-          key: ${{ matrix.os }}-${{ matrix.triplet }}-vcpkg-proj${{ env.PROJ_VERSION }}-cache0
+            #- name: Cache vcpkg
+            #  uses: actions/cache@v3
+            #  id: vcpkgcache
+            #  with:
+            #    path: |
+            #      ${{ matrix.vcpkg_cache }}
+            #    # bump the last digit to avoid using previous build cache
+            #    key: ${{ matrix.os }}-${{ matrix.triplet }}-vcpkg-proj${{ env.PROJ_VERSION }}-cache0
 
       - name: Install PROJ with vcpkg
         env:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
         shell: bash
         run: |
+          ls -lrt ${GITHUB_WORKSPACE}
           cd "$VCPKG_INSTALLATION_ROOT"
           git pull > nul
           ./bootstrap-vcpkg.bat -disableMetrics
-          ## simple usage is to copy over the file based 
+          ## simple usage is to copy over the file based
           cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
-          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"* 
-          #cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
+          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16
         env:
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_ENVIRONMENT_LINUX:
-            PROJ_WHEEL=true
-            PROJ_NETWORK=ON
-            PROJ_VERSION=${{ env.PROJ_VERSION }}
-            PROJ_DIR=/project/pyproj/proj_dir
-          CIBW_ENVIRONMENT_MACOS:
-            PROJ_WHEEL=true
-            PROJ_NETWORK=ON
-            PROJ_VERSION=${{ env.PROJ_VERSION }}
-            PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/proj_dir
-            MACOSX_DEPLOYMENT_TARGET=10.9
-            CMAKE_OSX_ARCHITECTURES='${{ matrix.cmake_osx_architectures }}'
-            LDFLAGS="${LDFLAGS} -Wl,-rpath,${GITHUB_WORKSPACE}/pyproj/proj_dir/lib"
           CIBW_ENVIRONMENT_WINDOWS:
             PROJ_WHEEL=true
             PROJ_NETWORK=ON
@@ -74,8 +67,6 @@ jobs:
             PROJ_DIR=$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}
           CIBW_BEFORE_BUILD_WINDOWS: "python -m pip install delvewheel"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w {dest_dir} {wheel}"
-          CIBW_BEFORE_ALL_LINUX: bash ./ci/proj-compile-wheels.sh
-          CIBW_BEFORE_ALL_MACOS: bash ./ci/proj-compile-wheels.sh
           CIBW_TEST_REQUIRES: cython pytest numpy --config-settings=setup-args="-Dallow-noblas=true"
           CIBW_BEFORE_TEST: python -m pip install shapely pandas xarray || echo "Optional requirements install failed"
           CIBW_TEST_COMMAND: >
@@ -104,35 +95,45 @@ jobs:
         vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
     env:
       REPO_DIR: pyproj
-      PROJ_VERSION: "9.3.0"
-      BUILD_COMMIT: 3.6.1
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
 
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        id: vcpkgcache
-        with:
-          path: |
-            ${{ matrix.vcpkg_cache }}
-          # bump the last digit to avoid using previous build cache
-          key: ${{ matrix.os }}-${{ matrix.triplet }}-vcpkg-proj${{ env.PROJ_VERSION }}-cache0
-
-      - name: Install PROJ with vcpkg
+      - name: Install GDAL with vcpkg
         env:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
         shell: bash
         run: |
+          ls -lrt ${GITHUB_WORKSPACE}
           cd "$VCPKG_INSTALLATION_ROOT"
           git pull > nul
           ./bootstrap-vcpkg.bat -disableMetrics
-          ## simple usage is to copy over the file based 
+          ## simple usage is to copy over the file based
           cp ${GITHUB_WORKSPACE}/windows/vcpkg_gdal.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
-          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"* 
-          #mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
-          #cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
+          mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
+          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          pip download GDAL==${GDAL_VERSION}
+          ls GDAL-${GDAL_VERSION}.tar.gz
+          tar xzvf GDAL-${GDAL_VERSION}.tar.gz                                    
+          cd GDAL-${GDAL_VERSION}
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16
+        env:
+          CIBW_SKIP: "*musllinux* pp*-win* pp31*"
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_ENVIRONMENT_WINDOWS:
+            PROJ_WHEEL=true
+            PROJ_NETWORK=ON
+            PROJ_VERSION=${{ env.PROJ_VERSION }}
+            PROJ_DIR=$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}
+          CIBW_BEFORE_BUILD_WINDOWS: "python -m pip install delvewheel numpy"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w {dest_dir} {wheel}"
+          CIBW_TEST_REQUIRES: cython pytest numpy --config-settings=setup-args="-Dallow-noblas=true"
+          CIBW_BEFORE_TEST: python -m pip install shapely pandas xarray || echo "Optional requirements install failed"
