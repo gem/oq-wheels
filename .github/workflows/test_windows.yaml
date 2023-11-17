@@ -32,7 +32,7 @@ jobs:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
           PROJ_VERSION: 9.1.0
-          PROJ_DIR: $VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}
+          PROJ_DIR: c:/vcpkg/installed/${{ matrix.triplet }}
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
@@ -72,6 +72,11 @@ jobs:
           python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
           cd ${GITHUB_WORKSPACE}/wheels_torepair
           delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse *.whl
+          # test wheel
+          #pyproj -v &&
+          #python -c "import pyproj; pyproj.Proj(init='epsg:4269')"  &&
+          #cp -r {package}/test . &&
+          #python -m pytest test -v -s
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
