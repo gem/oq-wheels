@@ -50,7 +50,7 @@ jobs:
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_ALL: >
-      	    git clone https://github.com/pyproj4/pyproj.git
+            git clone https://github.com/pyproj4/pyproj.git
             cd pyproj
             git checkout ${PYPROJ_VERSION}
           CIBW_ENVIRONMENT_WINDOWS:
