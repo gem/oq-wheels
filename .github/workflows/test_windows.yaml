@@ -49,16 +49,20 @@ jobs:
         env:
           CIBW_SKIP: "*musllinux* pp*-win* pp31*"
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL: >
-            git clone https://github.com/pyproj4/pyproj.git
-            cd pyproj
-            git checkout ${PYPROJ_VERSION}
+            #CIBW_BEFORE_ALL: >
+            #  git clone https://github.com/pyproj4/pyproj.git
+            #  cd pyproj
+            #  git checkout ${PYPROJ_VERSION}
           CIBW_ENVIRONMENT_WINDOWS:
             PROJ_WHEEL=true
             PROJ_NETWORK=ON
             PROJ_VERSION=${{ env.PROJ_VERSION }}
             PROJ_DIR=$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}
-          CIBW_BEFORE_BUILD_WINDOWS: "python -m pip install delvewheel"
+          CIBW_BEFORE_BUILD_WINDOWS: >
+            git clone https://github.com/pyproj4/pyproj.git
+            cd pyproj
+            git checkout ${PYPROJ_VERSION}
+            python -m pip install delvewheel
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w {dest_dir} {wheel}"
           CIBW_TEST_REQUIRES: cython pytest numpy --config-settings=setup-args="-Dallow-noblas=true"
           CIBW_BEFORE_TEST: python -m pip install shapely pandas xarray || echo "Optional requirements install failed"
