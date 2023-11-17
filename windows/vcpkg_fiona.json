@@ -1,6 +1,6 @@
 {
-    "name": "gdalwheel",
-    "version": "3.7.3",
+    "name": "fionawheel",
+    "version": "1.9.5",
     "dependencies": [
         {
             "name": "gdal",
