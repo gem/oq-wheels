@@ -34,11 +34,11 @@ jobs:
           set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
           if not exist %VCPKG_INSTALLED%\bin (
              cd "C:\Tools\vcpkg" &
-             git clone https://github.com/Microsoft/vcpkg.git > nul &
-             .vcpkg\bootstrap-vcpkg.bat -disableMetrics &
-             .vcpkg\vcpkg.exe install sqlite3[core,tool]:"%platform%"-windows &
-             .vcpkg\vcpkg.exe install tiff:"%platform%"-windows &
-             .vcpkg\vcpkg.exe install curl:"%platform%"-windows &
+             git clone https://github.com/Microsoft/vcpkg.git > nul 
+             .\vcpkg\bootstrap-vcpkg.bat -disableMetrics 
+             .\vcpkg\vcpkg.exe install sqlite3[core,tool]:"%platform%"
+             .\vcpkg\vcpkg.exe install tiff:"%platform%"
+             .\vcpkg\vcpkg.exe install curl:"%platform%"
            )
           dir %VCPKG_INSTALLED%\bin
           REM
