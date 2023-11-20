@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
-      - name: Install vcpkg on custom path
+      - name: Install with vcpkg needed library
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
@@ -47,28 +47,37 @@ jobs:
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           # install ninja for cmake
+      - name: Install PROJ and build wheel of pyproj
+        env:
+          PROJ_WHEEL: true
+          PROJ_NETWORK: ON
+          PROJ_VERSION: 9.1.0
+          GDAL_VERSION: 3.7.3
+        run: |
           choco install ninja
-          export PROJ_DIR=${GITHUB_WORKSPACE}/PROJ
-          export BUILD_PROJ=1
-          echo $PROJ_DIR
-          env
-          cd ${GITHUB_WORKSPACE} 
+          $Env:PROJ_DIR = "$Env:GITHUB_WORKSPACE\PROJ"
+          $Env:BUILD_PROJ  =1
+          gci env:* | sort-object name
+          Write-Host $Env:PROJ_DIR
+          cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
           cd proj
           git checkout $PROJ_VERSION
           mkdir build
           cd build
-          ls $VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
-          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$PROJ_DIR
+          ls $Env:VCPKG_INSTALLATION_ROOT/installed
+          #
+          ls $Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
+          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$Env:PROJ_DIR
           ninja -v
           ninja install
-          echo $PATH
-          export PATH=$PROJ_DIR\bin:$PATH
-          export PROJ_DATA=$PROJ_DIR\share\proj
+          #
+          $Env:Path = $Env:PROJ_DIR\bin + $env:Path
+          $Env:PROJ_DATA = $Env:PROJ_DIR\share\proj
           proj
           #
           #
-          #          git clone 
+          #          git clone
           #          git clone https://github.com/pyproj4/pyproj.git
           #          cd pyproj
           #          git checkout ${PYPROJ_VERSION}
@@ -84,7 +93,7 @@ jobs:
           #          cd ${GITHUB_WORKSPACE}/wheels_torepair
           #          delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse pyproj*.whl
           #          #echo "PYPROJ test wheel"
-          #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"  
+          #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
           #          ##
           #          #pip download GDAL==${GDAL_VERSION}
           #          #ls GDAL-${GDAL_VERSION}.tar.gz
