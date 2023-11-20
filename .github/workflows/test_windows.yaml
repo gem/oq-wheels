@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
 
-      - name: Install PROJ with vcpkg adn build wheel with cibuildwheel
+      - name: Install PROJ with vcpkg adn build wheel
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
@@ -27,29 +27,30 @@ jobs:
           BUILD_SHARED_LIBS: ON
           PYPROJ_VERSION: 3.6.1
           REPO_DIR: pyproj
+          BUILD_PROJ: 1
         shell: cmd
         run: |
           set VCPKG_INSTALLED=C:\tools\vcpkg\installed\%platform%-windows
+          set BASE_INST_DIR="C:\tools\installed"
+          set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJ_SOURCE:~0,5%
           set
           cd \
           mkdir c:\tools
           git clone https://github.com/Microsoft/vcpkg.git
-          cd vcpkg"
+          cd vcpkg
           .\bootstrap-vcpkg.bat -disableMetrics 
           vcpkg install sqlite3[core,tool]:"%platform%"-windows &
           vcpkg install tiff:"%platform%"-windows &
           vcpkg install curl:"%platform%"-windows
-          dir %VCPKG_INSTALLED%\bin
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
-          set BASE_INST_DIR="C:\tools\installed"
-          set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJ_SOURCE:~0,5%
+          dir %VCPKG_INSTALLED%\bin
           cd c:\tools
           curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
           7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
           dir
           #
           cd "c:\tools\proj-%PROJSOURCE:~0,5%"
-          set BUILD_PROJ=1
+          # set BUILD_PROJ=1
           mkdir build
           cd build
           cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="%BUILD_SHARED_LIBS%" -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX="%PROJ_DIR%"
