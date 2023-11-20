@@ -30,24 +30,25 @@ jobs:
           platform: "x64-windows"
         shell: cmd
         run: |
-          REM set CPKG_INSTALLED
           REM set BASE_INST_DIR="C:\tools\installed"
           REM set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJSOURCE:~0,5%
-          #git clone https://github.com/Microsoft/vcpkg.git
           REM
           vcpkg install sqlite3[core,tool]:"%platform%"
           vcpkg install tiff:"%platform%"
           vcpkg install curl:"%platform%"
-          cd %RUNNER_WORKSPACE%
-          dir C:\vcpkg
-          #set PATH=%VCPKG_INSTALLED%\bin;%PATH%
+          dir %VCPKG_INSTALLED%
+          set
+          set PATH=%VCPKG_INSTALLED%\bin;%PATH%
           #dir %VCPKG_INSTALLED%\bin
+          cd %RUNNER_WORKSPACE%
           #cd c:\tools
-          #curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
-          #7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
-          #dir
+          dir C:\vcpkg\installed\bin
+          curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
+          7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
+          dir
           ##
-          #cd "c:\tools\proj-%PROJSOURCE:~0,5%"
+          cd "%RUNNER_WORKSPACE%\proj-%PROJSOURCE:~0,5%"
+          #
           ## set BUILD_PROJ=1
           #mkdir build
           #cd build
