@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "self-hosted" ]
+        os: [ "windows-2019" ]
         python: [ "3.9", "3.10", "3.11" ]
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,8 @@ jobs:
           dir C:\Tools\vcpkg
           set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
           c:
-          cd tools
+          cd \
+          cd c:\tools
           dir
           git clone https://github.com/Microsoft/vcpkg.git > nul
           .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
@@ -46,6 +47,8 @@ jobs:
           .\vcpkg\vcpkg.exe install curl:"%platform%"
           dir %VCPKG_INSTALLED%\bin
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
+          cd \
+          cd c:\tools
           curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
           7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
           ##
