@@ -8,76 +8,90 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "windows-2019" ]
+        os: [ "windows-2022" ]
+        arch: [ "auto64" ]
         python: [ "3.9", "3.10", "3.11" ]
+        triplet: [ "x64-windows" ]
+        vcpkg_cache: [ "c:\\vcpkg\\installed" ]
+        vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
+    env:
+      REPO_DIR: pyproj
+      PYPROJ_VERSION: 3.6.1
     steps:
       - uses: actions/checkout@v4
+        #      - uses: actions/checkout@v4
+        #        with:
+        #          repository: pyproj4/pyproj
+        #          ref: '3.6.1'
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
 
-      - name: Install vcpkg on custom path
+      - name: Install PROJ with vcpkg adn build wheel with cibuildwheel
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
+          PROJ_VERSION: 9.1.0
+          PROJ_DIR: c:/tools/PROJ
+          PROJ_DATA: d:/a/oq-wheels/oq-wheels/bin/pyproj/proj_dir/share/proj/
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           GDAL_VERSION: 3.7.3
-          PROJSOURCE: 9.1.0
-          BUILD_SHARED_LIBS: ON
-          PYPROJ_VERSION: 3.6.1
-          REPO_DIR: pyproj
-          BUILD_PROJ: 1
-          platform: "x64-windows"
-        shell: cmd
+        shell: bash
         run: |
-          set PROJ_DIR="C:\Tools\proj-%PROJSOURCE:~0,5%"
-          choco install ninja
-          REM choco install cmake
-          mkdir C:\Tools\vcpkg
-          dir C:\Tools\vcpkg
-          set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
-          c:
-          cd \
-          cd c:\tools
-          dir
-          curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
-          7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
-          git clone https://github.com/Microsoft/vcpkg.git > nul
-          .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
-      - name: Install PROJ 
-        env:
-          PROJ_WHEEL: true
-          PROJ_NETWORK: ON
-          GDAL_VERSION: 3.7.3
-          PROJSOURCE: 9.1.0
-          BUILD_SHARED_LIBS: ON
-          PYPROJ_VERSION: 3.6.1
-          REPO_DIR: pyproj
-          BUILD_PROJ: 1
-          platform: "x64-windows"
-        shell: cmd
-          set PROJ_DIR="C:\Tools\proj-%PROJSOURCE:~0,5%"
-          set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
-          cd \
-          cd c:\tools
-          dir
-          .\vcpkg\vcpkg.exe install sqlite3[core,tool]:"%platform%"
-          .\vcpkg\vcpkg.exe install tiff:"%platform%"
-          .\vcpkg\vcpkg.exe install curl:"%platform%"
-          dir %VCPKG_INSTALLED%\bin
-          set PATH=%VCPKG_INSTALLED%\bin;%PATH%
-          ##
-          cd "%PROJSOURCE:~0,5%"
-          #
-          set BUILD_PROJ=1
+          echo ${GITHUB_WORKSPACE}
+          ls -lrt ${GITHUB_WORKSPACE}
+          cd "$VCPKG_INSTALLATION_ROOT"
+          git pull > nul
+          ./bootstrap-vcpkg.bat -disableMetrics
+          ## simple usage is to copy over the file based
+          ## Install gdal since contains all other requirements for Fiona and proj
+          cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          cd c:/
+          mkdir tools
+          cd tools
+          git clone https://github.com/OSGeo/proj.git
+          cd proj
+          git checkout $PROJ_VERSION
+          export BUILD_PROJ=1
           mkdir build
           cd build
-          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="%BUILD_SHARED_LIBS%" -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX="%PROJ_DIR%"
+          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="%BUILD_SHARED_LIBS%" -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$PROJ_DIR
           ninja -v
           ninja install
-          set PATH=%PROJ_DIR%\bin;%PATH%
-          set PROJ_DATA=%PROJ_DIR%\share\proj
+          export PATH=$PROJ_DIR\bin:$PATH
+          export PROJ_DATA=$PROJ_DIR\share\proj
           proj
-          #python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
+          #
+          #
+          #          git clone 
+          #          git clone https://github.com/pyproj4/pyproj.git
+          #          cd pyproj
+          #          git checkout ${PYPROJ_VERSION}
+          #          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
+          #          mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
+          #          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          #          #
+          #          export PROJ_DATA=${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          #          echo ${PROJ_DATA}
+          #          ls ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          #          python -m pip install delvewheel
+          #          python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
+          #          cd ${GITHUB_WORKSPACE}/wheels_torepair
+          #          delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse pyproj*.whl
+          #          #echo "PYPROJ test wheel"
+          #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"  
+          #          ##
+          #          #pip download GDAL==${GDAL_VERSION}
+          #          #ls GDAL-${GDAL_VERSION}.tar.gz
+          #          #tar xzvf GDAL-${GDAL_VERSION}.tar.gz
+          #          #mv GDAL-${GDAL_VERSION} gdal
+          #          #ls
+          #          #cd gdal
+          #          #python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
+          #          #delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse gdal*.whl
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
