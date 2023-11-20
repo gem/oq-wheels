@@ -33,16 +33,16 @@ jobs:
           set BASE_INST_DIR="%RUNNER_WORKSPACE%\installed"
           set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJSOURCE:~0,5%
           REM
-          vcpkg install sqlite3[core,tool]:"%platform%"
-          vcpkg install tiff:"%platform%"
-          vcpkg install curl:"%platform%"
-          set VCPKG_PACKAGES=%VCPKG_INSTALLATION_ROOT%\packages\
-          set PATH=%VCPKG_PACKAGES%\bin;%PATH%
-          dir %VCPKG_PACKAGES%
-          REM
-          dir %VCPKG_PACKAGES%\bin
           set
+          set VCPKG_INSTALLED="%RUNNER_WORKSPACE%\vcpkg\installed\%platform%"
           cd %RUNNER_WORKSPACE%
+          git clone https://github.com/Microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install sqlite3[core,tool]:"%platform%"
+          .\vcpkg\vcpkg install tiff:"%platform%"
+          .\vcpkg\vcpkg install curl:"%platform%"
+          REM
+          set PATH=%VCPKG_INSTALLED%\bin;%PATH%
           curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
           7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
           ##
