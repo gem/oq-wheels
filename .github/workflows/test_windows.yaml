@@ -11,7 +11,6 @@ jobs:
         os: [ "windows-2022" ]
         arch: [ "auto64" ]
         python: [ "3.9", "3.10", "3.11" ]
-        triple: [ "x64-windows" ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -28,21 +27,25 @@ jobs:
           PYPROJ_VERSION: 3.6.1
           REPO_DIR: pyproj
           BUILD_PROJ: 1
-          platform: "${{ matrix.triplet }}"
+          platform: "x64-windows"
         shell: cmd
         run: |
-          set VCPKG_INSTALLED=C:\tools\vcpkg\installed\%platform%-windows
+          set VCPKG_INSTALLED=C:\vcpkg\installed\%platform%-windows
           set BASE_INST_DIR="C:\tools\installed"
           set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJ_SOURCE:~0,5%
           set
-          cd \
+          cd c:\
+          cd c:\vcpkg
+          dir
+          .\vcpkg install sqlite3[core,tool]:"%platform%"-windows 
+          .\vcpkg install tiff:"%platform%"-windows 
+          .\vcpkg install curl:"%platform%"-windows
+          cd c:\
           mkdir c:\tools
-          git clone https://github.com/Microsoft/vcpkg.git
-          cd vcpkg
-          .\bootstrap-vcpkg.bat -disableMetrics 
-          vcpkg install sqlite3[core,tool]:"%platform%"-windows 
-          vcpkg install tiff:"%platform%"-windows 
-          vcpkg install curl:"%platform%"-windows
+          cd c:\tools
+          #git clone https://github.com/Microsoft/vcpkg.git
+          #\vcpkg\bootstrap-vcpkg.bat -disableMetrics 
+          #cd vcpkg
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
           dir %VCPKG_INSTALLED%\bin
           cd c:\tools
