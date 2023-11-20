@@ -54,11 +54,11 @@ jobs:
           PROJ_VERSION: 9.1.0
           GDAL_VERSION: 3.7.3
         run: |
-          choco install ninja
-          PROJ_DIR = "$Env:GITHUB_WORKSPACE\PROJ"
-          $Env:BUILD_PROJ  =1
           gci env:* | sort-object name
-          Write-Host $Env:PROJ_DIR
+          choco install ninja
+          $PROJ_DIR = "C:\PROJ"
+          $Env:BUILD_PROJ = 1
+          Write-Host "Installation folder of PROJ:"$PROJ_DIR
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
           cd proj
