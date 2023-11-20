@@ -22,7 +22,7 @@ jobs:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
           GDAL_VERSION: 3.7.3
-          PROJ_SOURCE: 9.1.0
+          PROJSOURCE: 9.1.0
           BUILD_SHARED_LIBS: ON
           PYPROJ_VERSION: 3.6.1
           REPO_DIR: pyproj
@@ -32,20 +32,18 @@ jobs:
         run: |
           set VCPKG_INSTALLED=C:\vcpkg\installed\%platform%-windows
           set BASE_INST_DIR="C:\tools\installed"
-          set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJ_SOURCE:~0,5%
+          set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJSOURCE:~0,5%
           set
-          cd c:\
-          cd c:\vcpkg
+          cd %RUNNER_WORKSPACE%
           dir
+          git clone https://github.com/Microsoft/vcpkg.git
+          REM
+          .\vcpkg\bootstrap-vcpkg.bat -disableMetrics 
           .\vcpkg install sqlite3[core,tool]:"%platform%"-windows 
           .\vcpkg install tiff:"%platform%"-windows 
           .\vcpkg install curl:"%platform%"-windows
-          cd c:\
+          cd %RUNNER_WORKSPACE%
           mkdir c:\tools
-          cd c:\tools
-          #git clone https://github.com/Microsoft/vcpkg.git
-          #\vcpkg\bootstrap-vcpkg.bat -disableMetrics 
-          #cd vcpkg
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
           dir %VCPKG_INSTALLED%\bin
           cd c:\tools
