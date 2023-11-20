@@ -26,9 +26,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
-      #In order to use CMake + Ninja + MSVC (The Visual Studio Compiler) you need to startup a developer command prompt.
-      #https://stackoverflow.com/questions/76186423/how-to-setup-visual-studio-developer-command-prompt-on-github-actions
-      - uses: ilammy/msvc-dev-cmd@v1
       - name: Install with vcpkg needed library
         env:
           PROJ_WHEEL: true
@@ -50,26 +47,26 @@ jobs:
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           # install ninja for cmake
+      #In order to use CMake + Ninja + MSVC (The Visual Studio Compiler) you need to startup a developer command prompt.
+      #https://stackoverflow.com/questions/76186423/how-to-setup-visual-studio-developer-command-prompt-on-github-actions
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Install PROJ and build wheel of pyproj
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
           PROJ_VERSION: 9.1.0
+          PYPROJ_VERSION: 3.6.1
           GDAL_VERSION: 3.7.3
+          BUILD_PROJ: 1
         run: |
           gci env:* | sort-object name
           choco install ninja cmake
           ninja --version
           cmake --version
-          $PROJ_DIR = "C:\PROJ"
-          $Env:BUILD_PROJ = 1
+          $PROJ_DIR = "C:\proj"
+          mkdir $PROJ_DIR
+          Get-Content -Path $PROJ_DIR
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
-          gcc --version
-          g++ --version
-          cmake --version
-          cmake -G
-          cd "$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems"
-          cat vcpkg.cmake
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
           cd proj
@@ -77,21 +74,20 @@ jobs:
           git status
           mkdir build
           cd build
-          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$PROJ_DIR
+          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX="C:\proj"
           ninja -v
           ninja install
           #
           $Env:Path = "$PROJ_DIR\bin" + $env:Path
           $PROJ_DATA = "$PROJ_DIR\share\proj"
-          proj
           #
           #
-          #          git clone
-          #          git clone https://github.com/pyproj4/pyproj.git
-          #          cd pyproj
-          #          git checkout ${PYPROJ_VERSION}
-          #          ls "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/"*
-          #          mkdir -p ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj
+          cd "$Env:GITHUB_WORKSPACE"
+          git clone
+          git clone https://github.com/pyproj4/pyproj.git
+          cd pyproj
+          git checkout $Env:PYPROJ_VERSION
+          mkdir -p "$Env:GITHUB_WORKSPACE/pyproj/proj_dir/share/proj"
           #          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
           #          #
           #          export PROJ_DATA=${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
