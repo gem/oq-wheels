@@ -59,21 +59,24 @@ jobs:
           $PROJ_DIR = "C:\PROJ"
           $Env:BUILD_PROJ = 1
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
+          gcc --version
+          cmake --version
+          cmake -G
+          cd "$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems"
+          cat vcpkg.cmake
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
           cd proj
-          git checkout $PROJ_VERSION
+          git checkout $Env:PROJ_VERSION
+          git status
           mkdir build
           cd build
-          ls $Env:VCPKG_INSTALLATION_ROOT/installed
-          #
-          ls $Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
           cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$PROJ_DIR
           ninja -v
           ninja install
           #
           $Env:Path = "$PROJ_DIR\bin" + $env:Path
-          PROJ_DATA = "$PROJ_DIR\share\proj"
+          $PROJ_DATA = "$PROJ_DIR\share\proj"
           proj
           #
           #
