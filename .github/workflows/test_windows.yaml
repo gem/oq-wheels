@@ -55,7 +55,9 @@ jobs:
           GDAL_VERSION: 3.7.3
         run: |
           gci env:* | sort-object name
-          choco install ninja
+          choco install ninja cmake
+          ninja --version
+          cmake --version
           $PROJ_DIR = "C:\PROJ"
           $Env:BUILD_PROJ = 1
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
