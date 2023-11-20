@@ -45,8 +45,8 @@ jobs:
              .\vcpkg\vcpkg.exe install sqlite3[core,tool]:"%platform%"
              .\vcpkg\vcpkg.exe install tiff:"%platform%"
              .\vcpkg\vcpkg.exe install curl:"%platform%"
+             dir %VCPKG_INSTALLED%\bin
            )
-          dir %VCPKG_INSTALLED%\bin
           REM
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
           curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
