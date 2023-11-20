@@ -26,6 +26,9 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
+      #In order to use CMake + Ninja + MSVC (The Visual Studio Compiler) you need to startup a developer command prompt.
+      #https://stackoverflow.com/questions/76186423/how-to-setup-visual-studio-developer-command-prompt-on-github-actions
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Install with vcpkg needed library
         env:
           PROJ_WHEEL: true
