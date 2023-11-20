@@ -60,6 +60,7 @@ jobs:
           $Env:BUILD_PROJ = 1
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
           gcc --version
+          g++ --version
           cmake --version
           cmake -G
           cd "$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems"
