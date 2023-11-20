@@ -31,8 +31,7 @@ jobs:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
           PROJ_VERSION: 9.1.0
-          PROJ_DIR: c:/tools/PROJ
-          PROJ_DATA: d:/a/oq-wheels/oq-wheels/bin/pyproj/proj_dir/share/proj/
+          PROJ_DIR: C:/GEM/PROJ
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
           GDAL_VERSION: 3.7.3
         shell: bash
@@ -48,8 +47,8 @@ jobs:
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
           cd c:/
-          mkdir tools
-          cd tools
+          mkdir GEM
+          cd GEM
           git clone https://github.com/OSGeo/proj.git
           cd proj
           git checkout $PROJ_VERSION
@@ -61,6 +60,7 @@ jobs:
           ninja install
           export PATH=$PROJ_DIR\bin:$PATH
           export PROJ_DATA=$PROJ_DIR\share\proj
+          env
           proj
           #
           #
