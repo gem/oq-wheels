@@ -31,7 +31,7 @@ jobs:
         run: |
           set PROJ_DIR="C:\Tools\proj-%PROJSOURCE:~0,5%"
           set
-          REM choco install ninja
+          choco install ninja
           REM choco install cmake
           mkdir C:\Tools\vcpkg
           dir C:\Tools\vcpkg
@@ -40,6 +40,8 @@ jobs:
           cd \
           cd c:\tools
           dir
+          curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
+          7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
           git clone https://github.com/Microsoft/vcpkg.git > nul
           .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
           .\vcpkg\vcpkg.exe install sqlite3[core,tool]:"%platform%"
@@ -47,13 +49,8 @@ jobs:
           .\vcpkg\vcpkg.exe install curl:"%platform%"
           dir %VCPKG_INSTALLED%\bin
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
-          cd \
-          cd c:\tools
-          curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
-          7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
           ##
-          cd "%RUNNER_WORKSPACE%\proj-%PROJSOURCE:~0,5%"
-          dir
+          cd "%PROJSOURCE:~0,5%"
           #
           set BUILD_PROJ=1
           mkdir build
