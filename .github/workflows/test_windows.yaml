@@ -57,8 +57,6 @@ jobs:
         shell: cmd
           set PROJ_DIR="C:\Tools\proj-%PROJSOURCE:~0,5%"
           set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
-          set
-          c:
           cd \
           cd c:\tools
           dir
