@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
-
       - name: Install vcpkg on custom path
         env:
           PROJ_WHEEL: true
@@ -54,11 +53,12 @@ jobs:
           REPO_DIR: pyproj
           BUILD_PROJ: 1
           platform: "x64-windows"
-        shell: cmd
+        shell: cmd 
+        run: |
           set PROJ_DIR="C:\Tools\proj-%PROJSOURCE:~0,5%"
           set VCPKG_INSTALLED=C:\Tools\vcpkg\installed\%platform%
           set
-          c:
+          c:\
           cd \
           cd c:\tools
           dir
@@ -67,9 +67,7 @@ jobs:
           .\vcpkg\vcpkg.exe install curl:"%platform%"
           dir %VCPKG_INSTALLED%\bin
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
-          ##
           cd "%PROJSOURCE:~0,5%"
-          #
           set BUILD_PROJ=1
           mkdir build
           cd build
