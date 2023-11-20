@@ -12,7 +12,6 @@ jobs:
         arch: [ "auto64" ]
         python: [ "3.9", "3.10", "3.11" ]
         triplet: [ "x64-windows" ]
-    env:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
