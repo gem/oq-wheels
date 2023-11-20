@@ -26,8 +26,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
-
-      - name: Install PROJ with vcpkg adn build wheel with cibuildwheel
+      - name: Install vcpkg on custom path
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
