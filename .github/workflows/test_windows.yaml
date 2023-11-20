@@ -30,29 +30,30 @@ jobs:
           platform: "x64-windows"
         shell: cmd
         run: |
-          REM set BASE_INST_DIR="C:\tools\installed"
+          REM set BASE_INST_DIR="%RUNNER_WORKSPACE%\installed"
           REM set PROJ_DIR=%BASE_INST_DIR%\proj-%PROJSOURCE:~0,5%
           REM
           vcpkg install sqlite3[core,tool]:"%platform%"
           vcpkg install tiff:"%platform%"
           vcpkg install curl:"%platform%"
-          dir %VCPKG_INSTALLED%
-          set
+          dir %VCPKG_INSTALLATION_ROOT%
+          set VCPKG_INSTALLED=%VCPKG_INSTALLATION_ROOT%\installed\
           set PATH=%VCPKG_INSTALLED%\bin;%PATH%
-          #dir %VCPKG_INSTALLED%\bin
+          REM
+          set
+          dir %VCPKG_INSTALLED%\bin
           cd %RUNNER_WORKSPACE%
           #cd c:\tools
-          dir C:\vcpkg\installed\bin
           curl -o "proj-%PROJSOURCE:~0,5%.zip" "https://download.osgeo.org/proj/proj-%PROJSOURCE%.zip"
           7z x -aoa -y "proj-%PROJSOURCE:~0,5%.zip"
-          dir
           ##
-          cd "%RUNNER_WORKSPACE%\proj-%PROJSOURCE:~0,5%"
+          d "%RUNNER_WORKSPACE%\proj-%PROJSOURCE:~0,5%"
+          dir
           #
           ## set BUILD_PROJ=1
           #mkdir build
           #cd build
-          #cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="%BUILD_SHARED_LIBS%" -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX="%PROJ_DIR%"
+          #cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="%BUILD_SHARED_LIBS%" -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX="%PROJ_DIR%"
           #ninja -v
           #ninja install
           #set PATH=%PROJ_DIR%\bin;%PATH%
