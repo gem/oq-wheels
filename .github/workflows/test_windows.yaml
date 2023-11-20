@@ -30,6 +30,8 @@ jobs:
           platform: "x64-windows"
         shell: cmd
         run: |
+          set PROJ_DIR="c:\Tools\proj-%PROJSOURCE:~0,5%"
+          set
           choco install ninja
           mkdir C:\Tools\vcpkg
           dir C:\Tools\vcpkg 
