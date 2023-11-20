@@ -55,7 +55,7 @@ jobs:
           GDAL_VERSION: 3.7.3
         run: |
           choco install ninja
-          $Env:PROJ_DIR = "$Env:GITHUB_WORKSPACE\PROJ"
+          PROJ_DIR = "$Env:GITHUB_WORKSPACE\PROJ"
           $Env:BUILD_PROJ  =1
           gci env:* | sort-object name
           Write-Host $Env:PROJ_DIR
@@ -68,12 +68,12 @@ jobs:
           ls $Env:VCPKG_INSTALLATION_ROOT/installed
           #
           ls $Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
-          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$Env:PROJ_DIR
+          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX=$PROJ_DIR
           ninja -v
           ninja install
           #
-          $Env:Path = $Env:PROJ_DIR\bin + $env:Path
-          $Env:PROJ_DATA = $Env:PROJ_DIR\share\proj
+          $Env:Path = "$PROJ_DIR\bin" + $env:Path
+          PROJ_DATA = "$PROJ_DIR\share\proj"
           proj
           #
           #
