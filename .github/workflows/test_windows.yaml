@@ -46,6 +46,8 @@ jobs:
           cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
           cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
           vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          # install ninja for cmake
+          choco install ninja
           export PROJ_DIR=${GITHUB_WORKSPACE}/PROJ
           export BUILD_PROJ=1
           echo $PROJ_DIR
