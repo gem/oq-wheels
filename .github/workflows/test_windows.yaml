@@ -80,8 +80,8 @@ jobs:
           $Env:Path = "$PROJ_DIR\bin;" + $Env:Path
           $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
           # test bin on PATH
-          Write-Host "PATH: " + $Env:Path
-          Write-Host "PROJ_DIR: " + $Env:PROJ_DIR
+          Write-Host "PATH: "  $Env:Path
+          Write-Host "PROJ_DIR: "  $Env:PROJ_DIR
           #
           proj.exe
           #
