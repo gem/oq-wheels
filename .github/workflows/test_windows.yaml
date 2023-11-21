@@ -54,8 +54,8 @@ jobs:
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
-          PROJ_DIR: "C:\proj"
-          PROJ_DATA: "c:\proj\share\proj"
+          PROJ_DIR: "C:\\proj"
+          PROJ_DATA: "c:\\proj\\share\\proj"
           PROJ_VERSION: 9.1.0
           PYPROJ_VERSION: 3.6.1
           GDAL_VERSION: 3.7.3
@@ -97,7 +97,7 @@ jobs:
           Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
-          python -m pip wheel . --wheel-dir="$Env:TEMP" --no-deps
+          python -m pip wheel . --wheel-dir="$Env:TEMP" 
           cd "$Env:TEMP"
           Write-Host "Folder Content"
           ls
