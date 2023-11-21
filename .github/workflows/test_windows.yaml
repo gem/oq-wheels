@@ -54,13 +54,14 @@ jobs:
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
-          PROJ_DIR: "C:\\proj"
+          PROJ_DIR: "C:\proj"
+          PROJ_DATA: "c:\proj\share\proj"
           PROJ_VERSION: 9.1.0
           PYPROJ_VERSION: 3.6.1
           GDAL_VERSION: 3.7.3
           BUILD_PROJ: 1
         run: |
-          gci env:* | sort-object name
+          #gci env:* | sort-object name
           choco install ninja cmake
           $PROJ_DIR = $Env:PROJ_DIR
           mkdir $PROJ_DIR
@@ -77,11 +78,12 @@ jobs:
           ninja -v
           ninja install
           #
+          $Env:Path = "C:\vcpkg\installed\x64-windows\bin;" + $Env:Path
           $Env:Path = "$PROJ_DIR\bin;" + $Env:Path
-          $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
           # test bin on PATH
-          Write-Host "PATH: "  $Env:Path
-          Write-Host "PROJ_DIR: "  $Env:PROJ_DIR
+          Write-Host "PATH: "$Env:Path
+          Write-Host "PROJ_DIR: "$Env:PROJ_DIR
+          Write-Host "PROJ_DATA: "$Env:PROJ_DATA
           #
           proj.exe
           #
@@ -92,10 +94,6 @@ jobs:
           # NOT NEED: mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
           Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj" -Recurse
           #          #
-          echo "$Env:PROJ_DATA"
-          mkdir "$Env:GITHUB_WORKSPACE\wheels_torepair"
-          ls "$Env:GITHUB_WORKSPACE\wheels_torepair"
-          Write-Host "Check copyfolder"
           Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
@@ -105,7 +103,7 @@ jobs:
           ls
           mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
           $file=Get-ChildItem -Path .\ -Filter *.whl
-          delvewheel repair -v --add-path "C:\vcpkg\installed\x64-windows\bin" --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
+          delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
           #          ##
