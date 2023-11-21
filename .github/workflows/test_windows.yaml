@@ -99,7 +99,7 @@ jobs:
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
           python -m pip wheel . --wheel-dir="$Env:TEMP" --no-deps
-          cd "$Env:GITHUB_WORKSPACE\wheels_torepair"
+          cd "$Env:TEMP"
           Write-Host "Folder Content"
           ls
           mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
