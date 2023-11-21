@@ -54,7 +54,7 @@ jobs:
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
-          PROJ_DIR: "C:\proj"
+          PROJ_DIR: "C:\\proj"
           PROJ_VERSION: 9.1.0
           PYPROJ_VERSION: 3.6.1
           GDAL_VERSION: 3.7.3
