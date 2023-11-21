@@ -91,8 +91,9 @@ jobs:
           Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj" -Recurse
           #          #
           echo "$Env:PROJ_DATA"
+          mkdir "$Env:GITHUB_WORKSPACE\wheels_torepair"
+          ls "$Env:GITHUB_WORKSPACE\wheels_torepair"
           Write-Host "Check copyfolder"
-          ls "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj"
           Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
@@ -100,6 +101,7 @@ jobs:
           cd "$Env:GITHUB_WORKSPACE\wheels_torepair"
           Write-Host "Folder Content"
           ls
+          mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
           delvewheel repair -w "$Env:GITHUB_WORKSPACE\wheelhouse" pyproj*.whl
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
