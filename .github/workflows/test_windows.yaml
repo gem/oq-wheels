@@ -65,6 +65,7 @@ jobs:
           $PROJ_DIR = $Env:PROJ_DIR
           mkdir $PROJ_DIR
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
+          Write-Host "TEMP folder of wheels:"$Env:TEMP
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
           cd proj
@@ -97,7 +98,7 @@ jobs:
           Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
-          python -m pip wheel . -w="$Env:GITHUB_WORKSPACE\wheels_torepair" --no-deps
+          python -m pip wheel . --wheel-dir="$Env:TEMP" --no-deps
           cd "$Env:GITHUB_WORKSPACE\wheels_torepair"
           Write-Host "Folder Content"
           ls
