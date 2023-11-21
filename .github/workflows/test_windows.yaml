@@ -103,7 +103,8 @@ jobs:
           Write-Host "Folder Content"
           ls
           mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
-          delvewheel repair -w "$Env:GITHUB_WORKSPACE\wheelhouse" *.whl
+          $file=Get-ChildItem -Path .\ -Filter *.whl
+          delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
           #          ##
