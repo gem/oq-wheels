@@ -1,6 +1,6 @@
 ---
 name: Windows wheels and test x86_64
-on: [pull_request, workflow_dispatch]
+on: [workflow_dispatch]
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os }} ${{ matrix.triplet }}
