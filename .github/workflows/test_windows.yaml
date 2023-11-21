@@ -65,7 +65,6 @@ jobs:
           cmake --version
           $PROJ_DIR = "C:\proj"
           mkdir $PROJ_DIR
-          Get-Content -Path $PROJ_DIR
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/OSGeo/proj.git
@@ -79,7 +78,7 @@ jobs:
           ninja install
           #
           $Env:Path = "$PROJ_DIR\bin" + $env:Path
-          $PROJ_DATA = "$PROJ_DIR\share\proj"
+          $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
           #
           #
           cd "$Env:GITHUB_WORKSPACE"
@@ -88,10 +87,11 @@ jobs:
           cd pyproj
           git checkout $Env:PYPROJ_VERSION
           mkdir -p "$Env:GITHUB_WORKSPACE/pyproj/proj_dir/share/proj"
-          #          cp "$VCPKG_INSTALLATION_ROOT/installed/${{ matrix.triplet }}/share/proj/"* ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
+          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj" -Recurse
           #          #
-          #          export PROJ_DATA=${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
-          #          echo ${PROJ_DATA}
+          echo ${PROJ_DATA}
+          ls "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj"
+
           #          ls ${GITHUB_WORKSPACE}/pyproj/proj_dir/share/proj/
           #          python -m pip install delvewheel
           #          python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
