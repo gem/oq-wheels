@@ -54,6 +54,7 @@ jobs:
         env:
           PROJ_WHEEL: true
           PROJ_NETWORK: ON
+          PROJ_DIR: "C:\proj"
           PROJ_VERSION: 9.1.0
           PYPROJ_VERSION: 3.6.1
           GDAL_VERSION: 3.7.3
@@ -61,7 +62,7 @@ jobs:
         run: |
           gci env:* | sort-object name
           choco install ninja cmake
-          $PROJ_DIR = "C:\proj"
+          $PROJ_DIR = $Env:PROJ_DIR
           mkdir $PROJ_DIR
           Write-Host "Installation folder of PROJ:"$PROJ_DIR
           cd "$Env:GITHUB_WORKSPACE"
@@ -75,8 +76,10 @@ jobs:
           ninja -v
           ninja install
           #
-          $Env:Path = "$PROJ_DIR\bin" + $env:Path
+          $Env:Path = "$PROJ_DIR\bin" + $Env:Path
           $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
+          # test bin on PATH
+          proj
           #
           #
           cd "$Env:GITHUB_WORKSPACE"
