@@ -77,7 +77,8 @@ jobs:
           ninja -v
           ninja install
           #
-          $Env:Path = "$PROJ_DIR\bin" + $Env:Path
+          #need on PATH?
+          #$Env:Path = "$PROJ_DIR\bin" + $Env:Path
           $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
           # test bin on PATH
           Write-Host "PATH: " + $Env:Path
