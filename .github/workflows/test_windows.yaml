@@ -96,8 +96,10 @@ jobs:
           Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
-          python -m pip wheel . --wheel-dir="$Env:GITHUB_WORKSPACE\wheels_torepair" --no-deps
+          python -m pip wheel . -w="$Env:GITHUB_WORKSPACE\wheels_torepair" --no-deps
           cd "$Env:GITHUB_WORKSPACE\wheels_torepair"
+          Write-Host "Folder Content"
+          ls
           delvewheel repair -w "$Env:GITHUB_WORKSPACE\wheelhouse" pyproj*.whl
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
