@@ -103,6 +103,7 @@ jobs:
           ls
           mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
           $file=Get-ChildItem -Path .\ -Filter *.whl
+          unzip -l $file
           delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
