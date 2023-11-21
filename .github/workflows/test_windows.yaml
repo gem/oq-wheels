@@ -12,8 +12,6 @@ jobs:
         arch: [ "auto64" ]
         python: [ "3.9", "3.10", "3.11" ]
         triplet: [ "x64-windows" ]
-        vcpkg_cache: [ "c:\\vcpkg\\installed" ]
-        vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
     env:
       REPO_DIR: pyproj
       PYPROJ_VERSION: 3.6.1
@@ -50,15 +48,11 @@ jobs:
       #In order to use CMake + Ninja + MSVC (The Visual Studio Compiler) you need to startup a developer command prompt.
       #https://stackoverflow.com/questions/76186423/how-to-setup-visual-studio-developer-command-prompt-on-github-actions
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Install PROJ and build wheel of pyproj
+      - name: Install PROJ 
         env:
-          PROJ_WHEEL: true
-          PROJ_NETWORK: ON
           PROJ_DIR: "C:\\proj"
           PROJ_DATA: "c:\\proj\\share\\proj"
           PROJ_VERSION: 9.1.0
-          PYPROJ_VERSION: 3.6.1
-          GDAL_VERSION: 3.7.3
           BUILD_PROJ: 1
         run: |
           #gci env:* | sort-object name
@@ -86,6 +80,15 @@ jobs:
           Write-Host "PROJ_DATA: "$Env:PROJ_DATA
           #
           proj.exe
+      - name: build wheel 
+        env:
+          PROJ_WHEEL: true
+          PROJ_NETWORK: ON
+          PROJ_VERSION: 9.1.0
+          PROJ_DATA: "c:\\proj\\share\\proj"
+          PYPROJ_VERSION: 3.6.1
+          BUILD_PROJ: 1
+        run: |
           #
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/pyproj4/pyproj.git
@@ -94,7 +97,6 @@ jobs:
           # NOT NEED: mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
           Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj\" -Recurse
           #
-          dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\"
           Write-Host "CHECK PROJ_DATA copy files"
           dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj"
           Write-Host "Install python requirements"
@@ -108,18 +110,7 @@ jobs:
           $file=Get-ChildItem -Path .\ -Filter *.whl
           unzip -l $file
           delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
-          #          #echo "PYPROJ test wheel"
-          #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
-          #          ##
-          #          #pip download GDAL==${GDAL_VERSION}
-          #          #ls GDAL-${GDAL_VERSION}.tar.gz
-          #          #tar xzvf GDAL-${GDAL_VERSION}.tar.gz
-          #          #mv GDAL-${GDAL_VERSION} gdal
-          #          #ls
-          #          #cd gdal
-          #          #python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
-          #          #delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse gdal*.whl
-
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
