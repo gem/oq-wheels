@@ -83,8 +83,8 @@ jobs:
           git clone https://github.com/pyproj4/pyproj.git
           cd pyproj
           git checkout $Env:PYPROJ_VERSION
-          mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
-          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share" -Recurse
+          # NOT NEED: mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
+          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\pro" -Recurse
           #          #
           echo "$Env:PROJ_DATA"
           ls "$Env:PROJ_DATA"
