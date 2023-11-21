@@ -1,0 +1,11 @@
+{
+    "name": "fionawheel",
+    "version": "1.9.5",
+    "dependencies": [
+        {
+            "name": "gdal",
+            "version>=": "3.7.3"
+        }
+    ],
+    "builtin-baseline": "6193a5e89d2fb5621aaaf3bb7d9e7d136eb06f4e"
+}

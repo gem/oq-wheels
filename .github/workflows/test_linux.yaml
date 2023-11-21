@@ -1,12 +1,9 @@
 ---
 name: Linux wheels and test x86_64
-
-on: [pull_request, workflow_dispatch]
-
+on: [workflow_dispatch]   
 env:
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
-
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -15,12 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-22.04" ]
-        python: [ "3.8", "3.9", "3.10" ]
+        python: [ "3.9", "3.10", "3.11" ]
         platform: [ "x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: pyproj
-      BUILD_COMMIT: 3.4.0
+      BUILD_COMMIT: 3.6.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -40,7 +37,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             echo $PATH
             bash -x .github/workflows/build.sh
@@ -49,7 +46,7 @@ jobs:
           REPO_DIR: pyproj
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.4.0
+          BUILD_COMMIT: 3.6.1
         run: |
             sudo apt install python3-virtualenv
             bash -x .github/workflows/wheel.sh
@@ -65,17 +62,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-22.04" ]
-        python: [ "3.8", "3.9", "3.10" ]
+        python: [ "3.9", "3.10", "3.11" ]
         platform: [ "x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.8.21
+      BUILD_COMMIT: 1.9.5
+      GDAL_FIONA: 3.7.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
-      TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -90,7 +88,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.9.5
         run: |
             echo $PATH
             bash -x .github/workflows/build.sh
@@ -99,7 +97,7 @@ jobs:
           REPO_DIR: Fiona
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.8.21
+          BUILD_COMMIT: 1.9.5
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
@@ -118,17 +116,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-22.04" ]
-        python: [ "3.8", "3.9", "3.10" ]
+        python: [ "3.9", "3.10", "3.11" ]
         platform: [ "x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.4.3
+      BUILD_COMMIT: v3.7.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy==1.23.3 wheel"
-      TEST_DEPENDS: "numpy==1.13.3"
+      BUILD_DEPENDS: "numpy wheel"
+      TEST_DEPENDS: "numpy"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -143,15 +141,15 @@ jobs:
           REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.4.3
+          BUILD_COMMIT: v3.7.3
         run: |
             bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         env:
-          REPO_DIR: gdal/gdal/swig/python
+          REPO_DIR: gdal
           WHEEL_SDIR: wheelhouse
           SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.4.3
+          BUILD_COMMIT: v3.7.3
         run: |
             sudo apt install python3-virtualenv
             bash -x .github/workflows/wheel.sh
@@ -165,7 +163,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: [ "3.8", "3.9", "3.10" ]
+        python-version: [ "3.10" ]
     env:
       BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
@@ -191,24 +189,21 @@ jobs:
         python3 -m venv $HOME/openquake
         source $HOME/openquake/bin/activate
         pip install -U pip wheel setuptools
-        pip install install pytest
+        pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
+        #cd ${{steps.download.outputs.download-path}}
+        #PYCUT=`echo "${PYTHON_VERSION//.}"`
+        #ls *${PYCUT}*
+        #pip install --force-reinstall *${PYCUT}*
         cd $HOME
         git clone https://github.com/gem/oq-engine.git
         cd oq-engine && git checkout ${BRANCH_TEST}
         git status
         pip install -e .
         cd $HOME/oq-engine
-        cd ${{steps.download.outputs.download-path}}
-        pwd
-        ls -lrt
-        PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}*
-        pip install --force-reinstall *${PYCUT}*
-        cd $HOME/oq-engine
-        oq dbserver start
+        oq dbserver upgrade
         sleep 5
-        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
         pytest -vsx --color=yes openquake/sep/tests/test_utils.py
         pytest -vsx --color=yes openquake/sep
         pytest -vsx --color=yes openquake/calculators
         oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
+        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py

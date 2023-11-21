@@ -39,9 +39,9 @@ rm testfile
 
 rm_mkdir tmp_dir
 [ -d tmp_dir ] || ingest "tmp_dir does not exist"
-touch tmp_dir/afile
+touch tmp_dir/tmp_file
 rm_mkdir tmp_dir
-[ -e tmp_dir/afile ] && ingest "tmp_dir/afile should have been deleted"
+[ -e tmp_dir/tmp_file ] && ingest "tmp_dir/tmp_file should have been deleted"
 rmdir tmp_dir
 
 # Test suppress command
@@ -109,5 +109,5 @@ cmd_notexit good_cmd || ingest
     exit 1
 
 # Crudest possible check for get_distutils_platform
-expected=$(python3 -c "import distutils.util as du; print(du.get_platform())")
+expected=$(python -c "import distutils.util as du; print(du.get_platform())")
 [ "$(get_distutils_platform)" == "$expected" ] || ingest "bad distutils platform"

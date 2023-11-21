@@ -11,6 +11,8 @@ echo "::group::Build wheel"
   echo $PYTHON_EXE
   echo $REPO_DIR
   echo $PLAT
+  echo " ${PROJ_DIR}  ${PROJ_DATA}"
+  echo " ${PROJ_WHEEL} ${PROJ_NETWORK}"
   build_wheel $REPO_DIR $PLAT
   ls -l "${GITHUB_WORKSPACE}/${WHEEL_SDIR}/"
 echo "::endgroup::"

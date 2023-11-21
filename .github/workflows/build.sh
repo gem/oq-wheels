@@ -23,6 +23,7 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git clone https://github.com/OSGeo/gdal.git
 	  cd gdal
 	  git checkout ${BUILD_COMMIT}
-	  ls gdal/swig/python
+	  # No such file or directory for GDAL 3.6.4
+	  ls swig/python
   fi
 echo "::endgroup::"

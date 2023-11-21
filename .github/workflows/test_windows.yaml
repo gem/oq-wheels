@@ -1,0 +1,127 @@
+---
+name: Windows wheels and test x86_64
+on: [pull_request, workflow_dispatch]
+jobs:
+  build_pyproj:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os }} ${{ matrix.triplet }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "windows-2022" ]
+        arch: [ "auto64" ]
+        python: [ "3.9", "3.10", "3.11" ]
+        triplet: [ "x64-windows" ]
+        vcpkg_cache: [ "c:\\vcpkg\\installed" ]
+        vcpkg_logs: [ "c:\\vcpkg\\buildtrees\\**\\*.log" ]
+    env:
+      REPO_DIR: pyproj
+      PYPROJ_VERSION: 3.6.1
+    steps:
+      - uses: actions/checkout@v4
+        #      - uses: actions/checkout@v4
+        #        with:
+        #          repository: pyproj4/pyproj
+        #          ref: '3.6.1'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "${{ matrix.python }}"
+      - name: Install with vcpkg needed library
+        env:
+          PROJ_WHEEL: true
+          PROJ_NETWORK: ON
+          PROJ_VERSION: 9.1.0
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+          GDAL_VERSION: 3.7.3
+        shell: bash
+        run: |
+          set -x
+          echo ${GITHUB_WORKSPACE}
+          ls -lrt ${GITHUB_WORKSPACE}
+          cd "$VCPKG_INSTALLATION_ROOT"
+          git pull > nul
+          ./bootstrap-vcpkg.bat -disableMetrics
+          ## simple usage is to copy over the file based
+          ## Install gdal since contains all other requirements for Fiona and proj
+          cp ${GITHUB_WORKSPACE}/windows/vcpkg_proj.json ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          cat ${GITHUB_WORKSPACE}/windows/vcpkg.json
+          vcpkg install --feature-flags="versions,manifests" --x-manifest-root=${GITHUB_WORKSPACE}/windows --x-install-root=$VCPKG_INSTALLATION_ROOT/installed
+          # install ninja for cmake
+      #In order to use CMake + Ninja + MSVC (The Visual Studio Compiler) you need to startup a developer command prompt.
+      #https://stackoverflow.com/questions/76186423/how-to-setup-visual-studio-developer-command-prompt-on-github-actions
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Install PROJ and build wheel of pyproj
+        env:
+          PROJ_WHEEL: true
+          PROJ_NETWORK: ON
+          PROJ_DIR: "C:\\proj"
+          PROJ_DATA: "c:\\proj\\share\\proj"
+          PROJ_VERSION: 9.1.0
+          PYPROJ_VERSION: 3.6.1
+          GDAL_VERSION: 3.7.3
+          BUILD_PROJ: 1
+        run: |
+          #gci env:* | sort-object name
+          choco install ninja cmake
+          $PROJ_DIR = $Env:PROJ_DIR
+          mkdir $PROJ_DIR
+          Write-Host "Installation folder of PROJ:"$PROJ_DIR
+          Write-Host "TEMP folder of wheels:"$Env:TEMP
+          cd "$Env:GITHUB_WORKSPACE"
+          git clone https://github.com/OSGeo/proj.git
+          cd proj
+          git checkout $Env:PROJ_VERSION
+          git status
+          mkdir build
+          cd build
+          cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="/WX" -DCMAKE_CXX_FLAGS="/WX" -DCMAKE_TOOLCHAIN_FILE="$Env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_INSTALL_PREFIX="$PROJ_DIR"
+          ninja -v
+          ninja install
+          #
+          $Env:Path = "C:\vcpkg\installed\x64-windows\bin;" + $Env:Path
+          $Env:Path = "$PROJ_DIR\bin;" + $Env:Path
+          # test bin on PATH
+          Write-Host "PATH: "$Env:Path
+          Write-Host "PROJ_DIR: "$Env:PROJ_DIR
+          Write-Host "PROJ_DATA: "$Env:PROJ_DATA
+          #
+          proj.exe
+          #
+          cd "$Env:GITHUB_WORKSPACE"
+          git clone https://github.com/pyproj4/pyproj.git
+          cd pyproj
+          git checkout $Env:PYPROJ_VERSION
+          # NOT NEED: mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
+          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj\" -Recurse
+          #
+          dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\"
+          Write-Host "CHECK PROJ_DATA copy files"
+          dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj"
+          Write-Host "Install python requirements"
+          python -m pip install delvewheel
+          python -m pip install -r .\requirements-dev.txt
+          python -m pip wheel . --wheel-dir="$Env:TEMP" --no-deps
+          cd "$Env:TEMP"
+          Write-Host "Folder Content"
+          ls
+          mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
+          $file=Get-ChildItem -Path .\ -Filter *.whl
+          unzip -l $file
+          delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
+          #          #echo "PYPROJ test wheel"
+          #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
+          #          ##
+          #          #pip download GDAL==${GDAL_VERSION}
+          #          #ls GDAL-${GDAL_VERSION}.tar.gz
+          #          #tar xzvf GDAL-${GDAL_VERSION}.tar.gz
+          #          #mv GDAL-${GDAL_VERSION} gdal
+          #          #ls
+          #          #cd gdal
+          #          #python -m pip wheel . --wheel-dir=${GITHUB_WORKSPACE}/wheels_torepair --no-deps
+          #          #delvewheel repair --add-path C:/vcpkg/installed/${{ matrix.triplet }}/bin -w ${GITHUB_WORKSPACE}/wheelhouse gdal*.whl
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+          retention-days: 7

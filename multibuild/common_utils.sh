@@ -24,9 +24,6 @@ GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
 # with, so it is passed in when calling "docker run" for tests.
 UNICODE_WIDTH=${UNICODE_WIDTH:-32}
 
-# Default Manylinux version
-MB_ML_VER=${MB_ML_VER:-2014}
-
 if [ $(uname) == "Darwin" ]; then
   IS_MACOS=1; IS_OSX=1;
 else
@@ -35,6 +32,13 @@ else
   which python || export PATH=/opt/python/cp39-cp39/bin:$PATH
 fi
 
+if [ "$MB_ML_LIBC" == "musllinux" ]; then
+  IS_ALPINE=1;
+  MB_ML_VER=${MB_ML_VER:-"_1_1"}
+else
+  # Default Manylinux version
+  MB_ML_VER=${MB_ML_VER:-2014}
+fi
 
 # Work round bug in travis xcode image described at
 # https://github.com/direnv/direnv/issues/210
@@ -220,6 +224,8 @@ function install_rsync {
     if [ -n "$IS_MACOS" ]; then
         # macOS. The colon in the next line is the null command
         :
+    elif [ -n "$IS_ALPINE" ]; then
+        [[ $(type -P rsync) ]] || apk add rsync
     elif [[ $MB_ML_VER == "_2_24" ]]; then
         # debian:9 based distro
         [[ $(type -P rsync) ]] || apt-get install -y rsync
@@ -284,7 +290,7 @@ function clean_code {
     # to determine the version.  Give submodule proper git directory
     fill_submodule "$repo_dir"
     (cd $repo_dir \
-        && git fetch origin \
+        && git fetch origin --tags \
         && git checkout $build_commit \
         && git clean -fxd \
         && git reset --hard \
@@ -308,15 +314,15 @@ function build_wheel_cmd {
     local repo_dir=${2:-$REPO_DIR}
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    start_spinner
+    mkdir -p "$wheelhouse"
+    #start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    stop_spinner
+    #stop_spinner
     if [ -n "$BUILD_DEPENDS" ]; then
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
     (cd $repo_dir && $cmd $wheelhouse)
-	echo "use echo instead of repair to check"
-    echo "repair_wheelhouse $wheelhouse"
+    repair_wheelhouse $wheelhouse
 }
 
 function pip_wheel_cmd {
@@ -378,9 +384,9 @@ function build_index_wheel_cmd {
     # Discard first argument to pass remainder to pip
     shift
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    start_spinner
+    #start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    stop_spinner
+    #stop_spinner
     if [ -n "$BUILD_DEPENDS" ]; then
         pip install $(pip_opts) $@ $BUILD_DEPENDS
     fi
@@ -438,7 +444,7 @@ function install_wheel {
     check_python
     check_pip
 
-    $PIP_CMD install packaging
+    $PIP_CMD install packaging wheel
     local supported_wheels=$($PYTHON_EXE $MULTIBUILD_DIR/supported_wheels.py $wheelhouse/*.whl)
     if [ -z "$supported_wheels" ]; then
         echo "ERROR: no supported wheels found"
@@ -491,7 +497,7 @@ LATEST_PP_6=$LATEST_PP_6p0
 LATEST_PP_7p0=7.0.0
 LATEST_PP_7p1=7.1.1
 LATEST_PP_7p2=7.2.0
-LATEST_PP_7p3=7.3.3
+LATEST_PP_7p3=7.3.12
 LATEST_PP_7=$LATEST_PP_7p3
 
 function unroll_version {
@@ -522,9 +528,20 @@ function install_pypy {
     # sets $PYTHON_EXE variable to python executable
 
     local version=$1
+    # Need to convert pypy-7.2 to pypy2.7-v7.2.0 and pypy3.6-7.3 to pypy3.6-v7.3.0
+    local prefix=$(get_pypy_build_prefix $version)
+    # since prefix is pypy3.6v7.2 or pypy2.7v7.2, grab the 4th (0-index) letter
+    local major=${prefix:4:1}
+    # get the pypy version 7.2.0
+    local py_version=$(fill_pypy_ver $(echo $version | cut -f2 -d-))
+
     case "$PLAT" in
     "x86_64")  if [ -n "$IS_MACOS" ]; then
-                   suffix="osx64";
+                   if [ $(lex_ver $py_version) -ge $(lex_ver 7.3.10) ]; then
+                       suffix="macos_x86_64";
+                   else
+                       suffix="osx64";
+                   fi
                else
                    suffix="linux64";
                fi;;
@@ -534,13 +551,6 @@ function install_pypy {
     "aarch64")  suffix="aarch64";;
     *) echo unknown platform "$PLAT"; exit 1;;
     esac
-
-    # Need to convert pypy-7.2 to pypy2.7-v7.2.0 and pypy3.6-7.3 to pypy3.6-v7.3.0
-    local prefix=$(get_pypy_build_prefix $version)
-    # since prefix is pypy3.6v7.2 or pypy2.7v7.2, grab the 4th (0-index) letter
-    local major=${prefix:4:1}
-    # get the pypy version 7.2.0
-    local py_version=$(fill_pypy_ver $(echo $version | cut -f2 -d-))
 
     local py_build=$prefix$py_version-$suffix
     local py_zip=$py_build.tar.bz2
