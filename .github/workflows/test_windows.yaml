@@ -92,14 +92,15 @@ jobs:
           cd pyproj
           git checkout $Env:PYPROJ_VERSION
           # NOT NEED: mkdir -p "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share"
-          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\" -Recurse
+          Copy-Item -Path $Env:PROJ_DATA -Destination "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj\" -Recurse
           #
           dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\"
-          Write-Host "Install python requirements"
+          Write-Host "CHECK PROJ_DATA copy files"
           dir "$Env:GITHUB_WORKSPACE\pyproj\proj_dir\share\proj"
+          Write-Host "Install python requirements"
           python -m pip install delvewheel
           python -m pip install -r .\requirements-dev.txt
-          python -m pip wheel . --wheel-dir="$Env:TEMP"
+          python -m pip wheel . --wheel-dir="$Env:TEMP" --no-deps
           cd "$Env:TEMP"
           Write-Host "Folder Content"
           ls
