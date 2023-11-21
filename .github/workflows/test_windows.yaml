@@ -77,13 +77,13 @@ jobs:
           ninja -v
           ninja install
           #
-          #need on PATH?
-          #$Env:Path = "$PROJ_DIR\bin" + $Env:Path
+          $Env:Path = "$PROJ_DIR\bin;" + $Env:Path
           $Env:PROJ_DATA = "$PROJ_DIR\share\proj"
           # test bin on PATH
           Write-Host "PATH: " + $Env:Path
           Write-Host "PROJ_DIR: " + $Env:PROJ_DIR
           #
+          proj.exe
           #
           cd "$Env:GITHUB_WORKSPACE"
           git clone https://github.com/pyproj4/pyproj.git
@@ -105,7 +105,7 @@ jobs:
           ls
           mkdir "$Env:GITHUB_WORKSPACE\wheelhouse"
           $file=Get-ChildItem -Path .\ -Filter *.whl
-          delvewheel repair -v --add-path "$PROJ_DIR\bin" --add-path "C:\vcpkg\installed\x64-windows\bin" --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
+          delvewheel repair -v --wheel-dir "$Env:GITHUB_WORKSPACE\wheelhouse" $file
           #          #echo "PYPROJ test wheel"
           #          #pyproj -v && python -c "import pyproj; pyproj.Proj(init='epsg:4269')"
           #          ##
