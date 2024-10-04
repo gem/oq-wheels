@@ -31,7 +31,7 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
       - name: get code of pyproj
         env:
           REPO_DIR: pyproj
@@ -82,7 +82,7 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
       - name: get code of Fiona
         env:
           REPO_DIR: Fiona
@@ -135,7 +135,7 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
       - name: get code of GDAL
         env:
           REPO_DIR: gdal

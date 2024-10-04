@@ -14,9 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-22.04" ]
-        python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
+        platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: pyproj
@@ -34,7 +34,7 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.10"
       - name: get code of pyproj
         env:
           REPO_DIR: pyproj
@@ -42,8 +42,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.6.1
         run: |
-            echo $PATH
-            bash -x .github/workflows/build.sh
+          echo $PATH
+          bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
@@ -51,8 +51,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.6.1
         run: |
-            sudo apt install python3-virtualenv
-            bash -x .github/workflows/wheel.sh
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -63,49 +63,49 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: [ "3.8", "3.9", "3.10" ]
+        python-version: ["3.10", "3.11", "3.12"]
     env:
       BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
-    - name: Set up Python  ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: download artifact
-      uses: actions/download-artifact@v3
-      id: download
-      with:
-        name: wheels
-        path: wheelhouse/
-    - name: 'Echo artifact download path'
-      run: echo ${{steps.download.outputs.download-path}}
-    - name: Test wheels with python ${{ matrix.python-version }}
-      shell: bash
-      run: |
-        set -x
-        echo "engine installation to test wheel"
-        python3 -m venv $HOME/openquake
-        source $HOME/openquake/bin/activate
-        pip install -U pip wheel setuptools
-        pip install install pytest
-        cd $HOME
-        git clone https://github.com/gem/oq-engine.git
-        cd oq-engine && git checkout ${BRANCH_TEST}
-        git status
-        pip install -e .
-        cd ${{steps.download.outputs.download-path}}
-        pwd
-        ls -lrt
-        PYCUT=`echo "${PYTHON_VERSION//.}"`
-        ls *${PYCUT}*
-        pip install --force-reinstall *${PYCUT}*
-        cd $HOME/oq-engine
-        oq dbserver upgrade
-        sleep 5
-        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
-        pytest -vsx --color=yes openquake/sep/tests/test_utils.py
-        pytest -vsx --color=yes openquake/sep
-        pytest -vsx --color=yes openquake/calculators
-        oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
+      - name: Set up Python  ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: wheels
+          path: wheelhouse/
+      - name: "Echo artifact download path"
+        run: echo ${{steps.download.outputs.download-path}}
+      - name: Test wheels with python ${{ matrix.python-version }}
+        shell: bash
+        run: |
+          set -x
+          echo "engine installation to test wheel"
+          python3 -m venv $HOME/openquake
+          source $HOME/openquake/bin/activate
+          pip install -U pip wheel setuptools
+          pip install install pytest
+          cd $HOME
+          git clone https://github.com/gem/oq-engine.git
+          cd oq-engine && git checkout ${BRANCH_TEST}
+          git status
+          pip install -e .
+          cd ${{steps.download.outputs.download-path}}
+          pwd
+          ls -lrt
+          PYCUT=`echo "${PYTHON_VERSION//.}"`
+          ls *${PYCUT}*
+          pip install --force-reinstall *${PYCUT}*
+          cd $HOME/oq-engine
+          oq dbserver upgrade
+          sleep 5
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
+          pytest -vsx --color=yes openquake/sep/tests/test_utils.py
+          pytest -vsx --color=yes openquake/sep
+          pytest -vsx --color=yes openquake/calculators
+          oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
