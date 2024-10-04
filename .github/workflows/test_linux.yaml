@@ -51,10 +51,6 @@ jobs:
         run: |
           echo $PATH
           bash -x .github/workflows/build.sh
-      - name: Setup debugging session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
