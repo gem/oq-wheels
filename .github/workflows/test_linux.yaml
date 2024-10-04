@@ -3,7 +3,7 @@ name: Linux wheels and test x86_64
 on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
-  SETUPTOOLS_USE_DISTUTILS: stdlib
+
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
