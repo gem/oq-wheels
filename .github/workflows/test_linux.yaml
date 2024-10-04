@@ -1,6 +1,6 @@
 ---
 name: Linux wheels and test x86_64
-on: [workflow_dispatch]   
+on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
   SETUPTOOLS_USE_DISTUTILS: stdlib
@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-22.04" ]
-        python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
+        platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: pyproj
@@ -39,8 +39,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.6.1
         run: |
-            echo $PATH
-            bash -x .github/workflows/build.sh
+          echo $PATH
+          bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
@@ -48,8 +48,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 3.6.1
         run: |
-            sudo apt install python3-virtualenv
-            bash -x .github/workflows/wheel.sh
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -61,9 +61,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-22.04" ]
-        python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
+        platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: Fiona
@@ -90,8 +90,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: 1.9.5
         run: |
-            echo $PATH
-            bash -x .github/workflows/build.sh
+          echo $PATH
+          bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
           REPO_DIR: Fiona
@@ -101,9 +101,9 @@ jobs:
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
-            echo $PATH
-            sudo apt install python3-virtualenv
-            bash -x .github/workflows/wheel.sh
+          echo $PATH
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -115,9 +115,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-22.04" ]
-        python: [ "3.9", "3.10", "3.11" ]
-        platform: [ "x86_64"]
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
+        platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: gdal
@@ -143,7 +143,7 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: v3.7.3
         run: |
-            bash -x .github/workflows/build.sh
+          bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         env:
           REPO_DIR: gdal
@@ -151,8 +151,8 @@ jobs:
           SETUPTOOLS_USE_DISTUTILS: stdlib
           BUILD_COMMIT: v3.7.3
         run: |
-            sudo apt install python3-virtualenv
-            bash -x .github/workflows/wheel.sh
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -163,47 +163,47 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: [ "3.10" ]
+        python-version: ["3.12"]
     env:
       BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
-    - name: Set up Python  ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: download artifact
-      uses: actions/download-artifact@v3
-      id: download
-      with:
-        name: wheels
-        path: wheelhouse
-    - name: 'Echo artifact download path'
-      run: echo ${{steps.download.outputs.download-path}}
-    - name: Test wheels with python ${{ matrix.python-version }}
-      shell: bash
-      run: |
-        set -x
-        echo "engine installation to test wheel"
-        python3 -m venv $HOME/openquake
-        source $HOME/openquake/bin/activate
-        pip install -U pip wheel setuptools
-        pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
-        #cd ${{steps.download.outputs.download-path}}
-        #PYCUT=`echo "${PYTHON_VERSION//.}"`
-        #ls *${PYCUT}*
-        #pip install --force-reinstall *${PYCUT}*
-        cd $HOME
-        git clone https://github.com/gem/oq-engine.git
-        cd oq-engine && git checkout ${BRANCH_TEST}
-        git status
-        pip install -e .
-        cd $HOME/oq-engine
-        oq dbserver upgrade
-        sleep 5
-        pytest -vsx --color=yes openquake/sep/tests/test_utils.py
-        pytest -vsx --color=yes openquake/sep
-        pytest -vsx --color=yes openquake/calculators
-        oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
-        pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
+      - name: Set up Python  ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: wheels
+          path: wheelhouse
+      - name: "Echo artifact download path"
+        run: echo ${{steps.download.outputs.download-path}}
+      - name: Test wheels with python ${{ matrix.python-version }}
+        shell: bash
+        run: |
+          set -x
+          echo "engine installation to test wheel"
+          python3 -m venv $HOME/openquake
+          source $HOME/openquake/bin/activate
+          pip install -U pip wheel setuptools
+          pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
+          #cd ${{steps.download.outputs.download-path}}
+          #PYCUT=`echo "${PYTHON_VERSION//.}"`
+          #ls *${PYCUT}*
+          #pip install --force-reinstall *${PYCUT}*
+          cd $HOME
+          git clone https://github.com/gem/oq-engine.git
+          cd oq-engine && git checkout ${BRANCH_TEST}
+          git status
+          pip install -e .
+          cd $HOME/oq-engine
+          oq dbserver upgrade
+          sleep 5
+          pytest -vsx --color=yes openquake/sep/tests/test_utils.py
+          pytest -vsx --color=yes openquake/sep
+          pytest -vsx --color=yes openquake/calculators
+          oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
