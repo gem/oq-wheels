@@ -1,6 +1,14 @@
 ---
 name: Linux wheels and test x86_64
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
+        required: false
+        default: false
+
 env:
   WHEEL_SDIR: wheelhouse
 
@@ -41,6 +49,10 @@ jobs:
         run: |
           echo $PATH
           bash -x .github/workflows/build.sh
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
