@@ -19,10 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          ["ubuntu-22.04"]
-          #python: ["3.10", "3.11", "3.12"]
-        python: ["3.12"]
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
@@ -50,7 +48,6 @@ jobs:
       - name: Build Wheel of pyproj
         run: |
           sudo apt install python3-virtualenv
-          #bash -x .github/workflows/wheel.sh
       - name: Setup debugging session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 30
