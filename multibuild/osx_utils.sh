@@ -10,7 +10,7 @@ MACPYTHON_URL=https://www.python.org/ftp/python
 MACPYTHON_PY_PREFIX=/Library/Frameworks/Python.framework/Versions
 WORKING_SDIR=working
 
-# As of 3 Oct 2023 - latest Python of each version with binary download
+# As of 22 Aug 2024 - latest Python of each version with binary download
 # available.
 # See: https://www.python.org/downloads/macos/
 LATEST_2p7=2.7.18
@@ -20,11 +20,9 @@ LATEST_3p7=3.7.9
 LATEST_3p8=3.8.10
 LATEST_3p9=3.9.13
 LATEST_3p10=3.10.11
-LATEST_3p11=3.11.6
-LATEST_3p12=3.12.0
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-
-echo $PATH
+LATEST_3p11=3.11.9
+LATEST_3p12=3.12.5
+LATEST_3p13=3.13.0rc1
 
 
 function check_python {
@@ -83,6 +81,8 @@ function fill_pyver {
         echo $LATEST_2p7
     elif [ $ver == 3 ] || [ $ver == "3.12" ]; then
         echo $LATEST_3p12
+    elif [ $ver == "3.13" ]; then
+        echo $LATEST_3p13
     elif [ $ver == "3.11" ]; then
         echo $LATEST_3p11
     elif [ $ver == "3.10" ]; then
@@ -320,10 +320,8 @@ function install_mac_cpython {
     local inst_path=$DOWNLOADS_SDIR/$py_inst
     local retval=""
     mkdir -p $DOWNLOADS_SDIR
-	echo " WORKING DIR : $PWD"
     # exit early on curl errors, but don't let it exit the shell
-    #cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
-    curl -v -f $MACPYTHON_URL/$py_stripped/${py_inst} --output $inst_path || retval=$?
+    cmd_notexit curl -f $MACPYTHON_URL/$py_stripped/${py_inst} > $inst_path || retval=$?
     if [ ${retval:-0} -ne 0 ]; then
       echo "Python download failed! Check ${py_inst} exists on the server."
       exit $retval
@@ -336,7 +334,7 @@ function install_mac_cpython {
     sudo installer -pkg $inst_path -target /
     local py_mm=${py_version%.*}
     PYTHON_EXE=$MACPYTHON_PY_PREFIX/$py_mm/bin/python$py_mm
-    # Install certificates for Python 3.x
+    # Install certificates for Python 3.6
     local inst_cmd="/Applications/Python ${py_mm}/Install Certificates.command"
     if [ -e "$inst_cmd" ]; then
         sh "$inst_cmd"
