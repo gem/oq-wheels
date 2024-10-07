@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
@@ -46,6 +46,9 @@ jobs:
           BUILD_COMMIT: 3.6.1
         run: |
           bash -x .github/workflows/build.sh
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of pyproj
         env:
           REPO_DIR: pyproj
@@ -65,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
@@ -110,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
@@ -148,7 +151,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
