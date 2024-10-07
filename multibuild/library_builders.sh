@@ -190,7 +190,7 @@ function build_bzip2 {
 }
 
 function build_tiff {
-    set +x
+    set -x
     build_zlib
     build_jpeg
     ensure_xz
