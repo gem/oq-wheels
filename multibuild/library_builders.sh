@@ -67,10 +67,10 @@ function build_simple {
     local name_version="${name}-${version}"
     local archive=${name_version}.${ext}
     fetch_unpack $url/$archive
-	(cd $name_version \
-    && ./configure --prefix=$BUILD_PREFIX $configure_args \
-    && make -j4 \
-    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    (cd $name_version \
+        && ./configure --prefix=$BUILD_PREFIX $configure_args \
+        && make -j4 \
+        && make install)
     touch "${name}-stamp"
 }
 
@@ -155,10 +155,10 @@ function build_new_zlib {
 function build_jpeg {
     if [ -e jpeg-stamp ]; then return; fi
     fetch_unpack http://ijg.org/files/jpegsrc.v${JPEG_VERSION}.tar.gz
-	(cd jpeg-${JPEG_VERSION} \
-    && ./configure --prefix=$BUILD_PREFIX \
-    && make -j4 \
-    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    (cd jpeg-${JPEG_VERSION} \
+        && ./configure --prefix=$BUILD_PREFIX \
+        && make -j4 \
+        && make install)
     touch jpeg-stamp
 }
 
@@ -190,6 +190,7 @@ function build_bzip2 {
 }
 
 function build_tiff {
+    set +x
     build_zlib
     build_jpeg
     ensure_xz

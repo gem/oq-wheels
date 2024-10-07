@@ -233,38 +233,37 @@ function build_gdal {
 	mkdir build
 	cd build
 	# build using cmake
-    cmake .. \
+    $cmake .. \
     -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
     -DCMAKE_INCLUDE_PATH=$BUILD_PREFIX/include \
     -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
     -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-	${GEOS_CONFIG}
-#    -DBUILD_SHARED_LIBS=ON \
-#    -DCMAKE_BUILD_TYPE=Release \
-#    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
-#    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
-#	${GEOS_CONFIG} \
-#    -DGDAL_USE_TIFF=ON \
-#    -DGDAL_USE_TIFF_INTERNAL=OFF \
-#    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
-#    -DGDAL_ENABLE_DRIVER_GIF=ON \
-#    -DGDAL_ENABLE_DRIVER_GRIB=ON \
-#    -DGDAL_ENABLE_DRIVER_JPEG=ON \
-#    -DGDAL_USE_ICONV=ON \
-#    -DGDAL_USE_JSONC=ON \
-#    -DGDAL_USE_JSONC_INTERNAL=OFF \
-#    -DGDAL_USE_ZLIB=ON \
-#    -DGDAL_USE_ZLIB_INTERNAL=OFF \
-#    -DGDAL_ENABLE_DRIVER_PNG=ON \
-#    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
-#    -DOGR_ENABLE_DRIVER_GPKG=ON \
-#    -DBUILD_PYTHON_BINDINGS=OFF \
-#    -DBUILD_JAVA_BINDINGS=OFF \
-#    -DBUILD_CSHARP_BINDINGS=OFF \
-#    -DGDAL_USE_SFCGAL=OFF \
-#    -DGDAL_USE_XERCESC=OFF \
-#    -DGDAL_USE_LIBXML2=OFF
+	${GEOS_CONFIG} \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
+    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
+    -DGDAL_USE_TIFF=ON \
+    -DGDAL_USE_TIFF_INTERNAL=OFF \
+    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
+    -DGDAL_ENABLE_DRIVER_GIF=ON \
+    -DGDAL_ENABLE_DRIVER_GRIB=ON \
+    -DGDAL_ENABLE_DRIVER_JPEG=ON \
+    -DGDAL_USE_ICONV=ON \
+    -DGDAL_USE_JSONC=ON \
+    -DGDAL_USE_JSONC_INTERNAL=OFF \
+    -DGDAL_USE_ZLIB=ON \
+    -DGDAL_USE_ZLIB_INTERNAL=OFF \
+    -DGDAL_ENABLE_DRIVER_PNG=ON \
+    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
+    -DOGR_ENABLE_DRIVER_GPKG=ON \
+    -DBUILD_PYTHON_BINDINGS=OFF \
+    -DBUILD_JAVA_BINDINGS=OFF \
+    -DBUILD_CSHARP_BINDINGS=OFF \
+    -DGDAL_USE_SFCGAL=OFF \
+    -DGDAL_USE_XERCESC=OFF \
+    -DGDAL_USE_LIBXML2=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -331,7 +330,7 @@ function run_tests {
         apt-get install -y ca-certificates
     fi
     cp -R ../Fiona/tests ./tests
-    python -m pip install "shapely;python_version<'3.12'" $TEST_DEPENDS
+    python -m pip install "shapely" $TEST_DEPENDS
     GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
     fio --version
     fio env --formats
