@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["macos-12"]
-        python: ["3.9", "3.10", "3.11"]
+        python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
         os-name: ["osx"]
@@ -27,7 +27,7 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup cmake
         run: |
           brew install cmake
@@ -75,7 +75,7 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Setup cmake
@@ -84,19 +84,10 @@ jobs:
           echo "check python3"
           python3 -c "import sys; print(sys.version)"
       - name: Get code of Fiona
-        env:
-          REPO_DIR: Fiona
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.9.5
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          REPO_DIR: Fiona
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.9.5
           BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
           TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
         run: |
@@ -113,13 +104,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ["macos-12"]
-        python: ["3.9", "3.10", "3.11"]
+        python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
       BUILD_COMMIT: v3.7.3
+      WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -128,24 +120,14 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup cmake
         run: |
           brew install cmake
       - name: Get code of gdal
-        env:
-          REPO_DIR: gdal
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.7.3
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
-        env:
-          REPO_DIR: gdal
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.7.3
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -160,7 +142,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["macos-12"]
-        python: ["3.9", "3.10", "3.11"]
+        python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
         macos-target: ["11"]
         os-name: ["osx"]
