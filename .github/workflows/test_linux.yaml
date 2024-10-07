@@ -185,7 +185,7 @@ jobs:
           git clone https://github.com/gem/oq-engine.git
           cd oq-engine && git checkout ${BRANCH_TEST}
           git status
-          pip install numpy==1.26.2 pandas==2.1.1 numba==0.59.1 matplotlib==3.8.2 shapely==2.0.2 scipy==1.11.4
+          pip install numpy==1.26.2 pandas==2.1.1 numba==0.59.1 matplotlib==3.8.2 shapely==2.0.2 scipy==1.11.4 onnxruntime==1.17.3
           pip install -e .
           cd $HOME/oq-engine
           oq engine --upgrade-db
