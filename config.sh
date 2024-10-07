@@ -84,7 +84,7 @@ function build_jsonc {
 function build_tiff {
     echo "Entering in the function of TIFF"
     sleep 20
-    set +x 
+    set +x
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
@@ -293,10 +293,10 @@ function pre_build {
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-    suppress build_zlib
+    build_zlib
     build_curl
+    build_tiff
     build_sqlite
-    suppress build_tiff
     build_proj
     if [[ "$REPO_DIR" != "pyproj" ]]; then
       suppress build_jpeg
