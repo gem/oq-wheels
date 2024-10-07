@@ -190,6 +190,8 @@ jobs:
           cd $HOME/oq-engine
           oq engine --upgrade-db
           sleep 5
+          pip install pytest
+          sleep 3
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/calculators
