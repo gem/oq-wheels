@@ -83,8 +83,6 @@ function build_jsonc {
 
 function build_tiff {
     echo "Entering in the function of TIFF"
-    sleep 20
-    set +x
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
