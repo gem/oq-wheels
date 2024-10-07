@@ -94,6 +94,7 @@ jobs:
           git clone https://github.com/gem/oq-engine.git
           cd oq-engine && git checkout ${BRANCH_TEST}
           git status
+          pip install numpy==1.26.2 pandas==2.0.3 numba==0.58.1 matplotlib==3.8.2 shapely==2.0.2 scipy==1.11.4
           pip install -e .
           cd ${{steps.download.outputs.download-path}}
           pwd
