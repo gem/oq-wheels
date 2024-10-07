@@ -96,6 +96,9 @@ jobs:
       - name: Get code of Fiona
         run: |
           bash -x .github/workflows/build.sh
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of Fiona
         env:
           BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
@@ -137,6 +140,9 @@ jobs:
       - name: Get code of gdal
         run: |
           bash -x .github/workflows/build.sh
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of GDAL
         run: |
           bash -x .github/workflows/wheel.sh
