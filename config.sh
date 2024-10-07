@@ -81,13 +81,14 @@ function build_jsonc {
     touch jsonc-stamp
 }
 
-
 function build_tiff {
+    echo "Entering in the function of TIFF"
+    sleep 20
+    set +x 
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
-    #if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
-    ensure_xz
+    build_xz
     fetch_unpack https://download.osgeo.org/libtiff/tiff-${TIFF_VERSION}.tar.gz
     (cd tiff-${TIFF_VERSION} \
         && mv VERSION VERSION.txt \
@@ -97,7 +98,6 @@ function build_tiff {
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch tiff-stamp
 }
-
 
 function build_proj {
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
