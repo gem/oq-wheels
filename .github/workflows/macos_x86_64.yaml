@@ -152,16 +152,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ["macos-13"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
-        os-name: ["osx"]
     env:
-      BRANCH_TEST: master
-      PYTHON_VERSION: "${{ matrix.python }}"
+      BRANCH_TEST: ae-py312
+      PYTHON_VERSION: "${{ matrix.python-version }}"
     steps:
       - name: Set up Python  ${{ matrix.python }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: download artifact
@@ -172,7 +170,7 @@ jobs:
           path: wheelhouse
       - name: "Echo artifact download path"
         run: echo ${{steps.download.outputs.download-path}}
-      - name: Test wheels with python ${{ matrix.python }}
+      - name: Test wheels with python ${{ matrix.python-version }}
         shell: bash
         run: |
           set -x
@@ -180,19 +178,21 @@ jobs:
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-new_whl_fiona/requirements-py311.txt
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
           ls *${PYCUT}*
           pip install --force-reinstall *${PYCUT}*
           cd $HOME
-          git clone https://github.com/gem/oq-engine.git
-          cd oq-engine && git checkout ${BRANCH_TEST}
+          git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
+          cd oq-engine
           git status
+          pip install -r requirements-py312-macos_x86_64.txt
           pip install -e .
           cd $HOME/oq-engine
           oq engine --upgrade-db
           sleep 5
+          pip install pytest
+          sleep 3
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/calculators

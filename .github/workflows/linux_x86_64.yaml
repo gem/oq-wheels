@@ -183,7 +183,7 @@ jobs:
           pip install --force-reinstall *${PYCUT}*
           cd $HOME
           git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
-          cd oq-engine 
+          cd oq-engine
           git status
           pip install -r requirements-py312-linux64.txt
           pip install -e .
