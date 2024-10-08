@@ -118,8 +118,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
-        python: ["3.10", "3.11", "3.12"]
+        os:
+          ["self-hosted"]
+          #python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
@@ -159,6 +161,7 @@ jobs:
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/wheel.sh
+          sleep 3600
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
