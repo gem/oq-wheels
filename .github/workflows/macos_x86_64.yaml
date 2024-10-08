@@ -108,8 +108,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-13"]
-        python: ["3.10", "3.11", "3.12"]
+        os:
+          ["macos-13"]
+          #python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
         macos-target: ["13"]
         os-name: ["osx"]
@@ -132,12 +134,12 @@ jobs:
       - name: Get code of gdal
         run: |
           bash -x .github/workflows/build.sh
-          #- name: Setup debugging session
-          #  uses: mxschmitt/action-tmate@v3
-          #  if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of GDAL
         run: |
           bash -x .github/workflows/wheel.sh
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
