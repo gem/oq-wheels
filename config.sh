@@ -288,8 +288,8 @@ function pre_build {
     	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
-    suppress build_nghttp2
-    suppress build_openssl
+    build_nghttp2
+    build_openssl
     # Remove previously installed curl.
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
@@ -297,14 +297,14 @@ function pre_build {
     suppress build_zlib
     build_curl
     build_sqlite
-    suppress build_tiff
+    build_tiff
     build_proj
     if [[ "$REPO_DIR" != "pyproj" ]]; then
-      suppress build_jpeg
-      suppress build_libpng
-      suppress build_jsonc
-      suppress build_expat
-      suppress build_geos
+      build_jpeg
+      build_libpng
+      build_jsonc
+      build_expat
+      build_geos
       build_gdal
     fi
     if [ -n "$IS_OSX" ]; then
@@ -375,7 +375,7 @@ function build_wheel_cmd {
 
 function build_cmd {
     local abs_wheelhouse=$1
-    python -m build -o $abs_wheelhouse
+    python -vv -m build -o $abs_wheelhouse
 }
 
 
