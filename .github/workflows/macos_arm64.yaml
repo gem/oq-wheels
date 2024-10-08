@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-14"]
+        os: ["self-hosted"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-14"]
+        os: ["self-hosted"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -77,7 +77,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2"
       TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
@@ -95,7 +95,7 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
         run: |
           bash -x .github/workflows/wheel.sh
@@ -110,7 +110,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-14"]
+        os: ["self-hosted"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]

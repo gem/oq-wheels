@@ -77,8 +77,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.2"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -95,8 +95,8 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2"
+          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.2"
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -122,8 +122,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy wheel"
-      TEST_DEPENDS: "numpy"
+      BUILD_DEPENDS: "wheel numpy==1.26.2"
+      TEST_DEPENDS: " numpy==1.26.2"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
