@@ -14,7 +14,7 @@ TIFF_VERSION=4.3.0
 OPENSSL_DOWNLOAD_URL=https://www.openssl.org/source/
 OPENSSL_ROOT=openssl-1.1.1w
 OPENSSL_HASH=cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8
-export MACOSX_DEPLOYMENT_TARGET=10.15
+export MACOSX_DEPLOYMENT_TARGET=13.0
 export GDAL_CONFIG=/usr/local/bin/gdal-config
 export PACKAGE_DATA=1
 #from PROJ 9.x

@@ -486,7 +486,7 @@ function macos_arm64_cross_build_setup {
     sudo mkdir -p $BUILD_PREFIX/lib $BUILD_PREFIX/include
     sudo chown -R $USER $BUILD_PREFIX
     update_env_for_build_prefix
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export _PYTHON_HOST_PLATFORM="macosx-13.0-arm64"
     export CFLAGS+=" -arch arm64"
     export CXXFLAGS+=" -arch arm64"
     export CPPFLAGS+=" -arch arm64"
@@ -495,7 +495,7 @@ function macos_arm64_cross_build_setup {
     export FC=$FC_ARM64
     export F90=${F90_ARM64:-${FC}}
     export F77=${F77_ARM64:-${FC}}
-    export MACOSX_DEPLOYMENT_TARGET="11.0"
+    export MACOSX_DEPLOYMENT_TARGET="13.0"
     export CROSS_COMPILING=1
     export LDFLAGS+=" -arch arm64 -L$BUILD_PREFIX/lib -Wl,-rpath,$BUILD_PREFIX/lib ${FC_ARM64_LDFLAGS:-}"
     # This would automatically let autoconf know that we are cross compiling for arm64 darwin
@@ -506,7 +506,7 @@ function macos_arm64_native_build_setup {
     # Setup native build for single arch arm_64 wheels
     export PLAT="arm64"
     # We don't want universal2 builds and only want an arm64 build
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export _PYTHON_HOST_PLATFORM="macosx-13.0-arm64"
     export ARCHFLAGS+=" -arch arm64"
     $@
 }
