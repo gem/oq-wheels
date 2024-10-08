@@ -219,11 +219,12 @@ function build_gdal {
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
     EXPAT_PREFIX=$BUILD_PREFIX
-	if [ -n "$IS_OSX" ]; then
-        GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
-    else
-        GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
-	fi
+	#if [ -n "$IS_OSX" ]; then
+    #    GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
+    #else
+    #    GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
+	#fi
+    GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
