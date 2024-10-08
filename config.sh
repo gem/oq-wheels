@@ -224,7 +224,8 @@ function build_gdal {
     #else
     #    GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
 	#fi
-    GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
+    EXPAT_PREFIX=$BUILD_PREFIX
+    GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
