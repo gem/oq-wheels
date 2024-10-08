@@ -1,5 +1,5 @@
 ---
-name: MacOS wheels x86_64
+name: MacOS wheels ARM64
 on:
   workflow_dispatch:
     inputs:
@@ -18,10 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-13"]
+        os: ["macos-14"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
@@ -65,10 +65,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-13"]
+        os: ["macos-14"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
@@ -110,10 +110,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-13"]
+        os: ["macos-14"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["arm64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal

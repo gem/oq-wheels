@@ -21,7 +21,7 @@ jobs:
         os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
@@ -68,7 +68,7 @@ jobs:
         os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
@@ -113,7 +113,7 @@ jobs:
         os: ["macos-13"]
         python: ["3.10", "3.11", "3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
