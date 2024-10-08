@@ -1,6 +1,6 @@
 ---
-name: MacOS wheels and test ARM64
-on: [pull_request, workflow_dispatch]
+name: MacOS wheels ARM64
+on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
