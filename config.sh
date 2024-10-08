@@ -219,13 +219,11 @@ function build_gdal {
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
     EXPAT_PREFIX=$BUILD_PREFIX
-	#if [ -n "$IS_OSX" ]; then
-    #    GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
-    #else
-    #    GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
-	#fi
-    EXPAT_PREFIX=$BUILD_PREFIX
-    GEOS_CONFIG="--with-geos=${BUILD_PREFIX}/bin/geos-config"
+	if [ -n "$IS_OSX" ]; then
+        GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
+    else
+        GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
+	fi
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
@@ -360,7 +358,10 @@ function build_wheel_cmd {
 		pip download GDAL==${GDAL_VERSION}
 		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
 		cd GDAL-${GDAL_VERSION}
-		GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse
+        echo "sleep"
+        sleep 3600
+        if [ "$(uname -m)" = "arm64" ]; GDAL_VERSION=$GDAL_VERSION ARCHFLAGS="-arch arm64" $cmd $wheelhouse --compile --no-cache-dir
+        GDAL_VERSION=$GDAL_VERSION ARCHFLAGS="-arch amd64" $cmd $wheelhouse --compile --no-cache-dir
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
 		pwd

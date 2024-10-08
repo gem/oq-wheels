@@ -115,7 +115,7 @@ function macpython_sdk_list_for_version {
     local _return
 
     if [ "$(uname -m)" = "arm64" ]; then
-        _return="11.0"
+        _return="13.0"
     elif [ "$_major" -eq "2" ]; then
         [ $(lex_ver $_ver) -lt $(lex_ver 2.7.18) ] && _return="10.6"
         [ $(lex_ver $_ver) -ge $(lex_ver 2.7.15) ] && _return="$_return 10.9"
