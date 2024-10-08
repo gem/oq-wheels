@@ -1,4 +1,4 @@
-#k Custom utilities for Fiona wheels.
+# Custom utilities for Fiona wheels.
 #
 # Test for OSX with [ -n "$IS_OSX" ].
 
@@ -100,13 +100,11 @@ function build_tiff {
 
 
 function build_proj {
+    build_sqlite
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
-    env
-	sleep 3
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
-    build_sqlite
 	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
 	echo "env: $PROJ_DATA and build prefix ${BUILD_PREFIX}"
 	#
@@ -204,6 +202,9 @@ function build_curl {
     touch curl-stamp
 }
 
+function build_pcre2 {
+    build_simple pcre2 $PCRE_VERSION https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${PCRE_VERSION}
+}
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
@@ -216,16 +217,19 @@ function build_gdal {
     build_sqlite
     build_expat
     build_geos
+    build_pcre2
 
+    EXPAT_PREFIX=$BUILD_PREFIX
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
-    EXPAT_PREFIX=$BUILD_PREFIX
-	if [ -n "$IS_OSX" ]; then
+    if [ -n "$IS_OSX" ]; then
         GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
+        PCRE2_LIB="$BUILD_PREFIX/lib/libpcre2-8.dylib"
     else
         GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
-	fi
+        PCRE2_LIB="$BUILD_PREFIX/lib/libpcre2-8.so"
+    fi
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
@@ -239,32 +243,36 @@ function build_gdal {
     -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
     -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-	${GEOS_CONFIG}
-#    -DBUILD_SHARED_LIBS=ON \
-#    -DCMAKE_BUILD_TYPE=Release \
-#    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
-#    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
-#	${GEOS_CONFIG} \
-#    -DGDAL_USE_TIFF=ON \
-#    -DGDAL_USE_TIFF_INTERNAL=OFF \
-#    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
-#    -DGDAL_ENABLE_DRIVER_GIF=ON \
-#    -DGDAL_ENABLE_DRIVER_GRIB=ON \
-#    -DGDAL_ENABLE_DRIVER_JPEG=ON \
-#    -DGDAL_USE_ICONV=ON \
-#    -DGDAL_USE_JSONC=ON \
-#    -DGDAL_USE_JSONC_INTERNAL=OFF \
-#    -DGDAL_USE_ZLIB=ON \
-#    -DGDAL_USE_ZLIB_INTERNAL=OFF \
-#    -DGDAL_ENABLE_DRIVER_PNG=ON \
-#    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
-#    -DOGR_ENABLE_DRIVER_GPKG=ON \
-#    -DBUILD_PYTHON_BINDINGS=OFF \
-#    -DBUILD_JAVA_BINDINGS=OFF \
-#    -DBUILD_CSHARP_BINDINGS=OFF \
-#    -DGDAL_USE_SFCGAL=OFF \
-#    -DGDAL_USE_XERCESC=OFF \
-#    -DGDAL_USE_LIBXML2=OFF
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
+    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
+    ${GEOS_CONFIG} \
+    -DGDAL_USE_TIFF=ON \
+    -DGDAL_USE_TIFF_INTERNAL=OFF \
+    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
+    -DGDAL_ENABLE_DRIVER_GIF=ON \
+    -DGDAL_ENABLE_DRIVER_GRIB=ON \
+    -DGDAL_ENABLE_DRIVER_JPEG=ON \
+    -DGDAL_USE_ICONV=ON \
+    -DGDAL_USE_JSONC=ON \
+    -DGDAL_USE_JSONC_INTERNAL=OFF \
+    -DGDAL_USE_ZLIB=ON \
+    -DGDAL_USE_ZLIB_INTERNAL=OFF \
+    -DGDAL_ENABLE_DRIVER_PNG=ON \
+    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
+    -DOGR_ENABLE_DRIVER_GPKG=ON \
+    -DBUILD_PYTHON_BINDINGS=OFF \
+    -DBUILD_JAVA_BINDINGS=OFF \
+    -DBUILD_CSHARP_BINDINGS=OFF \
+    -DGDAL_USE_SFCGAL=OFF \
+    -DGDAL_USE_XERCESC=OFF \
+    -DGDAL_USE_LIBXML2=OFF \
+    -DGDAL_USE_PCRE2=ON \
+    -DPCRE2_INCLUDE_DIR=$BUILD_PREFIX/include \
+    -DPCRE2-8_LIBRARY=$PCRE2_LIB \
+    -DGDAL_USE_POSTGRESQL=OFF \
+    -DGDAL_USE_ODBC=OFF \
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -369,6 +377,12 @@ function build_wheel_cmd {
 		sleep 10
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
+    if [ -n "$IS_OSX" ]; then
+        pip install delocate
+        delocate-listdeps --all --depending $wheelhouse/*.whl
+    else  # manylinux
+        pip install auditwheel
+    fi
     repair_wheelhouse $wheelhouse
 }
 
@@ -383,7 +397,7 @@ function macos_arm64_native_build_setup {
     # Setup native build for single arch arm_64 wheels
     export PLAT="arm64"
     # We don't want universal2 builds and only want an arm64 build
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export _PYTHON_HOST_PLATFORM="macosx-13.0-arm64"
     export ARCHFLAGS+=" -arch arm64"
     $@
 }
