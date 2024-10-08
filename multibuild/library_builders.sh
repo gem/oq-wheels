@@ -70,7 +70,7 @@ function build_simple {
     (cd $name_version \
         && ./configure --prefix=$BUILD_PREFIX $configure_args \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
