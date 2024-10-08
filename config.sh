@@ -217,7 +217,6 @@ function build_gdal {
     build_sqlite
     build_expat
     build_geos
-    build_pcre2
 
     EXPAT_PREFIX=$BUILD_PREFIX
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
