@@ -148,12 +148,16 @@ jobs:
           which cmake
       - name: Get code of gdal
         run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
           bash -x .github/workflows/build.sh
           #- name: Setup debugging session
           #  uses: mxschmitt/action-tmate@v3
           #  if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Build Wheel of GDAL
         run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
