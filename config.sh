@@ -358,8 +358,6 @@ function build_wheel_cmd {
 		pip download GDAL==${GDAL_VERSION}
 		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
 		cd GDAL-${GDAL_VERSION}
-        echo "sleep"
-        sleep 3600
         if [ "$(uname -m)" = "arm64" ]; then 
             GDAL_VERSION=$GDAL_VERSION ARCHFLAGS="-arch arm64" $cmd $wheelhouse --compile --no-cache-dir
         fi
