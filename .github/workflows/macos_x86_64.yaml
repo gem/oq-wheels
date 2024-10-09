@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-14"]
         python: ["3.12"]
         platform: ["x86_64"]
         macos-target: ["13"]
@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-14"]
         python: ["3.12"]
         platform: ["x86_64"]
         macos-target: ["13"]
@@ -87,7 +87,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-14"]
         python: ["3.12"]
         platform: ["x86_64"]
         macos-target: ["13"]
@@ -123,7 +123,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
+        os: ["macos-14"]
         python: ["3.12"]
         platform: ["x86_64"]
         macos-target: ["13"]
