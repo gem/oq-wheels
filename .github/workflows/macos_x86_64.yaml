@@ -30,8 +30,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup cmake
         run: |
-          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          echo $PATH
           brew install cmake
           echo "check python3"
           python3 -c "import sys; print(sys.version)"
