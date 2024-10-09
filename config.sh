@@ -320,9 +320,6 @@ function pre_build {
 }
 
 function run_tests {
-    unset GDAL_DATA
-    unset PROJ_LIB
-    unset PROJ_DATA
     if [ -n "$IS_OSX" ]; then
         export PATH=$PATH:${BUILD_PREFIX}/bin
         export LC_ALL=en_US.UTF-8
@@ -334,12 +331,25 @@ function run_tests {
         apt-get update
         apt-get install -y ca-certificates
     fi
-    cp -R ../Fiona/tests ./tests
-    python -m pip install "shapely;python_version<'3.12'" $TEST_DEPENDS
-    GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
-    fio --version
-    fio env --formats
-    python ../test_fiona_issue383.py
+    if [[ "$REPO_DIR" == "Fiona" ]]; then
+      unset GDAL_DATA
+      unset PROJ_LIB
+      unset PROJ_DATA
+       cp -R ../Fiona/tests ./tests
+       python -m pip install "shapely" $TEST_DEPENDS
+       GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
+       fio --version
+       fio env --formats
+       python ../test_fiona_issue383.py
+    fi
+    if [[ "$REPO_DIR" == "gdal" ]]; then
+        echo "Run import to test that numpy is included"
+        python3 -c 'from osgeo import gdal_array'
+    fi
+
+
+
+
 }
 
 
