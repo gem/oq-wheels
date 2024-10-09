@@ -123,7 +123,7 @@ jobs:
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.7.3
+      BUILD_COMMIT: v3.8.4
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
