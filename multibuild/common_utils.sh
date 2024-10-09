@@ -327,9 +327,10 @@ function build_wheel_cmd {
 
 function pip_wheel_cmd {
     local abs_wheelhouse=$1
-    python -vv -m build -n -w . -o $abs_wheelhouse 
-    #python -m build -x -w . -o $abs_wheelhouse 
-    #pip wheel $(pip_opts) -w $abs_wheelhouse --no-deps .
+    if [[ "$REPO_DIR" == "gdal" ]]; then
+      python -vv -m build -n -w . -o $abs_wheelhouse
+    fi
+    pip wheel $(pip_opts) -w $abs_wheelhouse --no-deps .
 }
 
 function bdist_wheel_cmd {
