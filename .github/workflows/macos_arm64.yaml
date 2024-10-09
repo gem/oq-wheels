@@ -117,9 +117,9 @@ jobs:
       fail-fast: false
       matrix:
         os: ["self-hosted"]
-        python: ["3.12"]
+        python: ["3.11"]
         platform: ["arm64"]
-        macos-target: ["12"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
