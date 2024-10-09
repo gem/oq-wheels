@@ -38,7 +38,6 @@ jobs:
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
-        env:
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
