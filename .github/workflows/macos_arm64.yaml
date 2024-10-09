@@ -4,111 +4,111 @@ on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
-  #  build_pyproj:
-  #    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
-  #    runs-on: ${{ matrix.os }}
-  #    strategy:
-  #      fail-fast: false
-  #      matrix:
-  #        os: [ "self-hosted" ]
-  #        python: [ "3.12" ]
-  #        platform: [ "arm64"]
-  #        macos-target: [ "12" ]
-  #        os-name: ["osx"]
-  #    env:
-  #      REPO_DIR: pyproj
-  #      BUILD_COMMIT: 3.6.1
-  #      PLAT: "${{ matrix.platform }}"
-  #      MB_PYTHON_VERSION: "${{ matrix.python }}"
-  #      MB_ML_VER: "2014"
-  #      BUILD_DEPENDS: "cython wheel"
-  #      TEST_DEPENDS: "cython"
-  #      TRAVIS_OS_NAME: ${{ matrix.os-name }}
-  #      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #      - name: Setup cmake
-  #        run: |
-  #          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-  #          echo $PATH
-  #          brew install cmake
-  #          echo "check python3"
-  #          python3 -c "import sys; print(sys.version)"
-  #      - name: Get code of pyproj
-  #        env:
-  #          REPO_DIR: pyproj
-  #          WHEEL_SDIR: wheelhouse
-  #          SETUPTOOLS_USE_DISTUTILS: stdlib
-  #          BUILD_COMMIT: 3.6.1
-  #        run: |
-  #            bash -x .github/workflows/build.sh
-  #      - name: Build Wheel of pyproj
-  #        env:
-  #          REPO_DIR: pyproj
-  #          WHEEL_SDIR: wheelhouse
-  #          SETUPTOOLS_USE_DISTUTILS: stdlib
-  #          BUILD_COMMIT: 3.6.1
-  #        run: |
-  #            bash -x .github/workflows/wheel.sh
-  #      - uses: actions/upload-artifact@v3
-  #        with:
-  #          name: wheels
-  #          path: wheelhouse
-  #
-  #  build_Fiona:
-  #    name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
-  #    runs-on: ${{ matrix.os }}
-  #    strategy:
-  #      fail-fast: false
-  #      matrix:
-  #        os: [ "self-hosted" ]
-  #        python: [ "3.9", "3.10", "3.11" ]
-  #        platform: [ "arm64"]
-  #        macos-target: [ "12" ]
-  #        os-name: ["osx"]
-  #    env:
-  #      REPO_DIR: Fiona
-  #      BUILD_COMMIT: 1.9.5
-  #      GDAL_FIONA: 3.7.3
-  #      PLAT: "${{ matrix.platform }}"
-  #      MB_PYTHON_VERSION: "${{ matrix.python }}"
-  #      MB_ML_VER: "2014"
-  #      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-  #      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
-  #      TRAVIS_OS_NAME: ${{ matrix.os-name }}
-  #      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #        with:
-  #          submodules: true
-  #      - name: Setup cmake
-  #        run: |
-  #          ls -lrt /opt/homebrew/bin/
-  #          /opt/homebrew/bin/brew install cmake
-  #          echo "check python3"
-  #          python3 -c "import sys; print(sys.version)"
-  #      - name: Get code of Fiona
-  #        env:
-  #          REPO_DIR: Fiona
-  #          WHEEL_SDIR: wheelhouse
-  #          SETUPTOOLS_USE_DISTUTILS: stdlib
-  #          BUILD_COMMIT: 1.9.5
-  #        run: |
-  #            bash -x .github/workflows/build.sh
-  #      - name: Build Wheel of Fiona
-  #        env:
-  #          REPO_DIR: Fiona
-  #          WHEEL_SDIR: wheelhouse
-  #          SETUPTOOLS_USE_DISTUTILS: stdlib
-  #          BUILD_COMMIT: 1.9.5
-  #          BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-  #          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
-  #        run: |
-  #            bash -x .github/workflows/wheel.sh
-  #      - uses: actions/upload-artifact@v3
-  #        with:
-  #          name: wheels
-  #          path: wheelhouse
+  build_pyproj:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["self-hosted"]
+        python: ["3.12"]
+        platform: ["arm64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
+    env:
+      REPO_DIR: pyproj
+      BUILD_COMMIT: 3.6.1
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "cython wheel"
+      TEST_DEPENDS: "cython"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup cmake
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
+          brew install cmake
+          echo "check python3"
+          python3 -c "import sys; print(sys.version)"
+      - name: Get code of pyproj
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.6.1
+        run: |
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of pyproj
+        env:
+          REPO_DIR: pyproj
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 3.6.1
+        run: |
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheelhouse
+
+  build_Fiona:
+    name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["self-hosted"]
+        python: ["3.12"]
+        platform: ["arm64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
+    env:
+      REPO_DIR: Fiona
+      BUILD_COMMIT: 1.9.5
+      GDAL_FIONA: 3.7.3
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Setup cmake
+        run: |
+          ls -lrt /opt/homebrew/bin/
+          /opt/homebrew/bin/brew install cmake
+          echo "check python3"
+          python3 -c "import sys; print(sys.version)"
+      - name: Get code of Fiona
+        env:
+          REPO_DIR: Fiona
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 1.9.5
+        run: |
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of Fiona
+        env:
+          REPO_DIR: Fiona
+          WHEEL_SDIR: wheelhouse
+          SETUPTOOLS_USE_DISTUTILS: stdlib
+          BUILD_COMMIT: 1.9.5
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
+          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+        run: |
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheelhouse
 
   build_GDAL:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
