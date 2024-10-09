@@ -1,9 +1,17 @@
 ---
-name: Linux wheels and test x86_64
-on: [workflow_dispatch]
+name: Linux wheels x86_64
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "tmate debugging enabled"
+        required: false
+        default: false
+
 env:
   WHEEL_SDIR: wheelhouse
-  SETUPTOOLS_USE_DISTUTILS: stdlib
+
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -12,12 +20,13 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: pyproj
       BUILD_COMMIT: 3.6.1
+      WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -26,29 +35,21 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.10"
       - name: get code of pyproj
-        env:
-          REPO_DIR: pyproj
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.6.1
         run: |
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
-        env:
-          REPO_DIR: pyproj
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.6.1
         run: |
           sudo apt install python3-virtualenv
+      - name: Build Wheel of pyproj
+        run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
@@ -62,7 +63,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
@@ -77,27 +78,22 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.10"
+      - name: Setup debugging session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: get code of Fiona
-        env:
-          REPO_DIR: Fiona
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.9.5
         run: |
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          REPO_DIR: Fiona
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 1.9.5
           BUILD_DEPENDS: "oldest-supported-numpy cython==0.29.26 wheel==0.34.2"
           TEST_DEPENDS: "oldest-supported-numpy attrs==21.4.0 pytest==6.2.5 click==8.0.3 mock boto3 packaging hypothesis==4.38.1 wheel==0.34.2 pytz"
         run: |
@@ -116,12 +112,13 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
       REPO_DIR: gdal
       BUILD_COMMIT: v3.7.3
+      WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -130,26 +127,16 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.10"
       - name: get code of GDAL
-        env:
-          REPO_DIR: gdal
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.7.3
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
-        env:
-          REPO_DIR: gdal
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: v3.7.3
         run: |
           sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
@@ -165,12 +152,12 @@ jobs:
       matrix:
         python-version: ["3.12"]
     env:
-      BRANCH_TEST: master
+      BRANCH_TEST: ae-py312
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
       - name: Set up Python  ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: download artifact
@@ -189,19 +176,22 @@ jobs:
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py310-linux64.txt
-          #cd ${{steps.download.outputs.download-path}}
-          #PYCUT=`echo "${PYTHON_VERSION//.}"`
-          #ls *${PYCUT}*
-          #pip install --force-reinstall *${PYCUT}*
+          #pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py311-linux64.txt
+          cd ${{steps.download.outputs.download-path}}
+          PYCUT=`echo "${PYTHON_VERSION//.}"`
+          ls *${PYCUT}*
+          pip install --force-reinstall *${PYCUT}*
           cd $HOME
-          git clone https://github.com/gem/oq-engine.git
-          cd oq-engine && git checkout ${BRANCH_TEST}
+          git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
+          cd oq-engine 
           git status
+          pip install -r requirements-py312-linux64.txt
           pip install -e .
           cd $HOME/oq-engine
-          oq dbserver upgrade
+          oq engine --upgrade-db
           sleep 5
+          pip install pytest
+          sleep 3
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/calculators
