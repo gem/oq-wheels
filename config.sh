@@ -267,11 +267,8 @@ function build_gdal {
     -DGDAL_USE_SFCGAL=OFF \
     -DGDAL_USE_XERCESC=OFF \
     -DGDAL_USE_LIBXML2=OFF \
-    -DGDAL_USE_PCRE2=ON \
-    -DPCRE2_INCLUDE_DIR=$BUILD_PREFIX/include \
-    -DPCRE2-8_LIBRARY=$PCRE2_LIB \
     -DGDAL_USE_POSTGRESQL=OFF \
-    -DGDAL_USE_ODBC=OFF \
+    -DGDAL_USE_ODBC=OFF 
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
