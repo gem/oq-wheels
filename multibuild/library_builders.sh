@@ -154,7 +154,7 @@ function build_new_zlib {
 
 function build_jpeg {
     if [ -e jpeg-stamp ]; then return; fi
-    fetch_unpack http://ijg.org/files/jpegsrc.v${JPEG_VERSION}.tar.gz
+    fetch_unpack https://ijg.org/files/jpegsrc.v${JPEG_VERSION}.tar.gz
 	(cd jpeg-${JPEG_VERSION} \
     && ./configure --prefix=$BUILD_PREFIX \
     && make -j4 \
