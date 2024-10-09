@@ -163,7 +163,6 @@ jobs:
       - name: "Echo artifact download path"
         run: echo ${{steps.download.outputs.download-path}}
       - name: Test wheels with python ${{ matrix.python-version }}
-        shell: bash
         run: |
           set -x
           echo "engine installation to test wheel"
@@ -174,6 +173,7 @@ jobs:
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
           ls *${PYCUT}*
+          sleep 3600
           pip install --force-reinstall *${PYCUT}*
           cd $HOME
           git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
