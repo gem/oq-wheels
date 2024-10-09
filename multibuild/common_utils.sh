@@ -327,7 +327,7 @@ function build_wheel_cmd {
 
 function pip_wheel_cmd {
     local abs_wheelhouse=$1
-    python -vv -m build -w . -o $abs_wheelhouse 
+    python -vv -m build -n -w . -o $abs_wheelhouse 
     #python -m build -x -w . -o $abs_wheelhouse 
     #pip wheel $(pip_opts) -w $abs_wheelhouse --no-deps .
 }
