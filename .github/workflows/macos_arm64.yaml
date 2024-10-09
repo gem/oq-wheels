@@ -147,13 +147,13 @@ jobs:
         os-name: ["osx"]
     env:
       BRANCH_TEST: ae-py312
-      PYTHON_VERSION: "${{ matrix.python-version }}"
+      PYTHON_VERSION: "${{ matrix.python }}"
 
     steps:
-      - name: Set up Python  ${{ matrix.python-version }}
+      - name: Set up Python  ${{ matrix.python }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
       - name: download artifact
         uses: actions/download-artifact@v3
         id: download
