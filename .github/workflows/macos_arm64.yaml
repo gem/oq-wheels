@@ -117,13 +117,13 @@ jobs:
       fail-fast: false
       matrix:
         os: ["self-hosted"]
-        python: ["3.11"]
+        python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.8.4
+      BUILD_COMMIT: v3.7.3
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
