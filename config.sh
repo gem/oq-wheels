@@ -27,7 +27,7 @@ function fetch_unpack {
             ln -s $our_archive $out_archive
         else
             # Otherwise download it.
-            curl --insecure -L $url > $out_archive
+            curl -v --insecure -L $url > $out_archive
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
