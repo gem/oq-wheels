@@ -24,6 +24,5 @@ echo "::group::Test wheel"
   fi
   if [[ "$REPO_DIR" == "gdal" ]]; then
       install_run $PLAT 
-      python3 -c 'from osgeo import gdal_array'
   fi
 echo "::endgroup::"

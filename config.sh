@@ -268,7 +268,7 @@ function build_gdal {
     -DGDAL_USE_XERCESC=OFF \
     -DGDAL_USE_LIBXML2=OFF \
     -DGDAL_USE_POSTGRESQL=OFF \
-    -DGDAL_USE_ODBC=OFF 
+    -DGDAL_USE_ODBC=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -346,10 +346,6 @@ function run_tests {
         echo "Run import to test that numpy is included"
         python3 -c 'from osgeo import gdal_array'
     fi
-
-
-
-
 }
 
 
