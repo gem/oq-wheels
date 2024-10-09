@@ -146,6 +146,7 @@ jobs:
       - name: Build Wheel of GDAL
         run: |
           bash -x .github/workflows/wheel.sh
+          sleep 3600
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
