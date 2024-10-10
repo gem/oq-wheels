@@ -61,7 +61,6 @@ jobs:
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
-      PATH: "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
     steps:
       - uses: actions/checkout@v4
       - name: Setup cmake
@@ -73,9 +72,13 @@ jobs:
           python3 -c "import sys; print(sys.version)"
       - name: Get code of pyproj
         run: |
+          export PATH: "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
         run: |
+          export PATH: "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
         with:
