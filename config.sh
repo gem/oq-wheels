@@ -81,13 +81,12 @@ function build_jsonc {
     touch jsonc-stamp
 }
 
-
 function build_tiff {
+    echo "Entering in the function of TIFF"
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
     build_jpeg
-    #if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
-    ensure_xz
+    build_xz
     fetch_unpack https://download.osgeo.org/libtiff/tiff-${TIFF_VERSION}.tar.gz
     (cd tiff-${TIFF_VERSION} \
         && mv VERSION VERSION.txt \
@@ -97,7 +96,6 @@ function build_tiff {
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch tiff-stamp
 }
-
 
 function build_proj {
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
@@ -239,31 +237,32 @@ function build_gdal {
     -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
     -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-	${GEOS_CONFIG} \
-    -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
-    -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
-    -DGDAL_USE_TIFF=ON \
-    -DGDAL_USE_TIFF_INTERNAL=OFF \
-    -DGDAL_USE_GEOTIFF_INTERNAL=ON \
-    -DGDAL_ENABLE_DRIVER_GIF=ON \
-    -DGDAL_ENABLE_DRIVER_GRIB=ON \
-    -DGDAL_ENABLE_DRIVER_JPEG=ON \
-    -DGDAL_USE_ICONV=ON \
-    -DGDAL_USE_JSONC=ON \
-    -DGDAL_USE_JSONC_INTERNAL=OFF \
-    -DGDAL_USE_ZLIB=ON \
-    -DGDAL_USE_ZLIB_INTERNAL=OFF \
-    -DGDAL_ENABLE_DRIVER_PNG=ON \
-    -DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
-    -DOGR_ENABLE_DRIVER_GPKG=ON \
-    -DBUILD_PYTHON_BINDINGS=OFF \
-    -DBUILD_JAVA_BINDINGS=OFF \
-    -DBUILD_CSHARP_BINDINGS=OFF \
-    -DGDAL_USE_SFCGAL=OFF \
-    -DGDAL_USE_XERCESC=OFF \
-    -DGDAL_USE_LIBXML2=OFF
+	${GEOS_CONFIG} 
+    #    \
+    #-DBUILD_SHARED_LIBS=ON \
+    #-DCMAKE_BUILD_TYPE=Release \
+    #-DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
+    #-DOGR_BUILD_OPTIONAL_DRIVERS=ON \
+    #-DGDAL_USE_TIFF=ON \
+    #-DGDAL_USE_TIFF_INTERNAL=OFF \
+    #-DGDAL_USE_GEOTIFF_INTERNAL=ON \
+    #-DGDAL_ENABLE_DRIVER_GIF=ON \
+    #-DGDAL_ENABLE_DRIVER_GRIB=ON \
+    #-DGDAL_ENABLE_DRIVER_JPEG=ON \
+    #-DGDAL_USE_ICONV=ON \
+    #-DGDAL_USE_JSONC=ON \
+    #-DGDAL_USE_JSONC_INTERNAL=OFF \
+    #-DGDAL_USE_ZLIB=ON \
+    #-DGDAL_USE_ZLIB_INTERNAL=OFF \
+    #-DGDAL_ENABLE_DRIVER_PNG=ON \
+    #-DGDAL_ENABLE_DRIVER_OGCAPI=OFF \
+    #-DOGR_ENABLE_DRIVER_GPKG=ON \
+    #-DBUILD_PYTHON_BINDINGS=OFF \
+    #-DBUILD_JAVA_BINDINGS=OFF \
+    #-DBUILD_CSHARP_BINDINGS=OFF \
+    #-DGDAL_USE_SFCGAL=OFF \
+    #-DGDAL_USE_XERCESC=OFF \
+    #-DGDAL_USE_LIBXML2=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -287,23 +286,23 @@ function pre_build {
     	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
-    suppress build_nghttp2
-    suppress build_openssl
+    build_nghttp2
+    build_openssl
     # Remove previously installed curl.
     #sudo rm -rf /usr/local/lib/libcurl*
     if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-    suppress build_zlib
+    build_zlib
     build_curl
+    build_tiff
     build_sqlite
-    suppress build_tiff
     build_proj
     if [[ "$REPO_DIR" != "pyproj" ]]; then
-      suppress build_jpeg
-      suppress build_libpng
-      suppress build_jsonc
-      suppress build_expat
-      suppress build_geos
+      build_jpeg
+      build_libpng
+      build_jsonc
+      build_expat
+      build_geos
       build_gdal
     fi
     if [ -n "$IS_OSX" ]; then
@@ -360,7 +359,10 @@ function build_wheel_cmd {
 		pip download GDAL==${GDAL_VERSION}
 		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
 		cd GDAL-${GDAL_VERSION}
-		$cmd $wheelhouse
+        if [ "$(uname -m)" = "arm64" ]; then 
+            GDAL_VERSION=$GDAL_VERSION ARCHFLAGS="-arch arm64" $cmd $wheelhouse --compile --no-cache-dir
+        fi
+        GDAL_VERSION=$GDAL_VERSION ARCHFLAGS="-arch amd64" $cmd $wheelhouse --compile --no-cache-dir
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
 		pwd
@@ -382,7 +384,7 @@ function macos_arm64_native_build_setup {
     # Setup native build for single arch arm_64 wheels
     export PLAT="arm64"
     # We don't want universal2 builds and only want an arm64 build
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export _PYTHON_HOST_PLATFORM="macosx-13.0-arm64"
     export ARCHFLAGS+=" -arch arm64"
     $@
 }

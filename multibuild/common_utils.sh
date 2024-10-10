@@ -165,6 +165,7 @@ function suppress {
     [ "$ret" -eq 0 ] || cat "$tmp"
     rm -f "$tmp"
     if [[ -n $errexit_set ]]; then set -e; fi
+    set -x
     return "$ret"
 }
 

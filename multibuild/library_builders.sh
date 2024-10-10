@@ -70,7 +70,7 @@ function build_simple {
     (cd $name_version \
         && ./configure --prefix=$BUILD_PREFIX $configure_args \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
@@ -158,7 +158,7 @@ function build_jpeg {
     (cd jpeg-${JPEG_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch jpeg-stamp
 }
 
@@ -190,7 +190,7 @@ function build_bzip2 {
 }
 
 function build_tiff {
-    set +x
+    set -x
     build_zlib
     build_jpeg
     ensure_xz
