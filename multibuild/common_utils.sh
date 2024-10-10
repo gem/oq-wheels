@@ -414,7 +414,8 @@ function get_os {
 function get_platform {
     # Report platform as given by uname
     # Use any Python that comes to hand.
-    python3 -c 'import platform; print(platform.uname()[4])'
+    #python3 -c 'import platform; print(platform.uname()[4])'
+    python -c 'import platform; print(platform.uname()[4])'
 }
 
 if [ "$(get_platform)" == x86_64 ] || \
