@@ -10,10 +10,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"]
+        os: ["self-hosted"]
         python: ["3.12"]
-        platform: ["x86_64"]
-        os-name: ["jammy"]
+        platform: ["arm64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
     env:
       REPO_DIR: psutil
       BUILD_COMMIT: release-6.0.0
