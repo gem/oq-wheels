@@ -26,4 +26,9 @@ echo "::group::Get code of project: $REPO_DIR"
 	  # No such file or directory for GDAL 3.6.4
 	  ls swig/python
   fi
+  if [[ "$REPO_DIR" == "psutil" ]]; then
+	  git clone https://github.com/giampaolo/psutil.git
+	  cd psutil
+	  git checkout ${BUILD_COMMIT}
+  fi
 echo "::endgroup::"

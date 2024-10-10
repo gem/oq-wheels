@@ -13,6 +13,49 @@ env:
   WHEEL_SDIR: wheelhouse
 
 jobs:
+  build_psutil:
+    name: psutil ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-22.04"]
+        python: ["3.12"]
+        platform: ["x86_64"]
+        os-name: ["jammy"]
+    env:
+      REPO_DIR: psutil
+      BUILD_COMMIT: release-6.0.0
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "cython wheel setuptools"
+      TEST_DEPENDS: "cython"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: get code of psutil
+        run: |
+          echo $PATH
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of psutil
+        run: |
+          sudo apt install python3-virtualenv
+      - name: Build Wheel of pyproj
+        run: |
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheelhouse
+
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
@@ -30,7 +73,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel"
+      BUILD_DEPENDS: "cython wheel setuptools"
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}

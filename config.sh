@@ -292,30 +292,32 @@ function pre_build {
     	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
-    build_nghttp2
-    build_openssl
-    # Remove previously installed curl.
-    #sudo rm -rf /usr/local/lib/libcurl*
-    if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
-    fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-    suppress build_zlib
-    build_curl
-    build_sqlite
-    build_tiff
-    build_proj
-    if [[ "$REPO_DIR" != "pyproj" ]]; then
-      build_jpeg
-      build_libpng
-      build_jsonc
-      build_expat
-      build_geos
-      build_gdal
-    fi
-    if [ -n "$IS_OSX" ]; then
-       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
-       if [[ "$REPO_DIR" == "pyproj" ]]; then
-         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
-       fi
+    if [[ "$REPO_DIR" != "psutil" ]]; then
+        build_nghttp2
+        build_openssl
+        # Remove previously installed curl.
+        #sudo rm -rf /usr/local/lib/libcurl*
+        if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
+        fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
+        build_zlib
+        build_curl
+        build_sqlite
+        build_tiff
+        build_proj
+        if [[ "$REPO_DIR" != "pyproj" ]]; then
+          build_jpeg
+          build_libpng
+          build_jsonc
+          build_expat
+          build_geos
+          build_gdal
+        fi
+        if [ -n "$IS_OSX" ]; then
+           export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+           if [[ "$REPO_DIR" == "pyproj" ]]; then
+             export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+           fi
+        fi
     fi
 }
 
@@ -374,6 +376,12 @@ function build_wheel_cmd {
 		$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
+		pwd
+		ls -lrt
+		sleep 10
+    	(cd $repo_dir && $cmd $wheelhouse)
+	fi
+	if [ "$REPO_DIR" == "psutil" ]; then
 		pwd
 		ls -lrt
 		sleep 10
