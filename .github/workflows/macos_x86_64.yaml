@@ -30,16 +30,10 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
       - name: get code of psutil
         run: |
           echo $PATH
           bash -x .github/workflows/build.sh
-      - name: Build Wheel of psutil
-        run: |
-          sudo apt install python3-virtualenv
       - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
@@ -66,8 +60,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel setuptools numpy==1.26.2"
-      TEST_DEPENDS: "cython numpy==1.26.2"
+      BUILD_DEPENDS: "cython wheel setuptools numpy==1.26.4"
+      TEST_DEPENDS: "cython numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -102,8 +96,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2 setuptools"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.2"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.4 setuptools"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -116,8 +110,8 @@ jobs:
       - name: Build Wheel of Fiona
         env:
           BUILD_COMMIT: 1.9.5
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.2 setuptools"
-          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.2"
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.4 setuptools"
+          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.4"
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -143,8 +137,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy==1.26.2 setuptools wheel"
-      TEST_DEPENDS: "numpy==1.26.2"
+      BUILD_DEPENDS: "numpy==1.26.4 setuptools wheel"
+      TEST_DEPENDS: "numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
