@@ -39,7 +39,7 @@ jobs:
       - name: Build Wheel of psutil
         run: |
           sudo apt install python3-virtualenv
-      - name: Build Wheel of pyproj
+      - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
