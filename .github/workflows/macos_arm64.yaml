@@ -72,12 +72,12 @@ jobs:
           python3 -c "import sys; print(sys.version)"
       - name: Get code of pyproj
         run: |
-          export PATH: "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
         run: |
-          export PATH: "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
