@@ -155,16 +155,15 @@ jobs:
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          #pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py311-linux64.txt
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
           ls *${PYCUT}*
           pip install --force-reinstall *${PYCUT}*
           cd $HOME
           git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
-          cd oq-engine 
+          cd oq-engine
           git status
-          pip install -r requirements-py312-linux64.txt
+          pip install -r requirements-py312-macos_x86_64.txt
           pip install -e .
           cd $HOME/oq-engine
           oq engine --upgrade-db

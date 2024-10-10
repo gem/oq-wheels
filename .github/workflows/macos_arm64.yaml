@@ -179,7 +179,7 @@ jobs:
           git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
           cd oq-engine
           git status
-          pip install -r requirements-py312-linux64.txt
+          pip install -r requirements-py312-macos_arm64.txt
           pip install -e .
           cd $HOME/oq-engine
           oq engine --upgrade-db
