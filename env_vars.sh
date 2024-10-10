@@ -15,7 +15,7 @@ OPENSSL_DOWNLOAD_URL=https://www.openssl.org/source/
 OPENSSL_ROOT=openssl-1.1.1w
 OPENSSL_HASH=cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8
 export MACOSX_DEPLOYMENT_TARGET=11.0
-if [ -z "$IS_OSX" ] && [ "$PLAT" == x86_64 ]; then
+if [ -z "$IS_OSX" ] || [ "$PLAT" == x86_64 ]; then
     export MACOSX_DEPLOYMENT_TARGET=13.0
 fi
 export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
