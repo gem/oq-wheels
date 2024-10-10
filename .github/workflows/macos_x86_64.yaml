@@ -3,6 +3,8 @@ name: MacOS wheels x86_64
 on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
 jobs:
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
