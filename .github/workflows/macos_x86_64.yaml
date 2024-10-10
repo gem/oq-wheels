@@ -1,57 +1,75 @@
 ---
 name: MacOS wheels x86_64
-on:
-  workflow_dispatch:
-    inputs:
-      debug_enabled:
-        type: boolean
-        description: "tmate debugging enabled"
-        required: false
-        default: false
-
+on: [workflow_dispatch]
 env:
   WHEEL_SDIR: wheelhouse
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
 jobs:
+  build_psutil:
+    name: psutil ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["macos-13"]
+        python: ["3.12"]
+        platform: ["x86_64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
+    env:
+      REPO_DIR: psutil
+      BUILD_COMMIT: release-6.0.0
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "cython wheel setuptools"
+      TEST_DEPENDS: "cython"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: get code of psutil
+        run: |
+          echo $PATH
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of psutil
+        run: |
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheelhouse
+
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
-        python: ["3.10", "3.11", "3.12"]
+        os: ["macos-13"]
+        python: ["3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
+      WHEEL_SDIR: wheelhouse
       BUILD_COMMIT: 3.6.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel"
-      TEST_DEPENDS: "cython"
+      BUILD_DEPENDS: "cython wheel setuptools numpy==1.26.4"
+      TEST_DEPENDS: "cython numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup cmake
-        run: |
-          brew install cmake
       - name: Get code of pyproj
-        env:
-          REPO_DIR: pyproj
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.6.1
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyproj
-        env:
-          REPO_DIR: pyproj
-          WHEEL_SDIR: wheelhouse
-          SETUPTOOLS_USE_DISTUTILS: stdlib
-          BUILD_COMMIT: 3.6.1
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -65,38 +83,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
-        python: ["3.10", "3.11", "3.12"]
+        os: ["macos-13"]
+        python: ["3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.9.5
+      WHEEL_SDIR: wheelhouse
       GDAL_FIONA: 3.7.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.4 setuptools"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Setup cmake
-        run: |
-          brew install cmake
-          echo "check python3"
-          python3 -c "import sys; print(sys.version)"
       - name: Get code of Fiona
         run: |
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel"
-          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+          BUILD_COMMIT: 1.9.5
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.4 setuptools"
+          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.4"
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v3
@@ -110,10 +125,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
-        python: ["3.10", "3.11", "3.12"]
+        os: ["macos-13"]
+        python: ["3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
@@ -122,15 +137,12 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy wheel"
-      TEST_DEPENDS: "numpy"
+      BUILD_DEPENDS: "numpy==1.26.4 setuptools wheel"
+      TEST_DEPENDS: "numpy==1.26.4"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup cmake
-        run: |
-          brew install cmake
       - name: Get code of gdal
         run: |
           bash -x .github/workflows/build.sh
@@ -144,23 +156,25 @@ jobs:
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
+    name: test ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-12"]
-        python: ["3.10", "3.11", "3.12"]
+        os: ["macos-13"]
+        python: ["3.12"]
         platform: ["x86_64"]
-        macos-target: ["11"]
+        macos-target: ["13"]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: master
-      PYTHON_VERSION: "${{ matrix.python }}"
+      BRANCH_TEST: ae-py312
+      PYTHON_VERSION: "${{ matrix.python-version }}"
+
     steps:
-      - name: Set up Python  ${{ matrix.python }}
-        uses: actions/setup-python@v4
+      - name: Set up Python  ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
       - name: download artifact
         uses: actions/download-artifact@v3
         id: download
@@ -169,7 +183,7 @@ jobs:
           path: wheelhouse
       - name: "Echo artifact download path"
         run: echo ${{steps.download.outputs.download-path}}
-      - name: Test wheels with python ${{ matrix.python }}
+      - name: Test wheels with python ${{ matrix.python-version }}
         shell: bash
         run: |
           set -x
@@ -177,19 +191,21 @@ jobs:
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          pip install -r https://raw.githubusercontent.com/gem/oq-engine/ae-new_whl_fiona/requirements-py311.txt
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
           ls *${PYCUT}*
           pip install --force-reinstall *${PYCUT}*
           cd $HOME
-          git clone https://github.com/gem/oq-engine.git
-          cd oq-engine && git checkout ${BRANCH_TEST}
+          git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
+          cd oq-engine
           git status
+          pip install -r requirements-py312-macos_x86_64.txt
           pip install -e .
           cd $HOME/oq-engine
           oq engine --upgrade-db
           sleep 5
+          pip install pytest
+          sleep 3
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/calculators

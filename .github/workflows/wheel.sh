@@ -5,6 +5,7 @@ echo "::group::Build wheel"
   echo "+++++++++++++++++++++++++++++++++++++++++"
   echo "check python of venv after before_install"
   echo "+++++++++++++++++++++++++++++++++++++++++"
+  which python
   python3 -c "import sys; print(sys.version)" | awk -F \. {'print $1$2'}
   echo $PIP_CMD
   echo $PYTHON_EXE
@@ -20,5 +21,8 @@ echo "::group::Test wheel"
   source multibuild/common_utils.sh
   if [[ "$REPO_DIR" == "Fiona" ]]; then
       install_run $PLAT
+  fi
+  if [[ "$REPO_DIR" == "gdal" ]]; then
+      install_run $PLAT 
   fi
 echo "::endgroup::"

@@ -1,4 +1,4 @@
-#k Custom utilities for Fiona wheels.
+# Custom utilities for Fiona wheels.
 #
 # Test for OSX with [ -n "$IS_OSX" ].
 
@@ -27,7 +27,7 @@ function fetch_unpack {
             ln -s $our_archive $out_archive
         else
             # Otherwise download it.
-            curl --insecure -L $url > $out_archive
+            curl -v --insecure -L $url > $out_archive
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
@@ -100,13 +100,11 @@ function build_tiff {
 
 
 function build_proj {
+    build_sqlite
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
-    env
-	sleep 3
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
-    build_sqlite
 	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
 	echo "env: $PROJ_DATA and build prefix ${BUILD_PREFIX}"
 	#
@@ -204,6 +202,9 @@ function build_curl {
     touch curl-stamp
 }
 
+function build_pcre2 {
+    build_simple pcre2 $PCRE_VERSION https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${PCRE_VERSION}
+}
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
@@ -217,15 +218,15 @@ function build_gdal {
     build_expat
     build_geos
 
+    EXPAT_PREFIX=$BUILD_PREFIX
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
-    EXPAT_PREFIX=$BUILD_PREFIX
-	if [ -n "$IS_OSX" ]; then
+    if [ -n "$IS_OSX" ]; then
         GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
     else
         GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
-	fi
+    fi
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
@@ -233,17 +234,17 @@ function build_gdal {
 	mkdir build
 	cd build
 	# build using cmake
-    $cmake .. \
+    cmake .. \
     -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
     -DCMAKE_INCLUDE_PATH=$BUILD_PREFIX/include \
     -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
     -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-	${GEOS_CONFIG} \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
     -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
+    ${GEOS_CONFIG} \
     -DGDAL_USE_TIFF=ON \
     -DGDAL_USE_TIFF_INTERNAL=OFF \
     -DGDAL_USE_GEOTIFF_INTERNAL=ON \
@@ -263,7 +264,9 @@ function build_gdal {
     -DBUILD_CSHARP_BINDINGS=OFF \
     -DGDAL_USE_SFCGAL=OFF \
     -DGDAL_USE_XERCESC=OFF \
-    -DGDAL_USE_LIBXML2=OFF
+    -DGDAL_USE_LIBXML2=OFF \
+    -DGDAL_USE_POSTGRESQL=OFF \
+    -DGDAL_USE_ODBC=OFF
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
@@ -287,37 +290,36 @@ function pre_build {
     	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
     	export LD_RUN_PATH=$LD_RUN_PATH:/usr/local/lib
     fi
-    suppress build_nghttp2
-    suppress build_openssl
-    # Remove previously installed curl.
-    #sudo rm -rf /usr/local/lib/libcurl*
-    if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
-    fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-    suppress build_zlib
-    build_curl
-    build_sqlite
-    suppress build_tiff
-    build_proj
-    if [[ "$REPO_DIR" != "pyproj" ]]; then
-      suppress build_jpeg
-      suppress build_libpng
-      suppress build_jsonc
-      suppress build_expat
-      suppress build_geos
-      build_gdal
-    fi
-    if [ -n "$IS_OSX" ]; then
-       export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
-       if [[ "$REPO_DIR" == "pyproj" ]]; then
-         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
-       fi
+    if [[ "$REPO_DIR" != "psutil" ]]; then
+        build_nghttp2
+        build_openssl
+        # Remove previously installed curl.
+        #sudo rm -rf /usr/local/lib/libcurl*
+        if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
+        fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
+        build_zlib
+        build_curl
+        build_sqlite
+        build_tiff
+        build_proj
+        if [[ "$REPO_DIR" != "pyproj" ]]; then
+          build_jpeg
+          build_libpng
+          build_jsonc
+          build_expat
+          build_geos
+          build_gdal
+        fi
+        if [ -n "$IS_OSX" ]; then
+           export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
+           if [[ "$REPO_DIR" == "pyproj" ]]; then
+             export LDFLAGS="${LDFLAGS} -Wl,-rpath,${PROJ_DIR}/lib"
+           fi
+        fi
     fi
 }
 
 function run_tests {
-    unset GDAL_DATA
-    unset PROJ_LIB
-    unset PROJ_DATA
     if [ -n "$IS_OSX" ]; then
         export PATH=$PATH:${BUILD_PREFIX}/bin
         export LC_ALL=en_US.UTF-8
@@ -329,12 +331,21 @@ function run_tests {
         apt-get update
         apt-get install -y ca-certificates
     fi
-    cp -R ../Fiona/tests ./tests
-    python -m pip install "shapely" $TEST_DEPENDS
-    GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
-    fio --version
-    fio env --formats
-    python ../test_fiona_issue383.py
+    if [[ "$REPO_DIR" == "Fiona" ]]; then
+      unset GDAL_DATA
+      unset PROJ_LIB
+      unset PROJ_DATA
+       cp -R ../Fiona/tests ./tests
+       python -m pip install "shapely" $TEST_DEPENDS
+       GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
+       fio --version
+       fio env --formats
+       python ../test_fiona_issue383.py
+    fi
+    if [[ "$REPO_DIR" == "gdal" ]]; then
+        echo "Run import to test that numpy is included"
+        python3 -c 'from osgeo import gdal_array'
+    fi
 }
 
 
@@ -368,13 +379,25 @@ function build_wheel_cmd {
 		sleep 10
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
+	if [ "$REPO_DIR" == "psutil" ]; then
+		pwd
+		ls -lrt
+		sleep 10
+    	(cd $repo_dir && $cmd $wheelhouse)
+	fi
+    if [ -n "$IS_OSX" ]; then
+        pip install delocate
+        delocate-listdeps --all --depending $wheelhouse/*.whl
+    else  # manylinux
+        pip install auditwheel
+    fi
     repair_wheelhouse $wheelhouse
 }
 
 
 function build_cmd {
     local abs_wheelhouse=$1
-    python -m build -o $abs_wheelhouse
+    python -vv -m build -o $abs_wheelhouse
 }
 
 
@@ -382,7 +405,7 @@ function macos_arm64_native_build_setup {
     # Setup native build for single arch arm_64 wheels
     export PLAT="arm64"
     # We don't want universal2 builds and only want an arm64 build
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
+    export _PYTHON_HOST_PLATFORM="macosx-13.0-arm64"
     export ARCHFLAGS+=" -arch arm64"
     $@
 }

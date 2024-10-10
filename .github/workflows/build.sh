@@ -3,7 +3,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
   # webp, zstd, xz, libtiff cause a conflict with building webp and libtiff
   # curl from brew requires zstd, use system curl
   # if php is installed, brew tries to reinstall these after installing openblas
-  brew remove --ignore-dependencies webp zstd xz libtiff curl php
+  brew remove --ignore-dependencies webp zstd libtiff curl php
 fi
 
 echo "::group::Get code of project: $REPO_DIR"
@@ -25,5 +25,10 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git checkout ${BUILD_COMMIT}
 	  # No such file or directory for GDAL 3.6.4
 	  ls swig/python
+  fi
+  if [[ "$REPO_DIR" == "psutil" ]]; then
+	  git clone https://github.com/giampaolo/psutil.git
+	  cd psutil
+	  git checkout ${BUILD_COMMIT}
   fi
 echo "::endgroup::"
