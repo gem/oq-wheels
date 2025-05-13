@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"]
+        os: ["ubuntu-24.04"]
         python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"]
+        os: ["ubuntu-24.04"]
         python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
@@ -105,7 +105,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"]
+        os: ["ubuntu-24.04"]
         python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
@@ -150,7 +150,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"]
+        os: ["ubuntu-24.04"]
         python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
@@ -190,7 +190,7 @@ jobs:
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: ["3.12"]
