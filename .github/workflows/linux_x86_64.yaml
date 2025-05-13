@@ -51,7 +51,7 @@ jobs:
       - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: wheelhouse
@@ -94,7 +94,7 @@ jobs:
       - name: Build Wheel of pyproj
         run: |
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: wheelhouse
@@ -139,7 +139,7 @@ jobs:
           echo $PATH
           sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: wheelhouse
@@ -183,7 +183,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 90
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: wheelhouse
