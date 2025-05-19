@@ -29,7 +29,7 @@ jobs:
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "_2_28"
+      MB_ML_VER: "2014"
       BUILD_DEPENDS: "cython wheel setuptools"
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
@@ -111,11 +111,11 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.9.5
-      GDAL_FIONA: 3.7.3
+      BUILD_COMMIT: 1.10.1
+      GDAL_FIONA: 3.9.2
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "_2_28"
+      MB_ML_VER: "2014"
       BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.5 setuptools"
       TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5 setuptools"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
@@ -156,7 +156,7 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.7.3
+      BUILD_COMMIT: v3.9.2
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
