@@ -172,13 +172,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: get code of GDAL
+        run: |
+          bash -x .github/workflows/build.sh
       - name: Setup debugging session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 90
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      - name: get code of GDAL
-        run: |
-          bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         run: |
           sudo apt install python3-virtualenv
