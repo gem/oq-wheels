@@ -20,8 +20,8 @@ MB_PYTHON_VERSION=${MB_PYTHON_VERSION:-$TRAVIS_PYTHON_VERSION}
 function before_install {
     # Install a virtualenv to work in.
     # Virtualenv package may not be installed on host Python.
-    python3.12 -m pip install virtualenv
-	python3.12 -m venv venv
+    python -m pip install virtualenv
+    virtualenv --python=$PYTHON_EXE venv
     source venv/bin/activate
     python --version # just to check
     # Tomli for pyproject.toml parsing, to get dependencies.
