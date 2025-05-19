@@ -370,8 +370,10 @@ function build_wheel_cmd {
     fi
 	if [ "$REPO_DIR" == "gdal" ]; then
 		pip download GDAL==${GDAL_VERSION}
-		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
-		cd GDAL-${GDAL_VERSION}
+		echo "Control the DATA"
+		ls -lrt
+		tar xzvf gdal-${GDAL_VERSION}.tar.gz
+		cd gdal-${GDAL_VERSION}
 		$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
