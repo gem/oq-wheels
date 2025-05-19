@@ -49,6 +49,7 @@ function build_geos {
     (cd geos-${GEOS_VERSION} \
         && mkdir build && cd build \
         && $cmake .. \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_INSTALL_PREFIX:PATH=$BUILD_PREFIX \
         -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
         -DBUILD_SHARED_LIBS=ON \
