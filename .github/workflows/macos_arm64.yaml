@@ -186,7 +186,7 @@ jobs:
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
-    name: test ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    name: test ${{ matrix.python-version }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -201,10 +201,10 @@ jobs:
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
-      - name: Set up Python  ${{ matrix.python }}
+      - name: Set up Python  ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
       - name: download artifact
         uses: actions/download-artifact@v4
         id: download
