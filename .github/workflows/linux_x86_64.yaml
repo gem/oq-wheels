@@ -8,6 +8,7 @@ on:
         description: "tmate debugging enabled"
         required: false
         default: false
+  pull_request:
 
 env:
   WHEEL_SDIR: wheelhouse
@@ -53,7 +54,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels_psutil
+          name: "wheels_psutil_${{ matrix.python }}"
           path: wheelhouse
 
   build_pyproj:
