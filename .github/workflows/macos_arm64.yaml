@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
+        os: [m1]
         python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
+        os: [m1]
         python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -57,7 +57,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel setuptools numpy==1.26.4"
+      BUILD_DEPENDS: "cython wheel setuptools numpy==2.2.5"
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
@@ -91,7 +91,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
+        os: [m1]
         python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -103,8 +103,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel septools"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel septools numpy==2.2.5"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -125,8 +125,8 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==1.26.4 setuptools"
-          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==1.26.4"
+          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.5 setuptools"
+          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5"
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
@@ -142,7 +142,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
+        os: [m1]
         python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -154,8 +154,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy==1.26.4 setuptools wheel"
-      TEST_DEPENDS: "numpy==1.26.4"
+      BUILD_DEPENDS: "numpy==2.2.5 setuptools wheel"
+      TEST_DEPENDS: "numpy==2.2.5"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -189,7 +189,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["self-hosted"]
+        os: [m1]
         python: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
