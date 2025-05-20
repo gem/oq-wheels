@@ -190,13 +190,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python: ["3.12"]
+        python-version: ["3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: ae-py312
-      PYTHON_VERSION: "${{ matrix.python }}"
+      BRANCH_TEST: ae_numpy2
+      PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
       - name: Set up Python  ${{ matrix.python }}
@@ -211,10 +211,9 @@ jobs:
       - name: "Echo artifact download path"
         run: echo ${{steps.download.outputs.download-path}}
       - name: Test wheels with python ${{ matrix.python-version }}
+        shell: bash
         run: |
           set -x
-          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          echo $PATH
           echo "engine installation to test wheel"
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
@@ -222,22 +221,19 @@ jobs:
           #pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py311-linux64.txt
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
-          ls *${PYCUT}*
-          sleep 36
-          pip install --force-reinstall *${PYCUT}*
           cd $HOME
           git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
           cd oq-engine
           git status
-          pip install -r requirements-py312-macos_arm64.txt
-          pip install -e .
+          pip install -r requirements-py"${PYCUT}"-linux64.txt
+          cd $HOME
+          find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install --force-reinstall
+          pip install -e oq-engine/
           cd $HOME/oq-engine
           oq engine --upgrade-db
           sleep 5
-          pip install pytest
-          sleep 3
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
           pytest -vsx --color=yes openquake/calculators
           oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
-          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
