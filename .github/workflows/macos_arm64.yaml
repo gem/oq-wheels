@@ -35,9 +35,9 @@ jobs:
       - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: "wheels_psutil_${{ matrix.python }}"
           path: wheelhouse
 
   build_pyproj:
@@ -80,9 +80,9 @@ jobs:
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: "wheels_pyproj_${{ matrix.python }}"
           path: wheelhouse
 
   build_Fiona:
@@ -131,9 +131,9 @@ jobs:
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: "wheels_fiona_${{ matrix.python }}"
           path: wheelhouse
 
   build_GDAL:
@@ -177,9 +177,9 @@ jobs:
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: "wheels_gdal_${{ matrix.python }}"
           path: wheelhouse
 
   test_wheel:
@@ -204,10 +204,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
-          name: wheels
           path: wheelhouse
       - name: "Echo artifact download path"
         run: echo ${{steps.download.outputs.download-path}}
