@@ -97,7 +97,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels_pyproj
+          name: "wheels_pyproj_${{ matrix.python }}"
           path: wheelhouse
 
   build_Fiona:
@@ -142,7 +142,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels_fiona
+          name: "wheels_fiona_${{ matrix.python }}"
           path: wheelhouse
 
   build_GDAL:
@@ -186,7 +186,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels_gdal
+          name: "wheels_gdal_${{ matrix.python }}"
           path: wheelhouse
 
   test_wheel:
