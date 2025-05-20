@@ -60,7 +60,7 @@ jobs:
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "cython wheel setuptools numpy==2.2.5"
-      TEST_DEPENDS: "cython"
+      TEST_DEPENDS: "cython numpy==2.2.5"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -100,13 +100,13 @@ jobs:
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.9.5
-      GDAL_FIONA: 3.7.3
+      BUILD_COMMIT: 1.10.1
+      GDAL_FIONA: 3.9.2
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel septools numpy==2.2.5"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel setuptools numpy==2.2.5"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5 setuptools"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -151,7 +151,7 @@ jobs:
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.7.3
+      BUILD_COMMIT: v3.9.2
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
@@ -220,7 +220,6 @@ jobs:
           python3 -m venv $HOME/openquake
           source $HOME/openquake/bin/activate
           pip install -U pip wheel setuptools
-          #pip install -r https://raw.githubusercontent.com/gem/oq-engine/master/requirements-py311-linux64.txt
           cd ${{steps.download.outputs.download-path}}
           PYCUT=`echo "${PYTHON_VERSION//.}"`
           cd $HOME
