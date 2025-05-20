@@ -39,9 +39,9 @@ jobs:
       - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: "wheels_psutil_${{ matrix.python }}"
           path: wheelhouse
 
   build_pyproj:
