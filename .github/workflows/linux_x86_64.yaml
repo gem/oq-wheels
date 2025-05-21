@@ -8,6 +8,7 @@ on:
         description: "tmate debugging enabled"
         required: false
         default: false
+  pull_request:
 
 env:
   WHEEL_SDIR: wheelhouse
