@@ -126,8 +126,6 @@ jobs:
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
-        env:
-      TRAVIS_OS_NAME: ${{ matrix.os-name }}
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
