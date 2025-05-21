@@ -19,7 +19,7 @@ jobs:
         os-name: ["osx"]
     env:
       REPO_DIR: psutil
-      BUILD_COMMIT: release-6.0.0
+      BUILD_COMMIT: release-7.0.0
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
