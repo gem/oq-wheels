@@ -133,7 +133,6 @@ jobs:
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
-        env:
         run: |
           echo $PATH
           sudo apt install python3-virtualenv
