@@ -105,8 +105,8 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel setuptools numpy==2.2.5"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5 setuptools"
+      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.5 setuptools"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5 setuptools matplotlib pyparsing"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -127,8 +127,7 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
         env:
-          BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.5 setuptools"
-          TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.5"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
