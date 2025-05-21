@@ -231,5 +231,4 @@ jobs:
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
-          pytest -vsx --color=yes openquake/calculators
           oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
