@@ -111,8 +111,6 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Setup cmake
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"

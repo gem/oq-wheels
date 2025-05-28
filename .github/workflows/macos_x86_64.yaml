@@ -102,8 +102,6 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Get code of Fiona
         run: |
           bash -x .github/workflows/build.sh
