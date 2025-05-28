@@ -57,7 +57,7 @@ jobs:
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
-      BUILD_COMMIT: 3.6.1
+      BUILD_COMMIT: 3.7.0
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -92,7 +92,7 @@ jobs:
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
-      GDAL_FIONA: 3.9.2
+      GDAL_FIONA: 3.10.1
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
