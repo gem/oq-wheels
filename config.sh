@@ -49,6 +49,7 @@ function build_geos {
     (cd geos-${GEOS_VERSION} \
         && mkdir build && cd build \
         && $cmake .. \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_INSTALL_PREFIX:PATH=$BUILD_PREFIX \
         -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
         -DBUILD_SHARED_LIBS=ON \
@@ -67,7 +68,7 @@ function build_jsonc {
     local cmake=cmake
     fetch_unpack https://s3.amazonaws.com/json-c_releases/releases/json-c-${JSONC_VERSION}.tar.gz
     (cd json-c-${JSONC_VERSION} \
-        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET . \
+        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET . \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -n "$IS_OSX" ]; then
@@ -154,7 +155,7 @@ function build_sqlite {
 
 function build_expat {
     if [ -e expat-stamp ]; then return; fi
-    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-${EXPAT_VERSION}.tar.bz2
+    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_6_3/expat-${EXPAT_VERSION}.tar.bz2
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -369,8 +370,10 @@ function build_wheel_cmd {
     fi
 	if [ "$REPO_DIR" == "gdal" ]; then
 		pip download GDAL==${GDAL_VERSION}
-		tar xzvf GDAL-${GDAL_VERSION}.tar.gz
-		cd GDAL-${GDAL_VERSION}
+		echo "Control the DATA"
+		ls -lrt
+		tar xzvf gdal-${GDAL_VERSION}.tar.gz
+		cd gdal-${GDAL_VERSION}
 		$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
