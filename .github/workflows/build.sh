@@ -31,4 +31,9 @@ echo "::group::Get code of project: $REPO_DIR"
 	  cd psutil
 	  git checkout ${BUILD_COMMIT}
   fi
+  if [[ "$REPO_DIR" == "geopands" ]]; then
+	  git clone https://github.com/geopandas/geopandas.git
+	  cd geopandas
+	  git checkout ${BUILD_COMMIT}
+  fi
 echo "::endgroup::"
