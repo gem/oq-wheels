@@ -14,14 +14,14 @@ env:
   WHEEL_SDIR: wheelhouse
 
 jobs:
-  build_GDAL:
+  build_GEOS:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-24.04"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
@@ -50,29 +50,6 @@ jobs:
         with:
           name: "wheels_gdal_${{ matrix.python }}"
           path: wheelhouse
-
-  test_wheel:
-    needs: [build_GDAL]
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-    env:
-      BRANCH_TEST: ae_numpy2
-      PYTHON_VERSION: "${{ matrix.python-version }}"
-    steps:
-      - name: Set up Python  ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: download artifact
-        uses: actions/download-artifact@v4
-        id: download
-        with:
-          path: wheelhouse
-      - name: "Echo artifact download path"
-        run: echo ${{steps.download.outputs.download-path}}
       - name: Setup debugging session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 90
