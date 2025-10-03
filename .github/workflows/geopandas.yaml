@@ -52,7 +52,7 @@ jobs:
           path: wheelhouse
 
   test_wheel:
-    needs: [build_GDAL, build_pyproj, build_Fiona]
+    needs: [build_GDAL]
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
