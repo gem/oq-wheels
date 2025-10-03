@@ -52,7 +52,7 @@ jobs:
           path: wheelhouse
       - name: Setup debugging session
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 90
+        timeout-minutes: 180
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Test wheels with python ${{ matrix.python-version }}
         shell: bash
