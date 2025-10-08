@@ -56,6 +56,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: Test wheels with python ${{ matrix.python-version }}
         shell: bash
+        env:
+          BRANCH_TEST: ae_numpy2
+          PYTHON_VERSION: "${{ matrix.python-version }}"
         run: |
           set -x
           echo "engine installation to test wheel"
