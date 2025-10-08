@@ -143,7 +143,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-24.04"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.11", "3.12"]
         platform: ["x86_64"]
         os-name: ["jammy"]
     env:
