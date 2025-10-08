@@ -53,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_psutil_${{ matrix.python }}"
-          path: wheelhouse/psutil\*whl
+          path: wheelhouse/psutil*whl
 
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -93,7 +93,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_pyproj_${{ matrix.python }}"
-          path: wheelhouse/pyproj\*whl
+          path: wheelhouse/pyproj*whl
 
   build_Fiona:
     name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -133,7 +133,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_fiona_${{ matrix.python }}"
-          path: wheelhouse/fiona\*whl
+          path: wheelhouse/fiona*whl
 
   build_GDAL:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -170,7 +170,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_gdal_${{ matrix.python }}"
-          path: wheelhouse/GDAL\*whl
+          path: wheelhouse/GDAL*whl
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
