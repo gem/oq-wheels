@@ -36,4 +36,9 @@ echo "::group::Get code of project: $REPO_DIR"
 	  cd geopandas
 	  git checkout ${BUILD_COMMIT}
   fi
+  if [[ "$REPO_DIR" == "pyogrio" ]]; then
+	  git clone https://github.com/geopandas/pyogrio.git
+	  cd pyogrio
+	  git checkout ${BUILD_COMMIT}
+  fi
 echo "::endgroup::"
