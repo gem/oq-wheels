@@ -389,8 +389,14 @@ function build_wheel_cmd {
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
-    	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
-    fi
+		echo "Check GDAL"
+		echo "download pyogrio"
+		git clone https://github.com/geopandas/pyogrio.git
+                cd pyogrio
+                git checkout ${PYOGRIO_VERSION}
+		$cmd $wheelhouse
+		gdal-config
+	fi
     if [ -n "$IS_OSX" ]; then
         pip install delocate
         delocate-listdeps --all --depending $wheelhouse/*.whl
