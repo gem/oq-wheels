@@ -389,18 +389,16 @@ function build_wheel_cmd {
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
-		echo "Check GDAL"
-		gdal-config
-                cd pyogrio
-                git checkout ${PYOGRIO_VERSION}
-                git log -1
-		$cmd $wheelhouse
+       cd pyogrio
+       git checkout ${PYOGRIO_VERSION}
+       git log -1
+	   $cmd $wheelhouse
 	fi
     if [ -n "$IS_OSX" ]; then
-        pip install delocate
-        delocate-listdeps --all --depending $wheelhouse/*.whl
+       pip install delocate
+       delocate-listdeps --all --depending $wheelhouse/*.whl
     else  # manylinux
-        pip install auditwheel
+       pip install auditwheel
     fi
     repair_wheelhouse $wheelhouse
 }
