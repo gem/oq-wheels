@@ -389,10 +389,7 @@ function build_wheel_cmd {
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
-       cd pyogrio
-       git checkout ${PYOGRIO_VERSION}
-       git log -1
-	   $cmd $wheelhouse
+		(cd $repo_dir && $cmd $wheelhouse)
 	fi
     if [ -n "$IS_OSX" ]; then
        pip install delocate
