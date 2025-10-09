@@ -170,7 +170,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_gdal_${{ matrix.python }}"
-          path: wheelhouse/GDAL*whl
+          path: wheelhouse/gdal*whl
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
