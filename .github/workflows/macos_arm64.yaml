@@ -2,7 +2,7 @@
 name: MacOS wheels ARM64
 on:
   workflow_dispatch:
-#  pull_request:
+  pull_request:
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_psutil_${{ matrix.python }}"
-          path: wheelhouse
+          path: wheelhouse/psutil*whl
 
   build_pyproj:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -49,13 +49,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: pyproj
-      BUILD_COMMIT: 3.7.0
+      BUILD_COMMIT: 3.7.2
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -85,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_pyproj_${{ matrix.python }}"
-          path: wheelhouse
+          path: wheelhouse/pyproj*whl
 
   build_Fiona:
     name: Fiona ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -94,14 +94,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
-      GDAL_FIONA: 3.10.1
+      GDAL_FIONA: 3.10.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -131,7 +131,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_fiona_${{ matrix.python }}"
-          path: wheelhouse
+          path: wheelhouse/fiona*whl
 
   build_GDAL:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
@@ -140,13 +140,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
     env:
       REPO_DIR: gdal
-      BUILD_COMMIT: v3.9.2
+      BUILD_COMMIT: v3.10.3
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
@@ -176,7 +176,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_gdal_${{ matrix.python }}"
-          path: wheelhouse
+          path: wheelhouse/gdal*whl
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
@@ -186,7 +186,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [m1]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
         platform: ["arm64"]
         macos-target: ["13"]
         os-name: ["osx"]
