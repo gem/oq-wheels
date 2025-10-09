@@ -27,12 +27,12 @@ jobs:
     env:
       REPO_DIR: pyogrio
       BUILD_COMMIT: v0.11.1
-      PYOGRIO_VERISON: 
+      PYOGRIO_VERISON:
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "wheel numpy==2.2.6 setuptools==69.0.2"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 setuptools==69.0.2 tomli versioneer"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
