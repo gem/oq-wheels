@@ -389,7 +389,9 @@ function build_wheel_cmd {
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
-		(cd $repo_dir && $cmd $wheelhouse)
+        # setting git safe directory is required for properly building wheels when
+        # git >= 2.35.3
+		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
 	fi
     if [ -n "$IS_OSX" ]; then
        pip install delocate

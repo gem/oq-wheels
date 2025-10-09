@@ -39,6 +39,9 @@ echo "::group::Get code of project: $REPO_DIR"
   if [[ "$REPO_DIR" == "pyogrio" ]]; then
 	  git clone https://github.com/geopandas/pyogrio.git
 	  cd pyogrio
+	  # setting git safe directory is required for properly building wheels when
+      # git >= 2.35.3
+	  git config --global --add safe.directory "*"
 	  git checkout ${BUILD_COMMIT}
   fi
 echo "::endgroup::"
