@@ -390,12 +390,11 @@ function build_wheel_cmd {
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
 		echo "Check GDAL"
-		echo "download pyogrio"
-		git clone https://github.com/geopandas/pyogrio.git
+		gdal-config
                 cd pyogrio
                 git checkout ${PYOGRIO_VERSION}
+                git log -1
 		$cmd $wheelhouse
-		gdal-config
 	fi
     if [ -n "$IS_OSX" ]; then
         pip install delocate
