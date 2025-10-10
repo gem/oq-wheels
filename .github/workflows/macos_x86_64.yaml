@@ -271,7 +271,7 @@ jobs:
           pip install -r requirements-py"${PYCUT}"-macos_x86_64.txt
           cd $HOME
           find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install --force-reinstall
-          find . -name \*geopandas\* -type f -print0 | xargs -0 pip install --force-reinstall
+          find . -name \*geopandas\* -type f -print0 | xargs -0 pip install 
           pip install -e oq-engine/
           cd $HOME/oq-engine
           oq engine --upgrade-db
