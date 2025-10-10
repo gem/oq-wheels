@@ -180,7 +180,6 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of pyogrio
         run: |
-          sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
@@ -220,7 +219,6 @@ jobs:
           bash -x .github/workflows/build.sh
       - name: Build Wheel of geopandas
         run: |
-          sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
