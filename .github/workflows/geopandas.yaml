@@ -52,3 +52,42 @@ jobs:
         with:
           name: "wheels_pyogrio${{ matrix.python }}"
           path: wheelhouse/pyogrio*whl
+
+  build_geopandas:
+    name: pyogrio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-24.04"]
+        python: ["3.11", "3.12"]
+        platform: ["x86_64"]
+        os-name: ["jammy"]
+    env:
+      REPO_DIR: geopandas
+      BUILD_COMMIT: v1.11.1
+      PYOGRIO_VERISON:
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      #deps values from pyogrio github action
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: get code of geopandas
+        run: |
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of geopandas
+        run: |
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "wheels_geopandas${{ matrix.python }}"
+          path: wheelhouse/geopandas*whl

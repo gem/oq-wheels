@@ -44,4 +44,12 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git config --global --add safe.directory "*"
 	  git checkout ${BUILD_COMMIT}
   fi
+  if [[ "$REPO_DIR" == "geopandas" ]]; then
+	  git https://github.com/geopandas/geopandas.git
+	  cd geopandas
+	  # setting git safe directory is required for properly building wheels when
+      # git >= 2.35.3
+	  git config --global --add safe.directory "*"
+	  git checkout ${BUILD_COMMIT}
+  fi
 echo "::endgroup::"

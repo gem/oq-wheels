@@ -371,24 +371,22 @@ function build_wheel_cmd {
 	if [ "$REPO_DIR" == "gdal" ]; then
 		pip download GDAL==${GDAL_VERSION}
 		echo "Control the DATA"
-		ls -lrt
 		tar xzvf gdal-${GDAL_VERSION}.tar.gz
 		cd gdal-${GDAL_VERSION}
 		$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
-		pwd
-		ls -lrt
-		sleep 10
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "psutil" ]; then
-		pwd
-		ls -lrt
-		sleep 10
     	(cd $repo_dir && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "pyogrio" ]; then
+        # setting git safe directory is required for properly building wheels when
+        # git >= 2.35.3
+		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
+	fi
+	if [ "$REPO_DIR" == "geopandas" ]; then
         # setting git safe directory is required for properly building wheels when
         # git >= 2.35.3
 		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
