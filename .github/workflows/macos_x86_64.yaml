@@ -2,7 +2,7 @@
 name: MacOS wheels x86_64
 on:
   workflow_dispatch:
-#  pull_request:
+  pull_request:
 env:
   WHEEL_SDIR: wheelhouse
   HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
