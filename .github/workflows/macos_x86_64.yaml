@@ -270,12 +270,14 @@ jobs:
           git status
           pip install -r requirements-py"${PYCUT}"-macos_x86_64.txt
           cd $HOME
-          find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install --force-reinstall
+          find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install 
           find . -name \*geopandas\* -type f -print0 | xargs -0 pip install 
           pip install -e oq-engine/
           cd $HOME/oq-engine
           oq engine --upgrade-db
           sleep 5
+          python -c  "import sys; print(sys.version)"
+          python -c  "import geopandas; from shapely.geometry import Point;d = {'col1': ['name1', 'name2'], 'geometry': [Point(1, 2), Point(2, 1)]};print(geopandas.GeoDataFrame(d, crs='EPSG:4326')) "
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
