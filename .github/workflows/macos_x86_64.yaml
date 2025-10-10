@@ -271,7 +271,7 @@ jobs:
           pip install -r requirements-py"${PYCUT}"-macos_x86_64.txt
           cd $RUNNER_WORKSPACE
           find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install
-          find . -name \*geopandas\*whl -type f | grep "${PYTHON_VERSION}" -print0 | xargs -0 pip install
+          find . -name \*geopandas\*whl -type f | grep "${PYTHON_VERSION}" | xargs -0 pip install
           cd $HOME
           pip install -e oq-engine/
           cd $HOME/oq-engine
