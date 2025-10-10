@@ -301,7 +301,7 @@ jobs:
           sleep 5
           python -c  "import sys; print(sys.version)"
           python -c  "import geopandas; from shapely.geometry import Point;d = {'col1': ['name1', 'name2'], 'geometry': [Point(1, 2), Point(2, 1)]};print(geopandas.GeoDataFrame(d, crs='EPSG:4326')) "
-	  sleep 5
+	      sleep 5
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
           pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
