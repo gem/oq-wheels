@@ -276,3 +276,33 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 90
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      - name: Test wheels with python ${{ matrix.python-version }}
+        shell: bash
+        run: |
+          set -x
+          echo "engine installation to test wheel"
+          python3 -m venv $HOME/openquake
+          source $HOME/openquake/bin/activate
+          pip install -U pip wheel setuptools
+          cd ${{steps.download.outputs.download-path}}
+          PYCUT=`echo "${PYTHON_VERSION//.}"`
+          cd $HOME
+          git clone -b ${BRANCH_TEST} https://github.com/gem/oq-engine.git
+          cd oq-engine
+          git status
+          pip install -r requirements-py"${PYCUT}"-macos_arm64.txt
+          cd $RUNNER_WORKSPACE
+          find . -name \*cp"${PYCUT}"\* -type f -print0 | xargs -0 pip install
+          find . -name \*geopandas\*whl -type f | grep "${PYTHON_VERSION}" -print0 | xargs -0 pip install
+          cd $HOME
+          pip install -e oq-engine/
+          cd $HOME/oq-engine
+          oq engine --upgrade-db
+          sleep 5
+          python -c  "import sys; print(sys.version)"
+          python -c  "import geopandas; from shapely.geometry import Point;d = {'col1': ['name1', 'name2'], 'geometry': [Point(1, 2), Point(2, 1)]};print(geopandas.GeoDataFrame(d, crs='EPSG:4326')) "
+          sleep 5
+          pytest -vsx --color=yes openquake/sep/tests/test_utils.py
+          pytest -vsx --color=yes openquake/sep
+          pytest -vsx --color=yes openquake/hazardlib/tests/gsim/kotha_2020_test.py
+          oq engine --run https://downloads.openquake.org/jobs/risk_test.zip
