@@ -54,7 +54,7 @@ jobs:
           path: wheelhouse/pyogrio*whl
 
   build_geopandas:
-    name: pyogrio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    name: geopandas ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
