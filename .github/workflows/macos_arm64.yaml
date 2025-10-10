@@ -2,7 +2,7 @@
 name: MacOS wheels ARM64
 on:
   workflow_dispatch:
-#  pull_request:
+  pull_request:
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
@@ -24,7 +24,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel setuptools"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
@@ -59,7 +59,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "cython wheel setuptools numpy==2.2.6"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TEST_DEPENDS: "cython numpy==2.2.6"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
@@ -106,6 +106,7 @@ jobs:
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.6 setuptools"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.6 setuptools matplotlib pyparsing fsspec gcsfs"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
@@ -151,7 +152,7 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "numpy==2.2.6 setuptools wheel"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
@@ -166,17 +167,104 @@ jobs:
       - name: Get code of gdal
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of GDAL
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          echo $PATH
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
           name: "wheels_gdal_${{ matrix.python }}"
           path: wheelhouse/gdal*whl
+
+  build_pyogrio:
+    name: pyogrio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [m1]
+        python: ["3.11", "3.12"]
+        platform: ["arm64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
+    env:
+      REPO_DIR: pyogrio
+      BUILD_COMMIT: v0.11.1
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      #deps values from pyogrio github action
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup cmake
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
+          brew install cmake
+          echo "check python3"
+          python3 -c "import sys; print(sys.version)"
+      - name: get code of pyogrio
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of pyogrio
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "wheels_pyogrio${{ matrix.python }}"
+          path: wheelhouse/pyogrio*whl
+
+
+  build_geopandas:
+    name: geopandas ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [m1]
+        python: ["3.11", "3.12"]
+        platform: ["arm64"]
+        macos-target: ["13"]
+        os-name: ["osx"]
+    env:
+      REPO_DIR: geopandas
+      BUILD_COMMIT: v1.1.1
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      #deps values from pyogrio github action
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup cmake
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          echo $PATH
+          brew install cmake
+          echo "check python3"
+          python3 -c "import sys; print(sys.version)"
+      - name: get code of geopandas
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of geopandas
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "wheels_geopandas${{ matrix.python }}"
+          path: wheelhouse/geopandas*whl
 
   test_wheel:
     needs: [build_GDAL, build_pyproj, build_Fiona]
@@ -226,6 +314,9 @@ jobs:
           pip install -e oq-engine/
           cd $HOME/oq-engine
           oq engine --upgrade-db
+          sleep 5
+          python -c  "import sys; print(sys.version)"
+          python -c  "import geopandas; from shapely.geometry import Point;d = {'col1': ['name1', 'name2'], 'geometry': [Point(1, 2), Point(2, 1)]};print(geopandas.GeoDataFrame(d, crs='EPSG:4326')) "
           sleep 5
           pytest -vsx --color=yes openquake/sep/tests/test_utils.py
           pytest -vsx --color=yes openquake/sep
