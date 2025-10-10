@@ -65,7 +65,7 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: geopandas
-      BUILD_COMMIT: v1.11.1
+      BUILD_COMMIT: v1.1.1
       PYOGRIO_VERISON:
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
