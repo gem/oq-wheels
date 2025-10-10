@@ -303,7 +303,15 @@ function pre_build {
         build_sqlite
         build_tiff
         build_proj
-        if [[ "$REPO_DIR" != "pyproj" ]] || [[ "$REPO_DIR" != "geopandas" ]] ; then
+        if [[ "$REPO_DIR" != "pyproj" ]] ; then
+          build_jpeg
+          build_libpng
+          build_jsonc
+          build_expat
+          build_geos
+          build_gdal
+        fi
+        if [[ "$REPO_DIR" != "geopandas" ]] ; then
           build_jpeg
           build_libpng
           build_jsonc
