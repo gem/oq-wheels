@@ -105,7 +105,6 @@ jobs:
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
-      BUILD_DEPENDS: "oldest-supported-numpy cython wheel numpy==2.2.6 setuptools"
       BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.6 setuptools matplotlib pyparsing fsspec gcsfs"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
