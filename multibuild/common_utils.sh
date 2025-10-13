@@ -330,6 +330,12 @@ function pip_wheel_cmd {
     if [[ "$REPO_DIR" == "gdal" ]]; then
       python -vv -m build -n -w . -o $abs_wheelhouse
     fi
+    if [[ "$REPO_DIR" == "pyogrio" ]]; then
+      python -vv -m build -w . -o $abs_wheelhouse
+    fi
+    if [[ "$REPO_DIR" == "geopandas" ]]; then
+      python -vv -m build -w . -o $abs_wheelhouse
+    fi
     pip wheel $(pip_opts) -w $abs_wheelhouse --no-deps .
 }
 
