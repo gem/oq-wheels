@@ -9,6 +9,11 @@ fi
 echo "::group::Get code of project: $REPO_DIR"
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh
+  if [[ "$REPO_DIR" == "rasterio" ]]; then
+	  git clone https://github.com/rasterio/rasterio.git
+	  cd rasterio
+	  git checkout ${BUILD_COMMIT}
+  fi
   if [[ "$REPO_DIR" == "Fiona" ]]; then
 	  git clone https://github.com/Toblerity/Fiona.git
 	  cd Fiona

@@ -108,7 +108,6 @@ jobs:
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
-      GDAL_FIONA: 3.10.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -126,6 +125,45 @@ jobs:
           echo $PATH
           bash -x .github/workflows/build.sh
       - name: Build Wheel of Fiona
+        run: |
+          echo $PATH
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "wheels_fiona_${{ matrix.python }}"
+          path: wheelhouse/fiona*whl
+
+  build_rasterio:
+    name: rasterio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-24.04"]
+        python: ["3.11", "3.12", "3.13"]
+        platform: ["x86_64"]
+        os-name: ["jammy"]
+    env:
+      REPO_DIR: rasterio
+      BUILD_COMMIT: 1.5.0
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "oldest-supported-numpy wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.6 setuptools matplotlib pyparsing fsspec gcsfs"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: get code of rasterio
+        run: |
+          echo $PATH
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of rasterio
         run: |
           echo $PATH
           sudo apt install python3-virtualenv
@@ -251,7 +289,7 @@ jobs:
           path: wheelhouse/geopandas*whl
 
   test_wheel:
-    needs: [build_GDAL, build_pyproj, build_Fiona]
+    needs: [build_GDAL, build_pyproj, build_Fiona, build_rasterio]
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
