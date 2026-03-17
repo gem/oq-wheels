@@ -146,7 +146,7 @@ jobs:
         os-name: ["jammy"]
     env:
       REPO_DIR: rasterio
-      BUILD_COMMIT: 1.5.0
+      BUILD_COMMIT: 1.4.4
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -169,8 +169,8 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: "wheels_fiona_${{ matrix.python }}"
-          path: wheelhouse/fiona*whl
+          name: "wheels_rasterio_${{ matrix.python }}"
+          path: wheelhouse/rasterio*whl
 
   build_GDAL:
     name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
