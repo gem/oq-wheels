@@ -16,14 +16,3 @@ echo "::group::Build wheel"
   build_wheel $REPO_DIR $PLAT
   ls -l "${GITHUB_WORKSPACE}/${WHEEL_SDIR}/"
 echo "::endgroup::"
-
-# Test after with install of OQ in last steps
-#echo "::group::Test wheel"
-#  source multibuild/common_utils.sh
-#  if [[ "$REPO_DIR" == "Fiona" ]]; then
-#      install_run $PLAT
-#  fi
-#  if [[ "$REPO_DIR" == "gdal" ]]; then
-#      install_run $PLAT
-#  fi
-#echo "::endgroup::"
