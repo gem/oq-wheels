@@ -399,6 +399,9 @@ function build_wheel_cmd {
         # git >= 2.35.3
 		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
 	fi
+	if [ "$REPO_DIR" == "rasterio" ]; then
+       (cd $repo_dir &&  git config --global --add safe.directory "*" && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+    fi
     if [ -n "$IS_OSX" ]; then
        pip install delocate
        delocate-listdeps --all --depending $wheelhouse/*.whl

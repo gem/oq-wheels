@@ -101,7 +101,6 @@ jobs:
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
-      GDAL_FIONA: 3.10.3
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -278,7 +277,7 @@ jobs:
         macos-target: ["13"]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: ae_numpy2
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
