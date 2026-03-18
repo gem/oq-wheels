@@ -295,7 +295,7 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     env:
-      BRANCH_TEST: ae_numpy2
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
     steps:
       - name: Set up Python  ${{ matrix.python-version }}

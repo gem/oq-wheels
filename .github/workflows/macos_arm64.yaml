@@ -277,7 +277,7 @@ jobs:
         macos-target: ["13"]
         os-name: ["osx"]
     env:
-      BRANCH_TEST: ae_numpy2
+      BRANCH_TEST: master
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
     steps:
