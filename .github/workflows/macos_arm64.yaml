@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -93,7 +93,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -138,7 +138,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -181,7 +181,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -226,7 +226,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
@@ -271,7 +271,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [m1]
+        os: [macos-latest]
         python-version: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
         macos-target: ["13"]
