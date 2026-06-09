@@ -1,14 +1,25 @@
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-  # webp, zstd, xz, libtiff cause a conflict with building webp and libtiff
-  # curl from brew requires zstd, use system curl
-  # if php is installed, brew tries to reinstall these after installing openblas
-  brew remove --ignore-dependencies zstd libtiff curl php
-fi
+#if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+#  # webp, zstd, xz, libtiff cause a conflict with building webp and libtiff
+#  # curl from brew requires zstd, use system curl
+#  # if php is installed, brew tries to reinstall these after installing openblas
+#  brew remove --ignore-dependencies zstd libtiff curl php
+#fi
 
 echo "::group::Get code of project: $REPO_DIR"
-  source multibuild/common_utils.sh
-  source multibuild/travis_steps.sh
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+#  # webp, zstd, xz, libtiff cause a conflict with building webp and libtiff
+#  # curl from brew requires zstd, use system curl
+#  # if php is installed, brew tries to reinstall these after installing openblas
+#  brew remove --ignore-dependencies zstd libtiff curl php
+   echo "Wheels for OSX"
+   source multibuild/common_utils.sh
+   source multibuild/osx_utils.sh
+  else
+   echo "Wheels for ManyLinux"
+   source multibuild/common_utils.sh
+   source multibuild/manylinux_utils.sh
+fi
   if [[ "$REPO_DIR" == "rasterio" ]]; then
 	  git clone https://github.com/rasterio/rasterio.git
 	  cd rasterio
