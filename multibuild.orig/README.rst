@@ -1,33 +1,151 @@
-############################################################
-Utilities for building wheels that use third-party libraries
-############################################################
+################################################
+Utilities for building on Travis CI and AppVeyor
+################################################
 
 ************************************
 Update: Uploads, Rackspace, Anaconda
 ************************************
 
 The original Multibuild default was to upload wheels to a Rackspace container,
-where Rackspace kindly donated the hosting to the Scikit-learn team. Rackspace
-finally stopped subsidizing this container. Some projects using Multibuild have moved
-to using https://anaconda.org/scientific-python-nightly-wheels, see SPEC04_ for more
-info.
+where Rackspace kindly donated the hosting to the Scikit-learn team.  We had
+a URL pointing to the Rackspace container: `http://wheels.scipy.org`.
 
-.. _SPEC04: https://scientific-python.org/specs/spec-0004/
+Rackspace finally stopped subsidizing this container, and the Rackspace of
+`http://wheels.scipy.org` is no more. Some projects using Multibuild have moved
+to using https://anaconda.org/scipy-wheels-nightly/ for weekly uploads and
+https://anaconda.org/multibuild-wheels-staging for staging wheels to PyPI.
+
+*******************
+Uploads to Anaconda
+*******************
+
+If you want to upload to Anaconda, and you don't need the extra storage space for nightly builds that Anaconda kindly donates to NumPy, SciPy etc, then you can do this with your own Anaconda organization.
+
+See https://github.com/MacPython/nipy-wheels for a simple example.
+
+* Make an account at Anaconda.org.
+* Make an organization - for example we have used ``nipy``.
+* Navigate to ``https://anaconda.org/nipy`` (but use your organization).
+* Go to your account menu towards the top left. This should be labeled with your
+  organization name.
+* Select "Settings", then "Access".
+* Create an access token.  Give it permission: "Allow write access to the API
+  site", and (not sure if this is necessary) "Allow uploads to PyPI
+  repositories".
+* "View" your token.  It may be of form
+  ``ni-1234abcd-12ab-34dc-1234-d1e1f3a4b5c6``.
+* Encrypt this to your repository, maybe using the ``travis`` command line tool
+  (``gem install travis``).  Your command will be something like::
+
+      travis encrypt -r MacPython/nipy-wheels ANACONDA_SECRET=ni-1234abcd-12ab-34dc-1234-d1e1f3a4b5c6
+
+  Note that ``MacPython/nipy-wheels`` is your Github organization/repository.  The encryption only applies to Travis CI running against this repository.
+
+* Go to your `.travis.yml` file and add the output ``secure`` key.  This will
+  look something like::
+
+    env:
+      global:
+        # Following generated with
+        # travis encrypt -r MacPython/nipy-wheels ANACONDA_SECRET=<the api key>
+        # where <the api key> has API write access to the anaconda.org
+        # organization named in $ANACONDA_ORG
+        - secure: "IqN7LjXWVBaijggUoB+ohjzFzH6nU0OyxznXEMgWoNxQJRiYXXKAt/Z5c4ldp9LUynefJO306M8foN4Gm8M8PNDlhjElzdOtIkGYtDKUXx7aXtrg8rPk1mzuM1F27er4Dbi7WFtpPClr8z8JKNNV50yeM1o2cXu4HgrPrRKgKk/2D8EQaPQlcOqul0O63D9AjVoW3EIG0aWEnZQQGfuGAPgyr0OS92LX2h1pcD2lNZHhqYmXmm5U0IwZmWL3Y0N7PO3VXcOCeIbiHAlJzhk4C4+86TT7DN+VhmfGyY/s61fOz47K+lEZLVqqeQki+HV75fti0XwYG7rjcSvDanNx+w2J/ogSLQpiNxZ0FZ+W8psXEaFUgFf7oXzRkW9gQ4KAsItEWHifq061ngr5AWLPLh+01LGP1Xg8wT5WEVUzBfD2uJPsy20DLcP9WGYa6cBNwtpqmUkdVgM3ZCPWlro7+v1kqxsKp91uh8SRKVlkD4mwbf0FnWxbNZ9v4Z9gs0pZoRclzL+/YcIcSTYAwiQRqaX7T0tpxaUZ0VYTMwCgpsufUX1idV1HV5+WKr9FUocoq+1RRW/JeXkisX9FRvem8cSGmnxB/hynlxoqzttCVMwtrKWPwxH4dHD+lavouho68Q7iBql1ZBZEhQy0O9NC1wr4Rg2CeDPZuzqVjmSPuXQ="
+
+  When Travis CI runs, this causes the ``ANACONDA_SECRET`` environment variable
+  to contain the API key above.
+
+  Also add this to your global environment variables::
+
+      - ANACONDA_ORG="nipy"
+
+*  To upload from Travis CI, add a clause like this to the end of your
+   ``.travis.yml``::
+
+     after_success:
+         # Upload wheels to Anaconda.org
+         - pip install git+https://github.com/Anaconda-Platform/anaconda-project
+         - pip install git+https://github.com/Anaconda-Platform/anaconda-client
+         - anaconda -t ${ANACONDA_SECRET} upload --force -u ${ANACONDA_ORG} ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl
+
+   ``wheelhouse/*.whl`` defines the files you want to upload.
+
+*   You might also want to build and upload from AppVeyor.  To encrypt the API
+    key above, go to https://ci.appveyor.com/account/matthew-brett/settings
+    (where ``matthew-brett`` is the account from which your AppVeyor job runs.
+    Click on "Encrypt YaML" on the left.  Type in your API key value (e.g.
+    ``ni-1234abcd-12ab-34dc-1234-d1e1f3a4b5c6``) as the value to encrypt. Click "Encrypt" and note the text it suggests.  Now, at the top of your ``appveyor.yml`` file, add something like::
+
+        environment:
+          global:
+            ANACONDA_ORG: "nipy"
+            ANACONDA_SECRET:
+              secure: Ds0PkQD0b/QOfoNoiPuFJb01zg0Mq0dkAxIG2jRXocCAereSXdWw6XYaDrutHWme
+
+    where ``secure:`` is the text suggested from "Encrypt" above, and ``nipy`` is your Anaconda organization.
+
+    Finally, add a clause like the following to the end of your ``appveyor.yml`` file::
+
+      on_success:
+        # Upload the generated wheel package to Anaconda.org
+        - pip install git+https://github.com/Anaconda-Platform/anaconda-project
+        - pip install git+https://github.com/Anaconda-Platform/anaconda-client
+        - anaconda -t %ANACONDA_SECRET% upload --force -u %ANACONDA_ORG% nipy\dist\*.whl
+
+    where ``nipy\dist\*.whl`` finds the files you want to upload.
+
+There's a simple example of these steps applied at
+https://github.com/MacPython/nipy-wheels.
+
+Here is the NumPy code (for running on Travis CI) to upload to Anaconda:
+https://github.com/MacPython/numpy-wheels/blob/master/.travis.yml#L99
+
+For projects housed under the MacPython GitHub organization, you have access to
+Anaconda upload tokens via the "Organization Secrets"
+https://github.com/MacPython/numexpr-wheels/settings/secrets . You can use
+these to move to GitHub Actions (they provide x86 machines for Windows, Linux
+and Mac). Otherwise we (please raise an issue here) will need to negotiate
+getting you tokens, or you can make your own, as above.
+
+**********************
+Use Github for uploads
+**********************
+
+Another option is to use GitHub for staging --- as do Cython `for Travis CI
+<https://github.com/MacPython/cython-wheels/blob/master/.travis.yml#L144>`_ and
+`for AppVeyor
+<https://github.com/MacPython/cython-wheels/blob/master/appveyor.yml#L118>`_.
 
 ************
 Introduction
 ************
 
-A set of scripts to automate builds of macOS and manylinux wheels. It will
-work with windows, but that is not the prime target.
+A set of scripts to automate builds of macOS and Manylinux1 wheels on the
+`Travis CI <https://travis-ci.org/>`_ infrastructure, and also Windows
+wheels on the `AppVeyor <https://ci.appveyor.com/>`_ infrastructure.
 
-The CI scripts are designed to build *and test*:
+The Travis CI scripts are designed to build *and test*:
 
-* 64-bit macOS x86_64 wheels built for macOS 10.9+
-* 64-bit macOS arm64 wheels built for macOS 10.6+
-* ``manylinux`` wheels in all the variations
+* 64-bit macOS wheels built for macOS 10.9+
+* 64/32-bit macOS wheels built for macOS 10.6+
+* 64-bit ``manylinuxX_x86_64`` wheels, both narrow and wide Unicode builds,
+  where `X` is any valid Manylinux version: `1`, `2010`, `2014`, `_2_24` or `_2_28`.
+* 32-bit ``manylinuxX_i686`` wheels, both narrow and wide Unicode builds
 
-You can build and test against all released versions of CPython and PyPy.
+You can currently build and test against Pythons 2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
+and 3.11.
+
+The small innovation here is that you can test against Linux 32-bit builds, both
+wide and narrow Unicode Python 2 builds, which was not easy on the default
+Travis CI configurations.
+
+The AppVeyor setup is designed to build *and test*:
+
+* 64-bit Windows ``win_amd64`` wheels
+* 32-bit Windows ``win32`` wheels
+
+You can currently build and test against Pythons 2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
+and 3.11.
 
 *****************
 How does it work?
@@ -56,33 +174,37 @@ The following bash scripts are sourced in this order::
 
 See ``multibuild/travis_osx_steps.sh``
 
-The macOS build / test phases run on the VM started by CI.
-Therefore any environment variable defined in the CI script or the bash
+The macOS build / test phases run on the macOS VM started by Travis CI.
+Therefore any environment variable defined in ``.travis.yml`` or the bash
 shell scripts listed above are available for your build and test.
 
 Build options are controlled mainly by the following environment
 variables:
 
-* ``MB_PYTHON_VERSION`` sets the Python version targeted: ``major.minor.patch``
+* ``MB_PYTHON_VER`` sets the Python version targeted: ``major.minor.patch``
   for CPython, or ``pypy-major.minor`` for PyPy.
-* ``MB_PYTHON_OSX_VER`` sets the minimum macOS SDK version for any C extensions.
-  For CPython targets it may be set to 10.6, 10.9 or 11.0, provided a
+* ``MB_PYTHON_OSX_VER`` sets the minimum macOS SDK version for any C
+  extensions. For CPython targets it may be set to 10.6 or 10.9, provided a
   corresponding Python build is available at `python.org
   <https://www.python.org/downloads/mac-osx/>`_. It defaults to the highest
   version available. It's ignored for PyPy targets.
 * ``PLAT`` sets the architectures built for any C extensions: ``x86_64`` or
-  ``arm64``. It defaults to the same arches as the target Python version: arm64
-  for macOS 11.0; x86_64 for CPython macOS 10.9 or PyPy; and 64/32-bit for
-  CPython 10.6.
+  ``intel`` for 64-bit or 64/32-bit respectively. It defaults to the same
+  arches as the target Python version: 64-bit for CPython macOS 10.9 or PyPy,
+  and 64/32-bit for CPython 10.6.
 
 In most cases it's best to rely on the defaults for ``MB_PYTHON_OSX_VER`` and
 ``PLAT``, rather than setting them explicitly. Examples of exceptions to this
 guideline include:
 
-* setting ``MB_PYTHON_OSX_VER=10.6`` to build a 10.6 CPython wheel
+* setting ``MB_PYTHON_OSX_VER=10.6`` to build a 10.6 64/32-bit CPython wheel
   for Python 2.7 (default for 2.7 is 10.9 64-bit)
 * setting ``MB_PYTHON_OSX_VER=10.6 and PLAT=x86_64`` to build a 10.6 64-bit
-  wheel.
+  only wheel (10.6 would normally be 64/32-bit). Such a wheel would still have
+  a platform tag of ``macosx_10_6_intel`` , advertising support for both 64 and
+  32-bit, but wouldn't work in 32-bit mode. This may be OK given how unlikely it
+  is that there is still anyone actually running Python on macOS in 32-bit
+  mode.
 
 The ``build_wheel`` function builds the wheel, and ``install_run``
 function installs and tests it.  Look in ``multibuild/common_utils.sh`` for
@@ -153,20 +275,20 @@ variable. The default version is dependent on ``MB_ML_LIBC`` and ``PLAT``.
 
 When ``MB_ML_LIBC`` is ``musllinux``:
 
-* ``multibuild/alpine3.22_x86_64``,  when ``PLAT`` is ``x86_64``
-* ``multibuild/alpine3.22_arm64v8``,  when ``PLAT`` is ``aarch64``
+* ``multibuild/alpine3.18_x86_64``,  when ``PLAT`` is ``x86_64``
+* ``multibuild/alpine3.18_arm64v8``,  when ``PLAT`` is ``aarch64``
 
 Otherwise:
 
-* ``multibuild/noble_x86_64``, when ``PLAT`` is ``x86_64``
+* ``multibuild/focal_x86_64``, when ``PLAT`` is ``x86_64``
 * ``matthewbrett/trusty:32`` when ``PLAT`` is ``i686`` (Yes, an older image for 32-bit)
-* ``multibuild/noble_arm64v8`` when ``PLAT`` is ``aarch64``
-* ``multibuild/noble_ppc64le`` when ``PLAT`` is ``ppc64le``
-* ``multibuild/noble_s390x`` when ``PLAT`` is ``s390x``
+* ``multibuild/focal_arm64v8`` when ``PLAT`` is ``aarch64``
+* ``multibuild/focal_ppc64le`` when ``PLAT`` is ``ppc64le``
+* ``multibuild/focal_s390x`` when ``PLAT`` is ``s390x``
 
-Other valid values are any in https://quay.io/organization/pypa,
+Other valid values are any in https://hub.docker.com/orgs/multibuild/repositories,
 using the correct platform code. Alternatively, you can use the substitution
-pattern ``multibuild/noble_{PLAT}`` in the ``.travis.yml`` file.
+pattern ``multibuild/focal_{PLAT}`` in the ``.travis.yml`` file.
 
 See ``multibuild/docker_test_wrap.sh``.
 
@@ -220,7 +342,7 @@ of the default implementations.
 To use these scripts
 ********************
 
-* Make a repository for building wheels - e.g.
+* Make a repository for building wheels on Travis CI - e.g.
   https://github.com/MacPython/astropy-wheels - or in your case maybe
   ``https://github.com/your-org/your-project-wheels``;
 
@@ -232,7 +354,7 @@ To use these scripts
 
     git submodule add https://github.com/your-org/your-project.git
 
-* For Travis CI, create a ``.travis.yml`` file, something like this::
+* Create a ``.travis.yml`` file, something like this::
 
     env:
         global:
@@ -410,8 +532,21 @@ To use these scripts
   example, if your repository had a subdirectory ``scripts`` with a file
   ``my_env_vars.sh``, you should set ``ENV_VARS_PATH=scripts/my_env_vars.sh``.
 
-* Make sure your project is set up to build, and you should now
+* Make sure your project is set up to build on Travis CI, and you should now
   be ready (to begin the long slow debugging process, probably).
+
+* For the Windows wheels, create an ``appveyor.yml`` file, something like:
+
+  - https://github.com/MacPython/astropy-wheels/blob/master/appveyor.yml
+  - https://github.com/MacPython/nipy-wheels/blob/master/appveyor.yml
+  - https://github.com/MacPython/pytables-wheels/blob/master/appveyor.yml
+
+  Note the Windows test customizations etc are inside ``appveyor.yml``,
+  and that ``config.sh`` and ``env_vars.sh`` are only for the
+  Linux/Mac builds on Travis CI.
+
+* Make sure your project is set up to build on AppVeyor, and you should now
+  be ready (for what could be another round of slow debugging).
 
 * For Apple silicon support you can either create an ``arm64`` wheel or
   a ``universal2`` wheel by supplying ``PLAT`` env variable.
@@ -441,7 +576,7 @@ To use these scripts
 
   In multibuild we are going with option 2. You can override this behaviour by
   overriding the function ``wrap_wheel_builder``.
-  To build Apple silicon builds, you should use a CI service with Xcode>=12 with
+  To build Apple silicon builds, you should use a CI service with Xcode 12 with
   universal build support and make sure that xcode is the default.
 
 If your project depends on NumPy, you will want to build against the earliest

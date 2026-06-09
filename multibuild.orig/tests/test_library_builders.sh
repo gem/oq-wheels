@@ -21,10 +21,8 @@ source tests/utils.sh
 
 start_spinner
 
-PATCH_DIR=$(pwd)/tests/patches
 fetch_unpack https://github.com/harfbuzz/harfbuzz/releases/download/2.7.4/harfbuzz-2.7.4.tar.xz
 [ -d harfbuzz-2.7.4 ] || ingest ".tar.xz should have been unpacked"
-[ -n "$(grep 'Harfbuzz has been patched by multibuild' harfbuzz-2.7.4/src/gen-def.py)" ] || ingest "Harfbuzz should have been patched"
 
 suppress build_bzip2
 suppress build_openssl
@@ -36,15 +34,13 @@ suppress build_swig
 # E.g. arb (below) requires a couple of other libraries.
 # Run here just for the output, even though they fail.
 (set +e ;
-    build_github flintlib/arb 2.21.1 ;
+    build_github fredrik-johansson/arb 2.21.1 ;
     build_github glennrp/libpng v1.6.37 ;
     build_github wbhart/mpir mpir-3.0.0
     )
 suppress build_flex
 if [[ $MB_ML_VER != "_2_24" ]]; then
-    (set +e ;
     suppress build_openblas
-    )
 fi
 suppress ensure_xz
 suppress build_tiff
