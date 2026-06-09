@@ -12,7 +12,7 @@ MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 
 if [ ! -d "$PWD/$WHEEL_SDIR" ]; then mkdir $PWD/$WHEEL_SDIR; fi
 if [[ "$(uname)" == "Darwin" ]]; then
-    if [ ! -d "$MULTIBUILD_DIR/travis_osx_steps.sh" ]; then exit 1; fi
+    if [ ! -f "$MULTIBUILD_DIR/travis_osx_steps.sh" ]; then exit 1; fi
     source $MULTIBUILD_DIR/travis_osx_steps.sh
 else
     source $MULTIBUILD_DIR/travis_linux_steps.sh
