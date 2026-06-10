@@ -10,6 +10,10 @@ source "${SCRIPT_DIR}/env_vars.sh"
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 DOWNLOADS_SDIR=downloads
 
+if [ $(uname) == "Darwin" ]; then
+  IS_MACOS=1; IS_OSX=1;
+fi
+
 function start_spinner {
     if [ -n "$MB_SPINNER_PID" ]; then
         return
@@ -189,22 +193,6 @@ function untar {
     esac
 }
 
-function install_rsync {
-    # install rsync via package manager
-    if [ -n "$IS_MACOS" ]; then
-        # macOS. The colon in the next line is the null command
-        :
-    elif [ -n "$IS_ALPINE" ]; then
-        [[ $(type -P rsync) ]] || apk add rsync
-    elif [[ $MB_ML_VER == "_2_24" ]]; then
-        # debian:9 based distro
-        [[ $(type -P rsync) ]] || apt-get install -y rsync
-    else
-        # centos based distro
-        [[ $(type -P rsync) ]] || yum_install rsync
-    fi
-}
-
 function fetch_unpack {
     # Fetch input archive name from input URL
     # Parameters
@@ -236,11 +224,9 @@ function fetch_unpack {
     # Unpack archive, refreshing contents, echoing dir and file
     # names.
     rm_mkdir arch_tmp
-    install_rsync
     (cd arch_tmp && \
         untar ../$out_archive && \
         ls -1d * &&
-        rsync --delete -ah * ..)
 }
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
