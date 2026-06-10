@@ -33,7 +33,7 @@ jobs:
       - name: get code of psutil
         run: |
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of psutil
         run: |
           bash -x .github/workflows/wheel.sh
@@ -76,7 +76,7 @@ jobs:
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of pyproj
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
@@ -121,7 +121,7 @@ jobs:
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of Fiona
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
@@ -165,7 +165,7 @@ jobs:
       - name: Get code of gdal
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of GDAL
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
@@ -209,7 +209,7 @@ jobs:
       - name: get code of pyogrio
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of pyogrio
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
@@ -254,7 +254,7 @@ jobs:
       - name: get code of geopandas
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of geopandas
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"

@@ -43,7 +43,7 @@ jobs:
       - name: get code of psutil
         run: |
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of psutil
         run: |
           sudo apt install python3-virtualenv
@@ -84,7 +84,7 @@ jobs:
       - name: get code of pyproj
         run: |
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of pyproj
         run: |
           echo $PATH
@@ -123,7 +123,7 @@ jobs:
       - name: get code of Fiona
         run: |
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of Fiona
         run: |
           echo $PATH
@@ -161,7 +161,7 @@ jobs:
       - name: get code of rasterio
         run: |
           echo $PATH
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of rasterio
         run: |
           echo $PATH
@@ -199,7 +199,7 @@ jobs:
           python-version: "3.12"
       - name: get code of GDAL
         run: |
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of GDAL
         run: |
           sudo apt install python3-virtualenv
@@ -238,7 +238,7 @@ jobs:
           python-version: "3.12"
       - name: get code of pyogrio
         run: |
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of pyogrio
         run: |
           sudo apt install python3-virtualenv
@@ -277,7 +277,7 @@ jobs:
           python-version: "3.12"
       - name: get code of geopandas
         run: |
-          bash -x .github/workflows/build.sh
+          bash -x .github/workflows/code.sh
       - name: Build Wheel of geopandas
         run: |
           sudo apt install python3-virtualenv
