@@ -15,6 +15,20 @@ if [ $(uname) == "Darwin" ]; then
   IS_MACOS=1; IS_OSX=1;
 fi
 
+function check_sha256sum {
+    local fname=$1
+    if [ -z "$fname" ]; then echo "Need path"; exit 1; fi
+    local sha256=$2
+    if [ -z "$sha256" ]; then echo "Need SHA256 hash"; exit 1; fi
+    echo "${sha256}  ${fname}" > ${fname}.sha256
+    if [ -n "$IS_MACOS" ]; then
+        shasum -a 256 -c ${fname}.sha256
+    else
+        sha256sum -c ${fname}.sha256
+    fi
+    rm ${fname}.sha256
+}
+
 function start_spinner {
     if [ -n "$MB_SPINNER_PID" ]; then
         return
