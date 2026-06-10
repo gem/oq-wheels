@@ -5,11 +5,9 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 #  # if php is installed, brew tries to reinstall these after installing openblas
 #  brew remove --ignore-dependencies zstd libtiff curl php
    echo "Wheels for OSX"
-   source multibuild/common_utils.sh
    source multibuild/osx_utils.sh
   else
    echo "Wheels for ManyLinux"
-   source multibuild/common_utils.sh
    source multibuild/manylinux_utils.sh
 fi
   source multibuild/travis_steps.sh

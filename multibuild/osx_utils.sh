@@ -503,6 +503,8 @@ function macos_arm64_cross_build_setup {
     sudo mkdir -p $BUILD_PREFIX/lib $BUILD_PREFIX/include
     sudo chown -R $USER $BUILD_PREFIX
     update_env_for_build_prefix
+	echo "BUILD_PREFIX is : $USER $BUILD_PREFIX"
+	sleep 120
     export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
     export CFLAGS+=" -arch arm64"
     export CXXFLAGS+=" -arch arm64"
