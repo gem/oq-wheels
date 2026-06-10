@@ -211,14 +211,28 @@ function untar {
 fetch_unpack() {
     local url="$1"
     local archive="$(basename "$url")"
-
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-
     [[ -f "$archive" ]] || curl -L -o "$archive" "$url"
-
-    tar xf "$archive"
-
+	# unpack
+    case "$archive_fname" in
+        *.tar.gz|*.tgz)
+            tar xzf "$archive_fname"
+            ;;
+        *.tar.bz2)
+            tar xjf "$archive_fname"
+            ;;
+        *.tar.xz)
+            tar xJf "$archive_fname"
+            ;;
+        *.zip)
+            unzip -q "$archive_fname"
+            ;;
+        *)
+            echo "Unsupported archive: $archive_fname"
+            exit 1
+            ;;
+    esac
     echo "$BUILD_DIR/${archive%.tar.*}"
 }
 
@@ -330,7 +344,8 @@ function build_nghttp2 {
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
 	OPENSSL_ROOT=$(fetch_unpack "${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz")
-    check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
+	echo "${OPENSSL_ROOT}"
+    check_sha256sum ${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
         && ./config no-ssl2 -fPIC --prefix=$BUILD_PREFIX \
         && make -j4 \
