@@ -45,8 +45,14 @@ jobs:
         run: |
           echo $PATH
           bash -x .github/workflows/code.sh
+          pwd
+          ls -lrt
+          sleep 180
       - name: Build Wheel of psutil
         uses: pypa/cibuildwheel@v4.0.0
+        with:
+          package-dir: ./psutil
+          output-dir: wheelhouse
 
   build_pyproj:
     name: Build wheels of pyproj  on ${{ matrix.os }} 
