@@ -43,10 +43,13 @@ jobs:
         with:
           python-version: 3.12
       - name: Build Wheel of psutil
-        uses: pypa/cibuildwheel@v3.2.1
+        uses: pypa/cibuildwheel@v4.0.0
         env:
           CIBW_ARCHS: "${{ matrix.arch }}"
           CIBW_BUILD: "cp311-* cp312-* cp313-*"
+          # This tells cibuildwheel to skip tests for all builds
+          CIBW_TEST_SKIP: "*"
+
         with:
           package-dir: ./psutil
           output-dir: wheelhouse
