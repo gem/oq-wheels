@@ -1,11 +1,9 @@
-
-#if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-#  # webp, zstd, xz, libtiff cause a conflict with building webp and libtiff
-#  # curl from brew requires zstd, use system curl
-#  # if php is installed, brew tries to reinstall these after installing openblas
-#  brew remove --ignore-dependencies zstd libtiff curl php
-#fi
-
+if [[ "$(uname)" == "Darwin" ]]; then
+    source multibuild/travis_osx_steps.sh
+else
+    source multibuild/travis_linux_steps.sh
+fi
+#
 echo "::group::Get code of project: $REPO_DIR"
 if [[ "$REPO_DIR" == "rasterio" ]]; then
     git clone https://github.com/rasterio/rasterio.git

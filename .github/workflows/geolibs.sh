@@ -1,6 +1,209 @@
-# Custom utilities for Fiona wheels.
-#
-# Test for OSX with [ -n "$IS_OSX" ].
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# import versions
+source "${SCRIPT_DIR}/env_vars.sh"
+
+MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
+DOWNLOADS_SDIR=downloads
+
+function start_spinner {
+    if [ -n "$MB_SPINNER_PID" ]; then
+        return
+    fi
+
+    >&2 echo "Building libraries..."
+    # Start a process that runs as a keep-alive
+    # to avoid travis quitting if there is no output
+    (while true; do
+        sleep 60
+        >&2 echo "Still building..."
+    done) &
+    MB_SPINNER_PID=$!
+    disown
+}
+
+function stop_spinner {
+    if [ ! -n "$MB_SPINNER_PID" ]; then
+        return
+    fi
+
+    kill $MB_SPINNER_PID
+    unset MB_SPINNER_PID
+
+    >&2 echo "Building libraries finished."
+}
+
+function any_python {
+    for cmd in $PYTHON_EXE python3 python; do
+        if [ -n "$(type -t $cmd)" ]; then
+            echo $cmd
+            return
+        fi
+    done
+    echo "Could not find python or python3"
+    exit 1
+}
+
+function abspath {
+    # Can work with any Python; need not be our installed Python.
+    $(any_python) -c "import os.path; print(os.path.abspath('$1'))"
+}
+
+function relpath {
+    # Path of first input relative to second (or $PWD if not specified)
+    # Can work with any Python; need not be our installed Python.
+    $(any_python) -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))"
+}
+
+function realpath {
+    # Can work with any Python; need not be our installed Python.
+    $(any_python) -c "import os; print(os.path.realpath('$1'))"
+}
+
+function lex_ver {
+    # Echoes dot-separated version string padded with zeros
+    # Thus:
+    # 3.2.1 -> 003002001
+    # 3     -> 003000000
+    echo $1 | awk -F "." '{printf "%03d%03d%03d", $1, $2, $3}'
+}
+
+function unlex_ver {
+    # Reverses lex_ver to produce major.minor.micro
+    # Thus:
+    # 003002001 -> 3.2.1
+    # 003000000 -> 3.0.0
+    echo "$((10#${1:0:3}+0)).$((10#${1:3:3}+0)).$((10#${1:6:3}+0))"
+}
+
+function strip_ver_suffix {
+    echo $(unlex_ver $(lex_ver $1))
+}
+
+function is_function {
+    # Echo "true" if input argument string is a function
+    # Allow errors during "set -e" blocks.
+    (set +e; $(declare -Ff "$1" > /dev/null) && echo true)
+}
+
+function gh_clone {
+    git clone https://github.com/$1
+}
+
+# gh-clone was renamed to gh_clone, so we have this alias for
+# backwards compatibility.
+alias gh-clone=gh_clone
+
+function set_opts {
+    # Set options from input options string (in $- format).
+    local opts=$1
+    local chars="exhmBH"
+    for (( i=0; i<${#chars}; i++ )); do
+        char=${chars:$i:1}
+        [ -n "${opts//[^${char}]/}" ] && set -$char || set +$char
+    done
+}
+
+function suppress {
+    # Run a command, show output only if return code not 0.
+    # Takes into account state of -e option.
+    # Compare
+    # https://unix.stackexchange.com/questions/256120/how-can-i-suppress-output-only-if-the-command-succeeds#256122
+    # Set -e stuff agonized over in
+    # https://unix.stackexchange.com/questions/296526/set-e-in-a-subshell
+    local tmp=$(mktemp tmp.XXXXXXXXX) || return
+    local errexit_set
+    echo "Running $@"
+    if [[ $- = *e* ]]; then errexit_set=true; fi
+    set +e
+    ( if [[ -n $errexit_set ]]; then set -e; fi; "$@"  > "$tmp" 2>&1 ) ; ret=$?
+    [ "$ret" -eq 0 ] || cat "$tmp"
+    rm -f "$tmp"
+    if [[ -n $errexit_set ]]; then set -e; fi
+    return "$ret"
+}
+
+function expect_return {
+  # Run a command, succeeding (returning 0) only if the commend returns a specified code
+  # Parameters
+  #   retcode   expected return code (which may be zero)
+  #   command   the command called
+  #
+  #   any further arguments are passed to the called command
+  #
+  # Returns 1 if called with less than 2 arguments
+  (( $# < 2 )) && echo "Must have at least 2 arguments" && return 1
+  local retcode=$1
+  local retval
+  ( "${@:2}" ) || retval=$?
+  [[ $retcode == ${retval:-0} ]] && return 0
+  return ${retval:-1}
+}
+
+function cmd_notexit {
+    # wraps a command, capturing its return code and preventing it
+    # from exiting the shell. Handles -e / +e modes.
+    # Parameters
+    #    cmd - command
+    #    any further parameters are passed to the wrapped command
+    # If called without an argument, it will exit the shell with an error
+    local cmd=$1
+    if [ -z "$cmd" ];then echo "no command"; exit 1; fi
+    if [[ $- = *e* ]]; then errexit_set=true; fi
+    set +e
+    ("${@:1}") ; retval=$?
+    [[ -n $errexit_set ]] && set -e
+    return $retval
+}
+
+function rm_mkdir {
+    # Remove directory if present, then make directory
+    local path=$1
+    if [ -z "$path" ]; then echo "Need not-empty path"; exit 1; fi
+    if [ -d "$path" ]; then rm -rf $path; fi
+    mkdir $path
+}
+
+function untar {
+    local in_fname=$1
+    if [ -z "$in_fname" ];then echo "in_fname not defined"; exit 1; fi
+    local extension=${in_fname##*.}
+    case $extension in
+        tar) tar -xf $in_fname ;;
+        gz|tgz) tar -zxf $in_fname ;;
+        bz2) tar -jxf $in_fname ;;
+        zip) unzip -qq $in_fname ;;
+        xz) if [ -n "$IS_MACOS" ]; then
+              tar -xf $in_fname
+            else
+              if [[ ! $(type -P "unxz") ]]; then
+                echo xz must be installed to uncompress file; exit 1
+              fi
+              unxz -c $in_fname | tar -xf -
+            fi ;;
+        *) echo Did not recognize extension $extension; exit 1 ;;
+    esac
+}
+
+function install_rsync {
+    # install rsync via package manager
+    if [ -n "$IS_MACOS" ]; then
+        # macOS. The colon in the next line is the null command
+        :
+    elif [ -n "$IS_ALPINE" ]; then
+        [[ $(type -P rsync) ]] || apk add rsync
+    elif [[ $MB_ML_VER == "_2_24" ]]; then
+        # debian:9 based distro
+        [[ $(type -P rsync) ]] || apt-get install -y rsync
+    else
+        # centos based distro
+        [[ $(type -P rsync) ]] || yum_install rsync
+    fi
+}
 
 function fetch_unpack {
     # Fetch input archive name from input URL
@@ -39,8 +242,6 @@ function fetch_unpack {
         ls -1d * &&
         rsync --delete -ah * ..)
 }
-
-
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
@@ -61,8 +262,6 @@ function build_geos {
         && $cmake --install .)
     touch geos-stamp
 }
-
-
 function build_jsonc {
     if [ -e jsonc-stamp ]; then return; fi
     local cmake=cmake
@@ -81,8 +280,6 @@ function build_jsonc {
     fi
     touch jsonc-stamp
 }
-
-
 function build_proj {
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
@@ -104,8 +301,6 @@ function build_proj {
         && $cmake --install .)
     touch proj-stamp
 }
-
-
 function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
     build_zlib
@@ -120,8 +315,6 @@ function build_tiff {
         && make install)
     touch tiff-stamp
 }
-
-
 function build_sqlite {
     if [ -e sqlite-stamp ]; then return; fi
     fetch_unpack https://www.sqlite.org/2020/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
@@ -131,8 +324,6 @@ function build_sqlite {
         && make install)
     touch sqlite-stamp
 }
-
-
 function build_expat {
     if [ -e expat-stamp ]; then return; fi
     if [ -n "$IS_OSX" ]; then
@@ -146,8 +337,6 @@ function build_expat {
     fi
     touch expat-stamp
 }
-
-
 function build_nghttp2 {
     if [ -e nghttp2-stamp ]; then return; fi
     fetch_unpack https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERSION}/nghttp2-${NGHTTP2_VERSION}.tar.gz
@@ -157,8 +346,6 @@ function build_nghttp2 {
         && make install)
     touch nghttp2-stamp
 }
-
-
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
@@ -169,8 +356,6 @@ function build_openssl {
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openssl-stamp
 }
-
-
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
     CFLAGS="$CFLAGS -g -O2"
@@ -185,15 +370,11 @@ function build_curl {
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch curl-stamp
 }
-
 function build_pcre2 {
     build_simple pcre2 $PCRE_VERSION https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${PCRE_VERSION}
 }
-
-
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-
     build_curl
     build_jpeg
     build_libpng
@@ -204,10 +385,8 @@ function build_gdal {
     build_expat
     build_geos
     build_pcre2
-
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
-
     if [ -n "$IS_OSX" ]; then
         GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
         PCRE2_LIB="$BUILD_PREFIX/lib/libpcre2-8.dylib"
@@ -215,7 +394,6 @@ function build_gdal {
         GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
         PCRE2_LIB="$BUILD_PREFIX/lib/libpcre2-8.so"
     fi
-
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
     (cd gdal-${GDAL_VERSION} \
@@ -265,11 +443,8 @@ function build_gdal {
         strip -v --strip-unneeded ${BUILD_PREFIX}/lib/libgdal.so.* || true
         strip -v --strip-unneeded ${BUILD_PREFIX}/lib64/libgdal.so.* || true
     fi
-
     touch gdal-stamp
 }
-
-
 function pre_build {
     # Any stuff that you need to do before you start building the wheels
     # Runs in the root directory of this repository.
@@ -277,23 +452,16 @@ function pre_build {
     #    # Update to latest zlib for OSX build
     #    build_new_zlib
     #fi
-
     local cmake=$(get_modern_cmake)
     suppress build_openssl
     suppress build_nghttp2
-
     if [ -n "$IS_OSX" ]; then
         rm /usr/local/lib/libpng* || true
     fi
-
-
     fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-
     # Remove previously installed curl.
     rm -rf /usr/local/lib/libcurl* || true
-
     suppress build_curl
-
     suppress build_jpeg
     suppress build_jsonc
     suppress build_tiff
@@ -301,91 +469,8 @@ function pre_build {
     suppress build_proj
     suppress build_expat
     suppress build_geos
-
     if [ -n "$IS_OSX" ]; then
         export LDFLAGS="${LDFLAGS} -Wl,-rpath,${BUILD_PREFIX}/lib"
     fi
-
     suppress build_gdal
-}
-
-
-function install_run {
-    if [ -n "$IS_OSX" ]; then
-        install_wheel
-        mkdir tmp_for_test
-        (cd tmp_for_test && run_tests)
-        rmdir tmp_for_test  2>/dev/null || echo "Cannot remove tmp_for_test"
-    else
-        if [ "${MB_PYTHON_VERSION}" != "3.13" ]; then
-            install_wheel
-            mkdir tmp_for_test
-            (cd tmp_for_test && run_tests)
-            rmdir tmp_for_test  2>/dev/null || echo "Cannot remove tmp_for_test"
-        else
-            :
-        fi
-    fi
-}
-
-function run_tests {
-    unset GDAL_DATA
-    unset PROJ_DATA
-    if [ -n "$IS_OSX" ]; then
-        export PATH=$PATH:${BUILD_PREFIX}/bin
-        export LC_ALL=en_US.UTF-8
-        export LANG=en_US.UTF-8
-    else
-        export LC_ALL=C.UTF-8
-        export LANG=C.UTF-8
-        export CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-        apt-get update
-        apt-get install -y ca-certificates
-    fi
-    cp -R ../Fiona/tests ./tests
-    python -m pip install $TEST_DEPENDS
-    GDAL_ENABLE_DEPRECATED_DRIVER_GTM=YES python -m pytest -vv tests -k "not test_collection_zip_http and not test_mask_polygon_triangle and not test_show_versions and not test_append_or_driver_error and not [PCIDSK] and not cannot_append[FlatGeobuf]"
-    fio --version
-    fio env --formats
-    python ../test_fiona_issue383.py
-}
-
-
-function build_wheel_cmd {
-    local cmd=${1:-build_cmd}
-    local repo_dir=${2:-$REPO_DIR}
-    [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
-    local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    start_spinner
-    if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    stop_spinner
-    pip install -U pip
-    pip install -U build
-    if [ -n "$BUILD_DEPENDS" ]; then
-        pip install $(pip_opts) $BUILD_DEPENDS
-    fi
-    (cd $repo_dir && GDAL_VERSION=3.8.4 $cmd $wheelhouse)
-    if [ -n "$IS_OSX" ]; then
-        pip install delocate
-        delocate-listdeps --all --depending $wheelhouse/*.whl
-    else  # manylinux
-        pip install -I "auditwheel @ git+https://github.com/sgillies/auditwheel.git@extra-lib-name-tag"
-    fi
-    repair_wheelhouse $wheelhouse
-}
-
-
-function build_cmd {
-    local abs_wheelhouse=$1
-    python -m build -o $abs_wheelhouse
-}
-
-
-function macos_arm64_native_build_setup {
-    # Setup native build for single arch arm_64 wheels
-    export PLAT="arm64"
-    # We don't want universal2 builds and only want an arm64 build
-    export _PYTHON_HOST_PLATFORM="macosx-11.0-arm64"
-    export ARCHFLAGS+=" -arch arm64"
-    $@
 }
