@@ -226,7 +226,7 @@ function fetch_unpack {
     # names.
     rm_mkdir arch_tmp
     (cd arch_tmp && \
-        untar ../$out_archive && \
+        untar $out_archive && \
         ls -1d * )
 }
 
