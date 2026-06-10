@@ -215,21 +215,21 @@ fetch_unpack() {
     cd "$BUILD_DIR"
     [[ -f "$archive" ]] || curl -L -o "$archive" "$url"
 	# unpack
-    case "$archive_fname" in
+    case "$archive" in
         *.tar.gz|*.tgz)
-            tar xzf "$archive_fname"
+            tar xzf "$archive"
             ;;
         *.tar.bz2)
-            tar xjf "$archive_fname"
+            tar xjf "$archive"
             ;;
         *.tar.xz)
-            tar xJf "$archive_fname"
+            tar xJf "$archive"
             ;;
         *.zip)
-            unzip -q "$archive_fname"
+            unzip -q "$archive"
             ;;
         *)
-            echo "Unsupported archive: $archive_fname"
+            echo "Unsupported archive: $archive"
             exit 1
             ;;
     esac
