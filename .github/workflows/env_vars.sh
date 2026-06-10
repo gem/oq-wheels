@@ -23,17 +23,7 @@ PYOGRIO_VERSION=v0.11.1
 export GDAL_CONFIG=/usr/local/bin/gdal-config
 export PACKAGE_DATA=1
 #from PROJ 9.x
-export PROJ_DIR=/usr/local/
-export PROJ_DATA=${PROJ_DIR}share/proj
 export PROJ_WHEEL=true
 export PROJ_NETWORK=ON
-#export SETUPTOOLS_USE_DISTUTILS=stdlib
-if [[ "$REPO_DIR" == "pyproj" ]]; then
- export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/pyproj/proj_dir
- export PROJ_DATA=${PROJ_DIR}/share/proj
- if [ -z "$IS_OSX" ]; then
-	 echo "PROJ_DIR on ManyLinux  "
-     export PROJ_DIR=/io/pyproj/pyproj/proj_dir
-     export PROJ_DATA=${PROJ_DIR}/share/proj
- fi
-fi
+export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/pyproj/proj_dir
+export PROJ_DATA=${PROJ_DIR}/share/proj
