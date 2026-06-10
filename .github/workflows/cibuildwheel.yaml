@@ -15,26 +15,19 @@ env:
 
 jobs:
   build_psutil:
-    name: Build wheels of psutil  on ${{ matrix.os }} 
-    runs-on: ${{ matrix.runs-on }}
+    name: Build wheels of psutil  on "${{ matrix.os }}, ${{ matrix.arch }}"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: linux-intel
-            runs-on: ubuntu-latest
-          - os: linux-arm
-            runs-on: ubuntu-24.04-arm
-          - os: windows-intel
-            runs-on: windows-latest
-          - os: windows-arm
-            runs-on: windows-11-arm
-          - os: macos-intel
-            # macos-15-intel is the last x86_64 runner
-            runs-on: macos-15-intel
-          - os: macos-arm
-            # macos-14+ (including latest) are ARM64 runners
-            runs-on: macos-latest
+          - { os: ubuntu-latest, arch: x86_64 }
+          - { os: ubuntu-24.04-arm, arch: aarch64 }
+          - { os: macos-15, arch: x86_64 }
+          - { os: macos-15, arch: arm64 }
+          - { os: windows-2025, arch: AMD64 }
+          - { os: windows-11-arm, arch: ARM64 }
     env:
       REPO_DIR: psutil
       BUILD_COMMIT: release-7.0.0
@@ -45,11 +38,17 @@ jobs:
         run: |
           echo $PATH
           bash -x .github/workflows/code.sh
-          pwd
-          ls -lrt
-          sleep 180
+      # Install Python 3.8 on macOS ARM64 for universal2 support, else 3.11
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && '3.8' || '3.11' }}
       - name: Build Wheel of psutil
         uses: pypa/cibuildwheel@v4.0.0
+        env:
+          CIBW_ARCHS: "${{ matrix.arch }}"
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_ENABLE: "cpython-freethreading ${{ startsWith(github.ref, 'refs/tags/') && '' || 'cpython-prerelease' }}"
         with:
           package-dir: ./psutil
           output-dir: wheelhouse
