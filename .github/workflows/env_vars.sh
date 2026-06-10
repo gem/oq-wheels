@@ -25,5 +25,3 @@ export PACKAGE_DATA=1
 #from PROJ 9.x
 export PROJ_WHEEL=true
 export PROJ_NETWORK=ON
-export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/pyproj/proj_dir
-export PROJ_DATA=${PROJ_DIR}/share/proj
