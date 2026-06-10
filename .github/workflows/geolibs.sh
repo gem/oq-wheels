@@ -226,8 +226,7 @@ function fetch_unpack {
     rm_mkdir arch_tmp
     (cd arch_tmp && \
         untar ../$out_archive && \
-        ls -1d * &&
-	)
+        ls -1d * )
 }
 
 function build_geos {
