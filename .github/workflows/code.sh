@@ -1,9 +1,3 @@
-if [[ "$(uname)" == "Darwin" ]]; then
-    source multibuild/travis_osx_steps.sh
-else
-    source multibuild/travis_linux_steps.sh
-fi
-#
 echo "::group::Get code of project: $REPO_DIR"
 if [[ "$REPO_DIR" == "rasterio" ]]; then
     git clone https://github.com/rasterio/rasterio.git
