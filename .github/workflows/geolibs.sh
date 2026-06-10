@@ -9,6 +9,7 @@ source "${SCRIPT_DIR}/env_vars.sh"
 
 MULTIBUILD_DIR=$(dirname "${BASH_SOURCE[0]}")
 DOWNLOADS_SDIR=downloads
+ARCHIVE_SDIR=/tmp/archives
 
 if [ $(uname) == "Darwin" ]; then
   IS_MACOS=1; IS_OSX=1;
