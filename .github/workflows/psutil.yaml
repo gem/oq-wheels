@@ -1,5 +1,5 @@
 ---
-name: GEOS wheels
+name: psutil wheels
 on:
   workflow_dispatch:
     inputs:
@@ -8,11 +8,7 @@ on:
         description: "tmate debugging enabled"
         required: false
         default: false
-  pull_request:
-
-env:
-  WHEEL_SDIR: wheelhouse
-
+#  pull_request:
 jobs:
   build_psutil:
     name: Build wheels of psutil  on "${{ matrix.os }}, ${{ matrix.arch }}"
@@ -31,7 +27,6 @@ jobs:
     env:
       REPO_DIR: psutil
       BUILD_COMMIT: release-7.0.0
-      WHEEL_SDIR: wheelhouse
     steps:
       - uses: actions/checkout@v6
       - name: get code of psutil
@@ -49,7 +44,6 @@ jobs:
           CIBW_BUILD: "cp311-* cp312-* cp313-*"
           # This tells cibuildwheel to skip tests for all builds
           CIBW_TEST_SKIP: "*"
-
         with:
           package-dir: ./psutil
           output-dir: wheelhouse
