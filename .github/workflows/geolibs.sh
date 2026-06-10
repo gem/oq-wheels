@@ -227,7 +227,9 @@ function fetch_unpack {
     (cd arch_tmp && \
         untar ../$out_archive && \
         ls -1d * &&
+	)
 }
+
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
