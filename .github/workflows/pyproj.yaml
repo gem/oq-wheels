@@ -40,6 +40,7 @@ jobs:
       - name: Build Wheel of pyproj
         uses: pypa/cibuildwheel@v4.0.0
         env:
+          REPO_DIR: pyproj
           BUILD_TARGET: proj
           CIBW_ARCHS: "${{ matrix.arch }}"
           CIBW_BUILD: "cp311-* cp312-* cp313-*"
