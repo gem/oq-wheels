@@ -2,8 +2,8 @@
 set -ex 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/geolibs.sh"
-BUILD_PREFIX="${BUILD_PREFIX:-$RUNNER_TEMP/geostack}"
-BUILD_DIR="${BUILD_DIR:-$RUNNER_TEMP/geostack-build}"
+BUILD_PREFIX="${BUILD_PREFIX:-${TMPDIR:-/tmp}/geostack}"
+BUILD_DIR="${BUILD_DIR:-${TMPDIR:-/tmp}/geostack-build}"
 mkdir -p "$BUILD_PREFIX" "$BUILD_DIR"
 OS="$(uname -s)"
 

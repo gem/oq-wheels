@@ -208,22 +208,20 @@ function untar {
     esac
 }
 
-
-function fetch_unpack {
-#download_extract() {
+fetch_unpack() {
     local url="$1"
-    local file="${url##*/}"
+    local archive="$(basename "$url")"
 
+    mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    [[ -f "$file" ]] || curl -L -O "$url"
+    [[ -f "$archive" ]] || curl -L -o "$archive" "$url"
 
-    case "$file" in
-        *.tar.gz|*.tgz) tar xzf "$file" ;;
-        *.tar.bz2)      tar xjf "$file" ;;
-        *.tar.xz)       tar xJf "$file" ;;
-    esac
+    tar xf "$archive"
+
+    echo "$BUILD_DIR/${archive%.tar.*}"
 }
+
 
 function build_geos {
     CFLAGS="$CFLAGS -g -O2"
@@ -331,7 +329,7 @@ function build_nghttp2 {
 }
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
-    fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
+	OPENSSL_ROOT=$(fetch_unpack "${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz")
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
         && ./config no-ssl2 -fPIC --prefix=$BUILD_PREFIX \
