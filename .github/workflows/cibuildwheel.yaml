@@ -43,10 +43,9 @@ jobs:
         with:
           python-version: 3.12
       - name: Build Wheel of psutil
-        uses: pypa/cibuildwheel@v4.0.0
+        uses: pypa/cibuildwheel@v3.2.1
         env:
           CIBW_ARCHS: "${{ matrix.arch }}"
-          CIBW_TEST_REQUIRES: pytest
           CIBW_BUILD: "cp311-* cp312-* cp313-*"
         with:
           package-dir: ./psutil
