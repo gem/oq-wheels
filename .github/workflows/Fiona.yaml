@@ -84,7 +84,7 @@ jobs:
           echo $PATH
           sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: "wheels_fiona_${{ matrix.python }}"
           path: wheelhouse/fiona*whl
