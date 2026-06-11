@@ -1,5 +1,5 @@
 ---
-name: PyProj wheels
+name: pyproj wheels
 on:
   workflow_dispatch:
     inputs:
@@ -12,8 +12,8 @@ on:
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
-  build_PyProj_OSX_arm64:
-    name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+  build_pyproj_OSX_arm64:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,7 +52,7 @@ jobs:
           name: "wheels_pyproj_${{ matrix.python }}"
           path: wheelhouse/pyproj*whl
 
-  build_PyProj_Linux_x86_64:
+  build_pyproj_Linux_x86_64:
     name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
