@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex 
+set -ex
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/geolibs.sh"
 BUILD_PREFIX="${BUILD_PREFIX:-${TMPDIR:-/tmp}/geostack}"
@@ -31,6 +31,8 @@ esac
 
 
 TARGET="${BUILD_TARGET:-gdal}"
+echo "TARGET: $TARGET"
+exit 1
 case "$TARGET" in
     gdal)
         build_gdal
