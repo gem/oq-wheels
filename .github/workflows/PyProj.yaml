@@ -1,0 +1,55 @@
+---
+name: PyProj wheels
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "tmate debugging enabled"
+        required: false
+        default: false
+  pull_request:
+
+env:
+  WHEEL_SDIR: wheelhouse
+
+jobs:
+  build_pyproj:
+    name: pyproj ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-24.04"]
+        python: ["3.11", "3.12", "3.13"]
+        platform: ["x86_64"]
+        os-name: ["jammy"]
+    env:
+      REPO_DIR: pyproj
+      BUILD_COMMIT: 3.7.2
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TEST_DEPENDS: "cython"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: get code of pyproj
+        run: |
+          echo $PATH
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of pyproj
+        run: |
+          echo $PATH
+          sudo apt install python3-virtualenv
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "wheels_pyproj_${{ matrix.python }}"
+          path: wheelhouse/pyproj*whl
