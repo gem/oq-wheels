@@ -312,7 +312,7 @@ function build_tiff {
 }
 function build_sqlite {
     if [ -e sqlite-stamp ]; then return; fi
-    fetch_unpack https://www.sqlite.org/2020/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
+    fetch_unpack https://www.sqlite.org/2026/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
     (cd sqlite-autoconf-${SQLITE_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -454,7 +454,7 @@ function pre_build {
     if [ -n "$IS_OSX" ]; then
         rm /usr/local/lib/libpng* || true
     fi
-    fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
+    #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     # Remove previously installed curl.
     rm -rf /usr/local/lib/libcurl* || true
     suppress build_curl
