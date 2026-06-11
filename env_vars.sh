@@ -18,10 +18,7 @@ EXPAT_VERSION=2.6.3
 TIFF_VERSION=4.7.0
 PCRE_VERSION=10.44
 PYOGRIO_VERSION=v0.11.1
-export MACOSX_DEPLOYMENT_TARGET=11.0
-if [ -z "$IS_OSX" ] || [ "$PLAT" == x86_64 ]; then
-    export MACOSX_DEPLOYMENT_TARGET=13.0
-fi
+export MACOSX_DEPLOYMENT_TARGET=14.0
 if [ -z "$IS_OSX" ] || [ "$PLAT" == arm_64 ]; then
     export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi

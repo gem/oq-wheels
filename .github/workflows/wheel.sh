@@ -13,6 +13,6 @@ echo "::group::Build wheel"
   echo $PLAT
   echo " ${PROJ_DIR}  ${PROJ_DATA}"
   echo " ${PROJ_WHEEL} ${PROJ_NETWORK}"
-  echo "build_wheel $REPO_DIR $PLAT "
+  build_wheel $REPO_DIR $PLAT
   ls -l "${GITHUB_WORKSPACE}/${WHEEL_SDIR}/"
 echo "::endgroup::"
