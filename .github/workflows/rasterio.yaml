@@ -12,41 +12,8 @@ on:
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
-  build_GDAL_OSX_arm64:
-    name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-14]
-        python: ["3.11", "3.12", "3.13"]
-        platform: ["arm64"]
-    env:
-      REPO_DIR: gdal
-      BUILD_COMMIT: v3.13.1
-      WHEEL_SDIR: wheelhouse
-      PLAT: "${{ matrix.platform }}"
-      MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "2014"
-      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
-      TRAVIS_OS_NAME: ${{ matrix.os-name }}
-    steps:
-      - uses: actions/checkout@v6
-      - name: Get code of gdal
-        run: |
-          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          bash -x .github/workflows/build.sh
-      - name: Build Wheel of GDAL
-        run: |
-          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          bash -x .github/workflows/wheel.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: "wheels_gdal_${{ matrix.python }}"
-          path: wheelhouse/gdal*whl
-
-  build_GDAL_Linux_x86_64:
-    name: GDAL ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+  build_rasterio_Linux_x86_64:
+    name: rasterio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -55,9 +22,8 @@ jobs:
         python: ["3.11", "3.12", "3.13"]
         platform: ["x86_64"]
     env:
-      REPO_DIR: gdal
-      BUILD_COMMIT: v3.13.1
-      WHEEL_SDIR: wheelhouse
+      REPO_DIR: rasterio
+      BUILD_COMMIT: 1.4.4
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
@@ -65,13 +31,44 @@ jobs:
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
     steps:
       - uses: actions/checkout@v6
-      - name: Get code of gdal
+      - name: get code of rasterio
         run: |
           bash -x .github/workflows/build.sh
-      - name: Build Wheel of GDAL
+      - name: Build Wheel of rasterio
         run: |
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_gdal_${{ matrix.python }}"
-          path: wheelhouse/gdal*whl
+          name: "wheels_rasterio_${{ matrix.python }}"
+          path: wheelhouse/rasterio*whl
+  build_rasterio_OSX_arm64:
+    name: rasterio ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        python: ["3.11", "3.12", "3.13"]
+        platform: ["arm64"]
+    env:
+      REPO_DIR: rasterio
+      BUILD_COMMIT: 1.4.4
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: get code of rasterio
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/build.sh
+      - name: Build Wheel of rasterio
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: "wheels_rasterio_${{ matrix.python }}"
+          path: wheelhouse/rasterio*whl
