@@ -30,10 +30,9 @@ case "$OS" in
 esac
 
 
-TARGET="${BUILD_TARGET:-gdal}"
-echo "TARGET: $TARGET"
+echo "BUILD_TARGET:: $BUILD_TARGET:"
 exit 1
-case "$TARGET" in
+case "$BUILD_TARGET:" in
     gdal)
         build_gdal
         ;;
@@ -41,7 +40,7 @@ case "$TARGET" in
         build_proj
         ;;
     *)
-        echo "Unknown target: $TARGET"
+        echo "Unknown target: $BUILD_TARGET:"
         exit 1
         ;;
 esac
