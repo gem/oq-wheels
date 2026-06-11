@@ -2,6 +2,12 @@
 name: GDAL wheels
 on:
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "tmate debugging enabled"
+        required: false
+        default: false
   pull_request:
 env:
   WHEEL_SDIR: wheelhouse
@@ -29,12 +35,6 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v6
-      - name: Setup cmake
-        run: |
-          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-          echo $PATH
-          echo "check python3"
-          python3 -c "import sys; print(sys.version)"
       - name: Get code of gdal
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
