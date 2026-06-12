@@ -1,0 +1,77 @@
+---
+name: geopandas wheels for x86_64 and arm64
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "tmate debugging enabled"
+        required: false
+        default: false
+  pull_request:
+env:
+  WHEEL_SDIR: wheelhouse
+jobs:
+  build_geopandas_OSX_arm64:
+    name: geopandas ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        python: ["3.11", "3.12", "3.13"]
+        platform: ["arm64"]
+    env:
+      REPO_DIR: geopandas
+      BUILD_COMMIT: v1.1.3
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Get code of geopandas
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/build.sh
+      - name: Build wheel of geopandas
+        run: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: "wheels_geopandas_${{ matrix.python }}_${{ matrix.platform }}"
+          path: wheelhouse/geopandas*whl
+
+  build_geopandas_Linux_x86_64:
+    name: geopandas ${{ matrix.python }} ${{ matrix.os-name }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-24.04"]
+        python: ["3.11", "3.12", "3.13"]
+        platform: ["x86_64"]
+    env:
+      REPO_DIR: geopandas
+      BUILD_COMMIT: v1.1.3
+      WHEEL_SDIR: wheelhouse
+      PLAT: "${{ matrix.platform }}"
+      MB_PYTHON_VERSION: "${{ matrix.python }}"
+      MB_ML_VER: "2014"
+      BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
+      TRAVIS_OS_NAME: ${{ matrix.os-name }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Get code of geopandas
+        run: |
+          bash -x .github/workflows/build.sh
+      - name: Build wheel of geopandas
+        run: |
+          bash -x .github/workflows/wheel.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: "wheels_geopandas_${{ matrix.python }}_${{ matrix.platform }}"
+          path: wheelhouse/geopandas*whl
