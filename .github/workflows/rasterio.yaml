@@ -42,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_rasterio_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_rasterio_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/rasterio*whl
 
   build_rasterio_Linux_x86_64:
@@ -72,5 +72,5 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_rasterio_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_rasterio_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/rasterio*whl

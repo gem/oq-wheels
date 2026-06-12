@@ -42,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_fiona_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_fiona_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/fiona*whl
 
   build_Fiona_Linux_x86_64:
@@ -75,5 +75,5 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_fiona_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_fiona_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/fiona*whl

@@ -42,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyogrio_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_pyogrio_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/pyogrio*whl
 
   build_pyogrio_Linux_x86_64:
@@ -73,5 +73,5 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyogrio_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_pyogrio_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/pyogrio*whl

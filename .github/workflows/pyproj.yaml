@@ -42,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyproj_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_pyproj_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/pyproj*whl
 
   build_pyproj_Linux_x86_64:
@@ -80,5 +80,5 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyproj_${{ matrix.python }}_{{ matrix.platform }}"
+          name: "wheels_pyproj_${{ matrix.python }}_${{ matrix.platform }}"
           path: wheelhouse/pyproj*whl
