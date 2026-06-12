@@ -1,5 +1,5 @@
 ---
-name: Fiona wheels
+name: Fiona wheels for x86_64 and arm64
 on:
   workflow_dispatch:
     inputs:
@@ -21,8 +21,6 @@ jobs:
         os: [macos-14]
         python: ["3.11", "3.12", "3.13"]
         platform: ["arm64"]
-        macos-target: ["13"]
-        os-name: ["osx"]
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
@@ -31,14 +29,9 @@ jobs:
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.6 setuptools matplotlib pyparsing fsspec gcsfs"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
-      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
       - name: get code of Fiona
         run: |
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
@@ -49,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_fiona_${{ matrix.python }}"
+          name: "wheels_fiona_${{ matrix.python }}_{{ matrix.platform }}"
           path: wheelhouse/fiona*whl
 
   build_Fiona_Linux_x86_64:
@@ -64,17 +57,14 @@ jobs:
     env:
       REPO_DIR: Fiona
       BUILD_COMMIT: 1.10.1
+      WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "oldest-supported-numpy wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
-      TEST_DEPENDS: "oldest-supported-numpy attrs pytest click mock boto3 packaging hypothesis wheel pytz numpy==2.2.6 setuptools matplotlib pyparsing fsspec gcsfs"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
       - name: get code of Fiona
         run: |
           echo $PATH
@@ -82,9 +72,8 @@ jobs:
       - name: Build Wheel of Fiona
         run: |
           echo $PATH
-          sudo apt install python3-virtualenv
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_fiona_${{ matrix.python }}"
+          name: "wheels_fiona_${{ matrix.python }}_{{ matrix.platform }}"
           path: wheelhouse/fiona*whl

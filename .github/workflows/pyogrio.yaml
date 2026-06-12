@@ -1,5 +1,5 @@
 ---
-name: pyogrio wheels
+name: pyogrio wheels for x86_64 and arm64
 on:
   workflow_dispatch:
     inputs:
@@ -29,7 +29,6 @@ jobs:
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
-      TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
     steps:
       - uses: actions/checkout@v6
@@ -43,7 +42,7 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyogrio_${{ matrix.python }}"
+          name: "wheels_pyogrio_${{ matrix.python }}_{{ matrix.platform }}"
           path: wheelhouse/pyogrio*whl
 
   build_pyogrio_Linux_x86_64:
@@ -63,9 +62,7 @@ jobs:
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "2014"
       BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
-      TEST_DEPENDS: "cython"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
-      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
     steps:
       - uses: actions/checkout@v6
       - name: Get code of pyogrio
@@ -76,5 +73,5 @@ jobs:
           bash -x .github/workflows/wheel.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: "wheels_pyogrio_${{ matrix.python }}"
+          name: "wheels_pyogrio_${{ matrix.python }}_{{ matrix.platform }}"
           path: wheelhouse/pyogrio*whl
