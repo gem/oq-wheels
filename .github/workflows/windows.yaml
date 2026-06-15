@@ -1,30 +1,31 @@
-name: (Windows) Build Geospatial Wheels 
+---
+name: (Windows) Build Geospatial Wheels
 on:
   push:
     branches: [ main ]
   pull_request:
   workflow_dispatch:
 jobs:
-   build-windows-wheels:
+  build-windows-wheels:
     name: Geospatial Wheels ${{ matrix.python }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.11", "3.12", "3.13"]        
-   steps:
-     - name: Checkout Repository
-       uses: actions/checkout@v6
-     - name: Set up Python
-       uses: actions/setup-python@v6
-       with:
-         python: ${{ matrix.python }}    
-     - name: Install OSGeo4W (GDAL, PROJ & Devel files)
-       shell: powershell
-       run: |
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python: ${{ matrix.python }}
+      - name: Install OSGeo4W (GDAL, PROJ & Devel files)
+        shell: powershell
+        run: |
           Write-Host "Downloading OSGeo4W installer..." -ForegroundColor Cyan
           Invoke-WebRequest -Uri "https://download.osgeo.org/osgeo4w/osgeo4w-setup.exe" -OutFile "osgeo4w-setup.exe"
-          
+
           # Create a temporary local package directory for the installer cache
           New-Item -ItemType Directory -Force -Path "C:\OSGeo4W-Packages"
 
@@ -52,77 +53,64 @@ jobs:
               Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
               exit 1
           }
-          
 
-     - name: Install Build Tools & Compilation Requirements
-       shell: powershell
-       run: |
+      - name: Install Build Tools & Compilation Requirements
+        shell: powershell
+        run: |
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
-
-     - name: Configure Environment Variables 
-       shell: powershell
-       run: |
+      - name: Configure Environment Variables
+        shell: powershell
+        run: |
           echo "C:\OSGeo4W\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "INCLUDE=C:\OSGeo4W\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "LIB=C:\OSGeo4W\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "LINK=gdal_i.lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "PROJ_DIR=C:\OSGeo4W" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "GDAL_HOME=C:\OSGeo4W" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      
-     - name: Build Unrepaired Wheels (Isolated & Diagnostic)
-       shell: powershell
-       run: |
+      - name: Build Unrepaired Wheels (Isolated & Diagnostic)
+        shell: powershell
+        run: |
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
-          
-          # 1. Build GDAL
+           # 1. Build GDAL
           $env:INCLUDE = "C:\OSGeo4W\include"
           $env:LIB = "C:\OSGeo4W\lib"
           pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
-          
+
           # 2. Build Fiona
           $env:GDAL_VERSION = "3.13.1"
-          [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")          
-          pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired `
-            --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" `
-            --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" `
-            --config-settings="build_ext.libraries=gdal_i"
-          
-          # 3. Build PyProj
+          [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
+          pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
+           # 3. Build PyProj
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
-          $env:PROJ_DIR = "C:\OSGeo4W"
-          pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired `
-            --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" `
-            --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib"
-          
-          # 4. Build Rasterio
-          pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired `
-            --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" `
-            --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" `
-            --config-settings="build_ext.libraries=gdal_i"
-          
-          # 5. Build PyOgrio
-          $env:GDAL_HOME = "C:\OSGeo4W"
-          $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
-          $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
-          pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
+           $env:PROJ_DIR = "C:\OSGeo4W"
+           pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib"
 
-          # 6. Build Geopandas (Pure Python wheel, no build isolation required)
-          pip wheel geopandas --no-build-isolation --wheel-dir=.\dist_unrepaired
+           # 4. Build Rasterio
+           pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
 
-     - name: Repair Wheels with Delvewheel (Make Portable)
-       shell: powershell
-       run: |
-          New-Item -ItemType Directory -Force -Path .\dist_repaired     
-          # Loop through all generated wheels
-          Get-ChildItem .\dist_unrepaired\*.whl | ForEach-Object {
-              # If it's a binary wheel (win_amd64), repair it by embedding OSGeo4W DLLs
-              if ($_.Name -like "*win_amd64*") {
-                  Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
-                  delvewheel repair --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
-              } else {
-                  # If it's a pure Python wheel (like Geopandas), just copy it as-is
-                  Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
-                  Copy-Item $_.FullName .\dist_repaired\
-              }
-          }
+           # 5. Build PyOgrio
+           $env:GDAL_HOME = "C:\OSGeo4W"
+           $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
+           $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
+           pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
+
+           # 6. Build Geopandas (Pure Python wheel, no build isolation required)
+           pip wheel geopandas --no-build-isolation --wheel-dir=.\dist_unrepaired
+
+      - name: Repair Wheels with Delvewheel (Make Portable)
+        shell: powershell
+        run: |
+           New-Item -ItemType Directory -Force -Path .\dist_repaired
+           # Loop through all generated wheels
+           Get-ChildItem .\dist_unrepaired\*.whl | ForEach-Object {
+               # If it's a binary wheel (win_amd64), repair it by embedding OSGeo4W DLLs
+               if ($_.Name -like "*win_amd64*") {
+                   Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
+                   delvewheel repair --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
+               } else {
+                   # If it's a pure Python wheel (like Geopandas), just copy it as-is
+                   Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
+                   Copy-Item $_.FullName .\dist_repaired\
+               }
+           }
