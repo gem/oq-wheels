@@ -60,35 +60,37 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
           
-
+# 4. Compila le CINQUE wheel dai sorgenti
       - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
         shell: powershell
         run: |
-          # 1. Forza MSVC a rispettare rigorosamente le variabili d'ambiente locali di sistema
-          $env:DISTUTILS_USE_SDK = "1"
-          $env:MSSdk = "1"
-
-          # 2. Configura i path globali per il Compilatore (C++) e il Linker (MSVC)
-          $env:INCLUDE = "C:\OSGeo4W\include"
-          $env:LIB = "C:\OSGeo4W\lib"
-          
-          # Dice esplicitamente al linker di agganciare la libreria di importazione di GDAL
-          $env:LINK = "gdal_i.lib"
-
-          # 3. PATH e directory di PROJ indispensabili per pyproj/rasterio
+          # 1. Configurazione PATH e directory di PROJ indispensabili ovunque
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
 
+          # 2. Configurazione path di base per trovare gli Header (.h)
+          $env:INCLUDE = "C:\OSGeo4W\include"
+          $env:LIB = "C:\OSGeo4W\lib"
+
+          # 3. Configurazione variabili GDAL per Fiona / PyOgrio
           $env:GDAL_VERSION = "3.13.1"
           [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
           $env:GDAL_HOME = "C:\OSGeo4W"
           $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
           $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
-          
+
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
-          
+
+          # --- COMPILAZIONE GDAL ---
+          # Qui NON attiviamo il flag SDK/LINK forzato, così si compila liscio come all'inizio
           echo "Compilazione GDAL..."
           pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
+
+          # --- ATTIVAZIONE DEL LINKER PER LE ALTRE LIBRERIE ---
+          # Attiviamo l'SDK e il Linker esplicito SOLO adesso, richiesto da Fiona, Rasterio e PyOgrio
+          $env:DISTUTILS_USE_SDK = "1"
+          $env:MSSdk = "1"
+          $env:LINK = "gdal_i.lib"
 
           echo "Compilazione Fiona..."
           pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired
