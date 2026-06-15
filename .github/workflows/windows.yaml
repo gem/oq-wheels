@@ -12,20 +12,33 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # 1. Configura l'ambiente Python
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-
-      # 2. Installa OSGeo4W includendo i pacchetti di sviluppo necessari
+          
+    # 2. Installa OSGeo4W e VERIFICA l'installazione
       - name: Install OSGeo4W (GDAL, PROJ & Devel files)
         shell: powershell
         run: |
+          echo "Downloading OSGeo4W installer..."
           Invoke-WebRequest -Uri "https://download.osgeo.org/osgeo4w/osgeo4w-setup.exe" -OutFile "osgeo4w-setup.exe"
-          ./osgeo4w-setup.exe --quiet-mode --advanced --packages gdal,gdal-devel,proj,proj-devel --root C:\OSGeo4W --auto-accept
+          
+          echo "Running OSGeo4W installer..."
+          # Running with Start-Process -Wait ensures PowerShell waits until the installer completely finishes writing files
+          Start-Process -FilePath ".\osgeo4w-setup.exe" -ArgumentList "--quiet-mode", "--advanced", "--packages", "gdal,gdal-devel,proj,proj-devel", "--root", "C:\OSGeo4W", "--auto-accept" -Wait -NoNewWindow
+
+          echo "Verifying installation paths..."
+          if (Test-Path "C:\OSGeo4W\include\gdal.h") {
+              Write-Host "Success: gdal.h found at C:\OSGeo4W\include\gdal.h" -ForegroundColor Green
+          } else {
+              Write-Error "CRITICAL ERROR: OSGeo4W installation failed! C:\OSGeo4W\include\gdal.h does not exist."
+              Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
+              exit 1
+          }
 
       # 3. Installazione dei prerequisiti di compilazione
       - name: Install Build Tools & Compilation Requirements
@@ -38,29 +51,30 @@ jobs:
       - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
         shell: powershell
         run: |
-          # PATH e directory di PROJ (Aggiunti sia a livello Process che Machine per sicurezza)
-          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
-          $env:PROJ_DIR = "C:\OSGeo4W"
+          # Forza MSVC a usare le variabili d'ambiente SDK globali
+          $env:DISTUTILS_USE_SDK = "1"
+          $env:MSSdk = "1"
 
           # Configurazione per il compilatore C++ MSVC e Linker
           $env:INCLUDE = "C:\OSGeo4W\include"
           $env:LIB = "C:\OSGeo4W\lib"
           $env:LINK = "gdal_i.lib"
 
-          # RISOLUZIONE FIONA & PYOGRIO: Configurazione versione a livello globale e di processo
+          # PATH e directory di PROJ
+          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
+          $env:PROJ_DIR = "C:\OSGeo4W"
+
+          # RISOLUZIONE FIONA & PYOGRIO
           $env:GDAL_VERSION = "3.13.1"
           [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
-
-          # RISOLUZIONE SPECIFICA PYOGRIO
           $env:GDAL_HOME = "C:\OSGeo4W"
           $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
           $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
 
-          # Creazione della cartella temporanea per i build grezzi
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
 
           echo "Compilazione GDAL..."
-          # Per passare include e library path direttamente al setup.py di GDAL:
+          # Usiamo sia i flag che le variabili d'ambiente per massima compatibilità
           pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\OSGeo4W\include" --config-settings="--global-option=-LC:\OSGeo4W\lib"
 
           echo "Compilazione Fiona..."
@@ -74,17 +88,3 @@ jobs:
 
           echo "Compilazione PyOgrio..."
           pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
-
-      # 5. Ripara tutte le wheel generate con Delvewheel
-      - name: Repair Wheels with Delvewheel (Make them Portable)
-        shell: powershell
-        run: |
-          delvewheel repair .\dist_unrepaired\*.whl --add-path C:\OSGeo4W\bin --wheel-dir=.\dist_portable
-
-      # 6. Salva i file .whl come unico Artifact di GitHub
-      - name: Upload Portable Wheels Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: geospatial-python313-portable-wheels
-          path: .\dist_portable\*.whl
-          retention-days: 7
