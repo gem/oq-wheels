@@ -61,16 +61,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
-
-      # 4. Compila le CINQUE wheel dai sorgenti
+          
+# 4. Compila le CINQUE wheel dai sorgenti
       - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
         shell: powershell
         run: |
-          # PATH e directory di PROJ
+          # PATH e directory di PROJ indispensabili per pyproj/rasterio
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
 
-          # RISOLUZIONE FIONA & PYOGRIO
+          # Variabili d'ambiente richieste per la retrocompatibilità di Fiona/PyOgrio
           $env:GDAL_VERSION = "3.13.1"
           [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
           $env:GDAL_HOME = "C:\OSGeo4W"
@@ -79,18 +79,21 @@ jobs:
 
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
 
+          # Stringhe di configurazione esplicite per il compilatore C++ (MSVC)
+          # Questo passa i percorsi direttamente a setuptools/build backend saltando l'isolamento di pip
+          $build_opts = '--config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\OSGeo4W\include" --config-settings="--global-option=-LC:\OSGeo4W\lib"'
+
           echo "Compilazione GDAL..."
-          # Usiamo sia i flag che le variabili d'ambiente per massima compatibilità
-          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\OSGeo4W\include" --config-settings="--global-option=-LC:\OSGeo4W\lib"
+          Invoke-Expression "pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired $build_opts"
 
           echo "Compilazione Fiona..."
-          pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired
+          Invoke-Expression "pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired $build_opts"
 
           echo "Compilazione PyProj..."
-          pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired
+          Invoke-Expression "pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired $build_opts"
 
           echo "Compilazione Rasterio..."
-          pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired
+          Invoke-Expression "pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired $build_opts"
 
           echo "Compilazione PyOgrio..."
-          pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
+          Invoke-Expression "pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired $build_opts"
