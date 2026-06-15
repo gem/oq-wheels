@@ -1,8 +1,8 @@
-name: Build Portable Geospatial Wheels (Windows)
+name: Build Geospatial Wheels (Windows)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ win_wheels ]
   pull_request:
   workflow_dispatch: 
 
@@ -16,7 +16,7 @@ jobs:
 
       # 1. Configura l'ambiente Python
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
