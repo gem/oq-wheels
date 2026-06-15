@@ -1,0 +1,87 @@
+name: Build Portable Geospatial Wheels (Windows)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch: 
+
+jobs:
+  build-windows-wheels:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      # 1. Configura l'ambiente Python
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      # 2. Installa OSGeo4W includendo i pacchetti di sviluppo necessari
+      - name: Install OSGeo4W (GDAL, PROJ & Devel files)
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://download.osgeo.org/osgeo4w/osgeo4w-setup.exe" -OutFile "osgeo4w-setup.exe"
+          ./osgeo4w-setup.exe --quiet-mode --advanced --packages gdal,gdal-devel,proj,proj-devel --root C:\OSGeo4W --auto-accept
+
+      # 3. Installazione dei prerequisiti di compilazione
+      - name: Install Build Tools & Compilation Requirements
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip setuptools wheel delvewheel
+          python -m pip install cython numpy versioneer packaging
+
+      # 4. Compila le CINQUE wheel dai sorgenti
+      - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
+        shell: powershell
+        run: |
+          # PATH e directory di PROJ
+          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
+          $env:PROJ_DIR = "C:\OSGeo4W"
+          
+          # Configurazione per il compilatore C++ MSVC e Linker
+          $env:INCLUDE = "C:\OSGeo4W\include"
+          $env:LIB = "C:\OSGeo4W\lib"
+          $env:LINK = "gdal_i.lib"
+          
+          # RISOLUZIONE FIONA & PYOGRIO: Configurazione versione a livello globale e di processo
+          $env:GDAL_VERSION = "3.13.1"
+          [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
+          
+          # RISOLUZIONE SPECIFICA PYOGRIO: Forziamo la triade richiesta esplicitamente dallo script
+          $env:GDAL_HOME = "C:\OSGeo4W"
+          $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
+          $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
+          
+          # Esecuzione dei Build in serie
+          echo "Compilazione GDAL..."
+          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
+          
+          echo "Compilazione Fiona..."
+          pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired
+          
+          echo "Compilazione PyProj..."
+          pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired
+          
+          echo "Compilazione Rasterio..."
+          pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired
+          
+          echo "Compilazione PyOgrio..."
+          pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
+
+      # 5. Ripara tutte le wheel generate con Delvewheel
+      - name: Repair Wheels with Delvewheel (Make them Portable)
+        shell: powershell
+        run: |
+          delvewheel repair .\dist_unrepaired\*.whl --add-path C:\OSGeo4W\bin --wheel-dir=.\dist_portable
+
+      # 6. Salva i file .whl come unico Artifact di GitHub
+      - name: Upload Portable Wheels Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: geospatial-python313-portable-wheels
+          path: .\dist_portable\*.whl
+          retention-days: 7
