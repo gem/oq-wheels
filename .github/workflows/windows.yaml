@@ -114,3 +114,9 @@ jobs:
                    Copy-Item $_.FullName .\dist_repaired\
                }
            }
+
+      - name: Upload Repaired & Portable Wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: geospatial-windows-wheels-${{ matrix.python }}
+          path: .\dist_repaired\*.whl
