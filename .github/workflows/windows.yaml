@@ -66,15 +66,6 @@ jobs:
       - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
         shell: powershell
         run: |
-          # Forza MSVC a usare le variabili d'ambiente SDK globali
-          $env:DISTUTILS_USE_SDK = "1"
-          $env:MSSdk = "1"
-
-          # Configurazione per il compilatore C++ MSVC e Linker
-          $env:INCLUDE = "C:\OSGeo4W\include"
-          $env:LIB = "C:\OSGeo4W\lib"
-          $env:LINK = "gdal_i.lib"
-
           # PATH e directory di PROJ
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
