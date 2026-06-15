@@ -1,10 +1,10 @@
-name: Build Portable Geospatial Wheels (Windows)
+name: Build Geospatial Wheels (Windows)
 
 on:
   push:
     branches: [ main ]
   pull_request:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   build-windows-wheels:
@@ -12,11 +12,11 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       # 1. Configura l'ambiente Python
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
@@ -38,37 +38,40 @@ jobs:
       - name: Build Unrepaired Wheels (GDAL, Fiona, PyProj, Rasterio & PyOgrio)
         shell: powershell
         run: |
-          # PATH e directory di PROJ
+          # PATH e directory di PROJ (Aggiunti sia a livello Process che Machine per sicurezza)
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
-          
+
           # Configurazione per il compilatore C++ MSVC e Linker
           $env:INCLUDE = "C:\OSGeo4W\include"
           $env:LIB = "C:\OSGeo4W\lib"
           $env:LINK = "gdal_i.lib"
-          
+
           # RISOLUZIONE FIONA & PYOGRIO: Configurazione versione a livello globale e di processo
           $env:GDAL_VERSION = "3.13.1"
           [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
-          
-          # RISOLUZIONE SPECIFICA PYOGRIO: Forziamo la triade richiesta esplicitamente dallo script
+
+          # RISOLUZIONE SPECIFICA PYOGRIO
           $env:GDAL_HOME = "C:\OSGeo4W"
           $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
           $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
-          
-          # Esecuzione dei Build in serie
+
+          # Creazione della cartella temporanea per i build grezzi
+          New-Item -ItemType Directory -Force -Path .\dist_unrepaired
+
           echo "Compilazione GDAL..."
-          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
-          
+          # Per passare include e library path direttamente al setup.py di GDAL:
+          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired --config-settings="--global-option=build_ext" --config-settings="--global-option=-IC:\OSGeo4W\include" --config-settings="--global-option=-LC:\OSGeo4W\lib"
+
           echo "Compilazione Fiona..."
           pip wheel fiona --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired
-          
+
           echo "Compilazione PyProj..."
           pip wheel pyproj --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired
-          
+
           echo "Compilazione Rasterio..."
           pip wheel rasterio --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired
-          
+
           echo "Compilazione PyOgrio..."
           pip wheel pyogrio --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
 
