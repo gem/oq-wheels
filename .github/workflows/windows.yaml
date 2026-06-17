@@ -110,7 +110,7 @@ jobs:
                }
            }
       - name: Upload Repaired & Portable Wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: "wheels_geospatial_windows_${{ matrix.python }}"
           path: .\dist_repaired\*.whl
