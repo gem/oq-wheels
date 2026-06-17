@@ -101,7 +101,7 @@ jobs:
                # If it's a binary wheel (win_amd64), repair it by embedding OSGeo4W DLLs
                if ($_.Name -like "*win_amd64*") {
                    Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
-                   delvewheel repair --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
+                   delvewheel repair --ignore-in-wheel --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
                } else {
                    # If it's a pure Python wheel (like Geopandas), just copy it as-is
                    Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
