@@ -1,4 +1,3 @@
----
 name: (Windows) Build Geospatial Wheels
 on:
   push:
@@ -12,14 +11,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      - name: Set up Python
+      - name: Set up Python  ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
       - name: Install OSGeo4W (GDAL, PROJ & Devel files)
         shell: powershell
         run: |
