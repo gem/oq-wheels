@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build-windows-wheels:
-    name: Geospatial Wheels ${{ matrix.python }}
+    name: Geospatial Wheels ${{ matrix.python-version }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -40,7 +40,7 @@ jobs:
             "--root", "C:\OSGeo4W", `
             "--local-package-dir", "C:\OSGeo4W-Packages", `
             "--site", "https://download.osgeo.org/osgeo4w/v2", `
-            "--packages", "gdal,gdal-devel,proj,proj-devel" `
+            "--packages", "gdal=3.13.1-1,proj=9.8.1-1,gdal-devel=3.13.1-1,proj-devel=9.8.1-1" `
             -Wait -NoNewWindow
 
           Write-Host "Verifying installation paths..." -ForegroundColor Cyan
