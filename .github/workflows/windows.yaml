@@ -31,17 +31,17 @@ jobs:
           Write-Host "Running OSGeo4W installer in quiet mode..." -ForegroundColor Cyan
           # Use correct flags to force clean internet download and silent extraction
           Start-Process -FilePath ".\osgeo4w-setup.exe" -ArgumentList `
-            "--quiet-mode", `
-            "--advanced", `
-            "--autoaccept", `
-            "--no-shortcuts", `
-            "--no-desktop", `
-            "--no-startmenu", `
-            "--root", "C:\OSGeo4W", `
-            "--local-package-dir", "C:\OSGeo4W-Packages", `
-            "--site", "https://download.osgeo.org/osgeo4w/v2", `
-            "--packages", "gdal=3.13.1-1,proj=9.8.1-1,gdal-devel=3.13.1-1,proj-devel=9.8.1-1" `
-            -Wait -NoNewWindow
+          "--quiet-mode", `
+          "--advanced", `
+          "--autoaccept", `
+          "--no-shortcuts", `
+          "--no-desktop", `
+          "--no-startmenu", `
+          "--root", "C:\OSGeo4W", `
+          "--local-package-dir", "C:\OSGeo4W-Packages", `
+          "--site", "https://download.osgeo.org/osgeo4w/v2", `
+          "--packages", "gdal=3.13.1-1,gdal-devel=3.13.1-1,proj=9.8.1-1,proj-devel=9.8.1-1" `
+          -Wait -NoNewWindow
 
           Write-Host "Verifying installation paths..." -ForegroundColor Cyan
           if (Test-Path "C:\OSGeo4W\include\gdal.h") {
