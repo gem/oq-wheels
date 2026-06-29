@@ -110,19 +110,26 @@ jobs:
       - name: Repair Wheels with Delvewheel (Make Portable)
         shell: powershell
         run: |
-           New-Item -ItemType Directory -Force -Path .\dist_repaired
-           # Loop through all generated wheels
-           Get-ChildItem .\dist_unrepaired\*.whl | ForEach-Object {
-               # If it's a binary wheel (win_amd64), repair it by embedding OSGeo4W DLLs
-               if ($_.Name -like "*win_amd64*") {
-                   Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
-                   delvewheel repair --ignore-in-wheel --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
-               } else {
-                   # If it's a pure Python wheel (like Geopandas), just copy it as-is
-                   Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
-                   Copy-Item $_.FullName .\dist_repaired\
-               }
-           }
+        New-Item -ItemType Directory -Force -Path .\dist_repaired
+        # Loop through all generated wheels
+        Get-ChildItem .\dist_unrepaired\*.whl | ForEach-Object {
+            # If it's a binary wheel (win_amd64), try to repair it by embedding OSGeo4W DLLs
+            if ($_.Name -like "*win_amd64*") {
+                Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
+                # Run delvewheel
+                delvewheel repair --ignore-in-wheel --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
+                # Verify if delvewheel actually outputted the file
+                $targetPath = Join-Path .\dist_repaired $_.Name
+                if (-not (Test-Path $targetPath)) {
+                    Write-Host "delvewheel skipped '$($_.Name)' (already repaired). Copying to dist_repaired as-is..." -ForegroundColor Yellow
+                    Copy-Item $_.FullName .\dist_repaired\
+                }
+            } else {
+                # If it's a pure Python wheel (like Geopandas), just copy it as-is
+                Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
+                Copy-Item $_.FullName .\dist_repaired\
+            }
+        }
       - name: Upload Repaired & Portable Wheels
         uses: actions/upload-artifact@v6
         with:
