@@ -26,7 +26,7 @@ LIBWEBP_VERSION="${LIBWEBP_VERSION:-0.5.0}"
 XZ_VERSION="${XZ_VERSION:-5.2.2}"
 LIBYAML_VERSION="${LIBYAML_VERSION:-0.2.2}"
 SZIP_VERSION="${SZIP_VERSION:-2.1.1}"
-HDF5_VERSION="${HDF5_VERSION:-1.10.5}"
+HDF5_VERSION="${HDF5_VERSION:-1.14.6}"
 LIBAEC_VERSION="${LIBAEC_VERSION:-1.0.4}"
 LZO_VERSION=${LZO_VERSION:-2.10}
 LZF_VERSION="${LZF_VERSION:-3.6}"
@@ -311,9 +311,10 @@ function build_hdf5 {
     build_zlib
     # libaec is a drop-in replacement for szip
     build_libaec
-    local hdf5_url=https://support.hdfgroup.org/ftp/HDF5/releases
+    local hdf5_url=https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
     local short=$(echo $HDF5_VERSION | awk -F "." '{printf "%d.%d", $1, $2}')
-    fetch_unpack $hdf5_url/hdf5-$short/hdf5-$HDF5_VERSION/src/hdf5-$HDF5_VERSION.tar.gz
+    #fetch_unpack $hdf5_url/hdf5-$short/hdf5-$HDF5_VERSION.tar.gz
+    fetch_unpack https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
     (cd hdf5-$HDF5_VERSION \
         && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib \
         && ./configure --with-szlib=$BUILD_PREFIX --prefix=$BUILD_PREFIX \
