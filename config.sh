@@ -1,7 +1,6 @@
 # Custom utilities for Fiona wheels.
 #
 # Test for OSX with [ -n "$IS_OSX" ].
-
 function fetch_unpack {
     # Fetch input archive name from input URL
     # Parameters
