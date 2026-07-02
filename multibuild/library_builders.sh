@@ -423,7 +423,7 @@ function build_netcdf {
     (cd netcdf-c-${NETCDF_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX --enable-dap \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch netcdf-stamp
 }
 
