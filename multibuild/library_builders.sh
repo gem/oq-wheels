@@ -319,7 +319,7 @@ function build_hdf5 {
         && ./configure --with-szlib=$BUILD_PREFIX --prefix=$BUILD_PREFIX \
         --enable-threadsafe --enable-unsupported --with-pthread=yes \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch hdf5-stamp
 }
 
@@ -332,7 +332,7 @@ function build_libaec {
     (cd $root_name \
         && ./configure --prefix=$BUILD_PREFIX \
         && make \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch libaec-stamp
 }
 
