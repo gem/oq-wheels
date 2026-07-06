@@ -91,16 +91,13 @@ jobs:
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W"
           $env:GDAL_DATA = "C:\OSGeo4W"
+          $env:INCLUDE = "C:\OSGeo4W\include"
+          $env:LIB = "C:\OSGeo4W\lib"
+          $env:GDAL_VERSION = "3.13.1"
           $GDAL_VERSION = "3.13.1"
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
-          python -m pip download --no-binary=:all: GDAL==$GDAL_VERSION
-          Write-Host "Extracting GDAL source..."
-          tar -xzvf "gdal-${GDAL_VERSION}.tar.gz"
-          cd gdal-${GDAL_VERSION}
-          python -m pip wheel . `
-            --no-build-isolation `
-            -v --wheel-dir=.\dist_unrepaired
+          python -m pip wheel GDAL==$GDAL_VERSION --no-build-isolation -v --wheel-dir=.\dist_unrepaired
       - name: Repair Wheels with Delvewheel (Make Portable)
         shell: powershell
         run: |
