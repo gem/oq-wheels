@@ -65,7 +65,7 @@ jobs:
               Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
               exit 1
           }
-      - name: Configure Environment Variables
+      - name: Configure Environment Variables and Build Unrepaired Wheels (Isolated & Diagnostic)
         shell: powershell
         run: |
           $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
@@ -82,11 +82,8 @@ jobs:
           where gdalinfo
           proj
           gdalinfo --version
-      - name: Build Unrepaired Wheels (Isolated & Diagnostic)
-        shell: powershell
-        run: |
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
-          # 3. Build PyProj
+          # Build PyProj
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W"
