@@ -98,7 +98,7 @@ jobs:
           $env:PROJ_DATA = "C:\OSGeo4W"
           $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
           git clone https://github.com/OSGeo/gdal.git
-     	  cd gdal
+          cd gdal
           git checkout v3.13.1
           cd swig/python
           python -m pip wheel . `
