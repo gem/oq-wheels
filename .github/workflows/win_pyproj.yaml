@@ -1,4 +1,4 @@
-name: (Windows) Build Geospatial Wheels
+name: (Windows) Build Pyproj Wheels
 on:
   push:
     branches: [ main ]

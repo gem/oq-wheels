@@ -1,0 +1,142 @@
+name: (Windows) Build GDAL Wheels
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build-windows-wheels:
+    name: Geospatial Wheels ${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Set up Python  ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install OSGeo4W (GDAL, PROJ & Devel files)
+        shell: powershell
+        run: |
+          Write-Host "Downloading OSGeo4W installer..." -ForegroundColor Cyan
+          Invoke-WebRequest -Uri "https://download.osgeo.org/osgeo4w/osgeo4w-setup.exe" -OutFile "osgeo4w-setup.exe"
+          # Create a temporary local package directory for the installer cache
+          New-Item -ItemType Directory -Force -Path "C:\OSGeo4W-Packages"
+          Write-Host "Running OSGeo4W installer in quiet mode..." -ForegroundColor Cyan
+          # Use correct flags to force clean internet download and silent extraction
+          #
+          #1. Find the Correct Snapshot
+          #Legacy packages and their respective indices are stored at: https://download.osgeo.org/osgeo4w/v2/snapshots/.
+          #
+          #You will need to navigate through that list and look for the folder with the date timestamp (YYYYMMDD-HHMMSS) when GDAL 3.13.1-1 and PROJ 9.8.1-1 were available.
+          #
+          #How to Verify Manually:
+          #Go to https://download.osgeo.org/osgeo4w/v2/snapshots/.
+          #
+          #Scroll down and look for a folder with the June 2026 prefix (e.g., 20260606-XXXXXX or later).
+          #
+          #Enter the folder, navigate to /x86_64/, and click on the setup.ini file (this is the repository index).
+          #
+          #Press Ctrl + F in your browser and search for @ gdal or @ proj to verify that the version: line matches exactly what you need.
+          #
+          Start-Process -FilePath ".\osgeo4w-setup.exe" -ArgumentList `
+          "--quiet-mode", `
+          "--advanced", `
+          "--autoaccept", `
+          "--no-shortcuts", `
+          "--no-desktop", `
+          "--no-startmenu", `
+          "--root", "C:\OSGeo4W", `
+          "--local-package-dir", "C:\OSGeo4W-Packages", `
+          "--site", "https://download.osgeo.org/osgeo4w/v2/snapshots/20260629-095933", `
+          "--packages", "gdal,gdal-devel,proj,proj-devel" `
+          -Wait -NoNewWindow
+
+          Write-Host "Verifying installation paths..." -ForegroundColor Cyan
+          if (Test-Path "C:\OSGeo4W\include\gdal.h") {
+              Write-Host "Success: gdal.h found at C:\OSGeo4W\include\gdal.h" -ForegroundColor Green
+          } else {
+              Write-Error "CRITICAL ERROR: OSGeo4W installation failed! C:\OSGeo4W\include\gdal.h does not exist."
+              # Output directory structure to help debug if it fails
+              Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
+              exit 1
+          }
+
+      - name: Install Build Tools & Compilation Requirements
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip setuptools wheel delvewheel
+          python -m pip install cython numpy==2.2.6 versioneer packaging
+      - name: Configure Environment Variables
+        shell: powershell
+        run: |
+          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
+          echo "PATH:"
+          echo $env:PATH
+          echo ""
+          echo "PROJ_DATA:"
+          echo $env:PROJ_DATA
+          echo "GDAL_DATA:"
+          echo $env:GDAL_DATA
+          echo ""
+          echo "=== BINARY CHECK ==="
+          where proj
+          where gdalinfo
+          proj
+          gdalinfo --version
+      - name: Build Unrepaired Wheels (Isolated & Diagnostic)
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path .\dist_unrepaired
+          # 3. Build PyProj
+          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
+          $env:PROJ_DIR = "C:\OSGeo4W"
+          $env:PROJ_DATA = "C:\OSGeo4W"
+          $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
+          git clone https://github.com/OSGeo/gdal.git
+     	  cd gdal
+          git checkout v3.13.1
+          cd swig/python
+          python -m pip wheel . `
+            --no-build-isolation `
+            -v --wheel-dir=.\dist_unrepaired
+      - name: Repair Wheels with Delvewheel (Make Portable)
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path .\dist_repaired
+          $allowedPackages = @('gdal', 'fiona', 'geopandas', 'rasterio', 'pyogrio', 'pyproj')
+          Get-ChildItem .\pyproj\dist_unrepaired\*.whl | ForEach-Object {
+              $fileName = $_.Name.ToLower()
+              $shouldProcess = $false
+              foreach ($pkg in $allowedPackages) {
+                  if ($fileName -like "${pkg}-*") {
+                      $shouldProcess = $true
+                      break
+                  }
+              }
+              if (-not $shouldProcess) {
+                  Write-Host "Skipping excluded wheel: $($_.Name)" -ForegroundColor Gray
+                  return
+              }
+              if ($_.Name -like "*win_amd64*") {
+                  Write-Host "Repairing binary wheel: $($_.Name)" -ForegroundColor Cyan
+                  delvewheel repair --ignore-in-wheel --add-path C:\OSGeo4W\bin --wheel-dir .\dist_repaired $_.FullName
+                  $targetPath = Join-Path .\dist_repaired $_.Name
+                  if (-not (Test-Path $targetPath)) {
+                      Write-Host "delvewheel skipped '$($_.Name)' (already repaired). Copying to dist_repaired as-is..." -ForegroundColor Yellow
+                      Copy-Item $_.FullName .\dist_repaired\
+                  }
+              } else {
+                  Write-Host "Copying pure Python wheel: $($_.Name)" -ForegroundColor Green
+                  Copy-Item $_.FullName .\dist_repaired\
+              }
+          }
+      - name: Upload Repaired & Portable Wheels
+        uses: actions/upload-artifact@v6
+        with:
+          name: "wheels_geospatial_windows_${{ matrix.python-version }}"
+          path: .\dist_repaired\*.whl
