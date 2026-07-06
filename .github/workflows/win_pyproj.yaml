@@ -68,7 +68,16 @@ jobs:
       - name: Configure Environment Variables and Build Unrepaired Wheels (Isolated & Diagnostic)
         shell: powershell
         run: |
+
           $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
+
+          # Build environment
+          $env:PROJ_DIR = "C:\OSGeo4W"
+          $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
+          $env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
+          $env:PROJ_NETWORK = "ON"
+          $env:PROJ_WHEEL = "true"
+
           echo "PATH:"
           echo $env:PATH
           echo ""
@@ -77,25 +86,26 @@ jobs:
           echo "GDAL_DATA:"
           echo $env:GDAL_DATA
           echo ""
+
           echo "=== BINARY CHECK ==="
           where proj
           where gdalinfo
           proj
           gdalinfo --version
+
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
-          # Build PyProj
-          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
-          $env:PROJ_DIR = "C:\OSGeo4W"
-          $env:PROJ_DATA = "C:\OSGeo4W"
-          $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
+
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
+
           git clone https://github.com/pyproj4/pyproj.git
           cd pyproj
           git checkout 3.7.2
+
           python -m pip wheel . `
-            --no-build-isolation `
-            -v --wheel-dir=.\dist_unrepaired
+              --no-build-isolation `
+              -v `
+              --wheel-dir=.\dist_unrepaired
       - name: Repair Wheels with Delvewheel (Make Portable)
         shell: powershell
         run: |
