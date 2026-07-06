@@ -24,10 +24,8 @@ jobs:
         run: |
           Write-Host "Downloading OSGeo4W installer..." -ForegroundColor Cyan
           Invoke-WebRequest -Uri "https://download.osgeo.org/osgeo4w/osgeo4w-setup.exe" -OutFile "osgeo4w-setup.exe"
-
           # Create a temporary local package directory for the installer cache
           New-Item -ItemType Directory -Force -Path "C:\OSGeo4W-Packages"
-
           Write-Host "Running OSGeo4W installer in quiet mode..." -ForegroundColor Cyan
           # Use correct flags to force clean internet download and silent extraction
           #
@@ -76,13 +74,7 @@ jobs:
       - name: Configure Environment Variables
         shell: powershell
         run: |
-          echo "C:\OSGeo4W\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "INCLUDE=C:\OSGeo4W\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "LIB=C:\OSGeo4W\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "LINK=gdal_i.lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "PROJ_DIR=C:\OSGeo4W" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "GDAL_HOME=C:\OSGeo4W" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "=== ENV CHECK ==="
+          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
           echo "PATH:"
           echo $env:PATH
           echo ""
