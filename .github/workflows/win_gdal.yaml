@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build-windows-wheels:
-    name: Geospatial Wheels ${{ matrix.python-version }}
+    name: GDAL Wheels ${{ matrix.python-version }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -65,12 +65,6 @@ jobs:
               Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
               exit 1
           }
-
-      - name: Install Build Tools & Compilation Requirements
-        shell: powershell
-        run: |
-          python -m pip install --upgrade pip setuptools wheel delvewheel
-          python -m pip install cython numpy==2.2.6 versioneer packaging
       - name: Configure Environment Variables
         shell: powershell
         run: |
@@ -98,7 +92,9 @@ jobs:
           $env:PROJ_DATA = "C:\OSGeo4W"
           $env:GDAL_DATA = "C:\OSGeo4W"
           $GDAL_VERSION = "3.13.1"
-          pip download --no-binary=:all: GDAL==$GDAL_VERSION
+          python -m pip install --upgrade pip setuptools wheel delvewheel
+          python -m pip install cython numpy==2.2.6 versioneer packaging
+          python -m pip download --no-binary=:all: GDAL==$GDAL_VERSION
           Write-Host "Extracting GDAL source..."
           tar -xzvf "gdal-${GDAL_VERSION}.tar.gz"
           cd gdal-${GDAL_VERSION}

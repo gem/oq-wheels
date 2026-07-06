@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build-windows-wheels:
-    name: Geospatial Wheels ${{ matrix.python-version }}
+    name: PyProj Wheels ${{ matrix.python-version }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -65,12 +65,6 @@ jobs:
               Get-ChildItem -Path "C:\OSGeo4W" -Recurse -Depth 2 -ErrorAction SilentlyContinue
               exit 1
           }
-
-      - name: Install Build Tools & Compilation Requirements
-        shell: powershell
-        run: |
-          python -m pip install --upgrade pip setuptools wheel delvewheel
-          python -m pip install cython numpy==2.2.6 versioneer packaging
       - name: Configure Environment Variables
         shell: powershell
         run: |
@@ -97,6 +91,8 @@ jobs:
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W"
           $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
+          python -m pip install --upgrade pip setuptools wheel delvewheel
+          python -m pip install cython numpy==2.2.6 versioneer packaging
           git clone https://github.com/pyproj4/pyproj.git
           cd pyproj
           git checkout 3.7.2
