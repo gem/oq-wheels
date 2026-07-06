@@ -96,11 +96,12 @@ jobs:
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W"
-          $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
-          git clone https://github.com/OSGeo/gdal.git
-          cd gdal
-          git checkout v3.13.1
-          cd swig/python
+          $env:GDAL_DATA = "C:\OSGeo4W"
+          $GDAL_VERSION = "3.13.1"
+          pip download --no-binary=:all: GDAL==$GDAL_VERSION
+          Write-Host "Extracting GDAL source..."
+          tar -xzvf "gdal-${GDAL_VERSION}.tar.gz"
+          cd gdal-${GDAL_VERSION}
           python -m pip wheel . `
             --no-build-isolation `
             -v --wheel-dir=.\dist_unrepaired
