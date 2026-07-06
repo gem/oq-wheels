@@ -74,6 +74,7 @@ jobs:
           # Build environment
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
+          $env:PROJ_LIB = "C:\OSGeo4W\share\proj"
           $env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
           $env:PROJ_NETWORK = "ON"
           $env:PROJ_WHEEL = "true"
