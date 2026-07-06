@@ -69,15 +69,6 @@ jobs:
         shell: powershell
         run: |
 
-          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
-
-          # Build environment
-          $env:PROJ_DIR = "C:\OSGeo4W"
-          $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
-          $env:PROJ_LIB = "C:\OSGeo4W\share\proj"
-          $env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
-          $env:PROJ_NETWORK = "ON"
-          $env:PROJ_WHEEL = "true"
 
           echo "PATH:"
           echo $env:PATH
@@ -94,25 +85,31 @@ jobs:
           proj
           gdalinfo --version
 
+          [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
+          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
+
+          # Build environment
+          $env:PROJ_DIR = "C:\OSGeo4W"
+          $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
+          $env:PROJ_LIB = "C:\OSGeo4W\share\proj"
+          $env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
+          $env:PROJ_NETWORK = "ON"
+          $env:PROJ_WHEEL = "true"
+          $env:INCLUDE = "C:\OSGeo4W\include"
+          $env:LIB = "C:\OSGeo4W\lib"
+          $env:PYPROJ_VERSION = "3.7.2"
+          $PYPROJ_VERSION = "3.7.2"
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
 
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
-
-          git clone https://github.com/pyproj4/pyproj.git
-          cd pyproj
-          git checkout 3.7.2
-
-          python -m pip wheel . `
-              --no-build-isolation `
-              -v `
-              --wheel-dir=.\dist_unrepaired
+          python -m pip wheel pyproj==$PYPROJ_VERSION --no-build-isolation -v --wheel-dir=.\dist_unrepaired
       - name: Repair Wheels with Delvewheel (Make Portable)
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path .\dist_repaired
           $allowedPackages = @('gdal', 'fiona', 'geopandas', 'rasterio', 'pyogrio', 'pyproj')
-          Get-ChildItem .\pyproj\dist_unrepaired\*.whl | ForEach-Object {
+          Get-ChildItem .\dist_unrepaired\*.whl | ForEach-Object {
               $fileName = $_.Name.ToLower()
               $shouldProcess = $false
               foreach ($pkg in $allowedPackages) {
