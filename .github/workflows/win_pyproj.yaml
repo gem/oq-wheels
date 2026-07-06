@@ -68,8 +68,7 @@ jobs:
       - name: Configure Environment Variables and Build Unrepaired Wheels (Isolated & Diagnostic)
         shell: powershell
         run: |
-
-
+          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
           echo "PATH:"
           echo $env:PATH
           echo ""
@@ -78,16 +77,12 @@ jobs:
           echo "GDAL_DATA:"
           echo $env:GDAL_DATA
           echo ""
-
           echo "=== BINARY CHECK ==="
           where proj
           where gdalinfo
           proj
           gdalinfo --version
-
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
-          $env:PATH = "C:\OSGeo4W\bin;$env:PATH"
-
           # Build environment
           $env:PROJ_DIR = "C:\OSGeo4W"
           $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
