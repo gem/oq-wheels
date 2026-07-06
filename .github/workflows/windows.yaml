@@ -92,14 +92,14 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path .\dist_unrepaired
-           # 1. Build GDAL
-          $env:INCLUDE = "C:\OSGeo4W\include"
-          $env:LIB = "C:\OSGeo4W\lib"
-          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
-          # 2. Build Fiona
-          $env:GDAL_VERSION = "3.13.1"
-          [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
-          pip wheel fiona==1.10.1 --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
+#           # 1. Build GDAL
+#          $env:INCLUDE = "C:\OSGeo4W\include"
+#          $env:LIB = "C:\OSGeo4W\lib"
+#          pip wheel GDAL==3.13.1 --no-build-isolation --wheel-dir=.\dist_unrepaired
+#          # 2. Build Fiona
+#          $env:GDAL_VERSION = "3.13.1"
+#          [System.Environment]::SetEnvironmentVariable("GDAL_VERSION", "3.13.1", "Process")
+#          pip wheel fiona==1.10.1 --no-binary fiona --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
            # 3. Build PyProj
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
@@ -113,14 +113,14 @@ jobs:
             -v --wheel-dir=.\dist_unrepaired
           #pip wheel pyproj==3.7.2 --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib"
           # 4. Build Rasterio
-          pip wheel rasterio==1.4.4 --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
-          # 5. Build PyOgrio
-          $env:GDAL_HOME = "C:\OSGeo4W"
-          $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
-          $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
-          pip wheel pyogrio==0.12.1 --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
-          # 6. Build Geopandas (Pure Python wheel, no build isolation required)
-          pip wheel geopandas==1.1.4 --no-build-isolation --wheel-dir=.\dist_unrepaired
+#          pip wheel rasterio==1.4.4 --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
+#          # 5. Build PyOgrio
+#          $env:GDAL_HOME = "C:\OSGeo4W"
+#          $env:GDAL_INCLUDE_PATH = "C:\OSGeo4W\include"
+#          $env:GDAL_LIBRARY_PATH = "C:\OSGeo4W\lib"
+#          pip wheel pyogrio==0.12.1 --no-binary pyogrio --no-build-isolation --wheel-dir=.\dist_unrepaired
+#          # 6. Build Geopandas (Pure Python wheel, no build isolation required)
+#          pip wheel geopandas==1.1.4 --no-build-isolation --wheel-dir=.\dist_unrepaired
       - name: Repair Wheels with Delvewheel (Make Portable)
         shell: powershell
         run: |
