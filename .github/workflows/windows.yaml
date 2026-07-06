@@ -97,6 +97,7 @@ jobs:
            # 3. Build PyProj
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
+          $env:PROJ_WHEEL = "true"  # <--- CRITICAL: Forces pyproj to bundle the modern proj.db inside the wheel
           pip wheel pyproj==3.7.2 --no-binary pyproj --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib"
           # 4. Build Rasterio
           pip wheel rasterio==1.4.4 --no-binary rasterio --no-build-isolation --wheel-dir=.\dist_unrepaired ` --config-settings="build_ext.include_dirs=C:\OSGeo4W\include" ` --config-settings="build_ext.library_dirs=C:\OSGeo4W\lib" ` --config-settings="build_ext.libraries=gdal_i"
