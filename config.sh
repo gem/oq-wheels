@@ -1,7 +1,6 @@
 # Custom utilities for Fiona wheels.
 #
 # Test for OSX with [ -n "$IS_OSX" ].
-
 function fetch_unpack {
     # Fetch input archive name from input URL
     # Parameters
@@ -210,6 +209,7 @@ function build_pcre2 {
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
     build_curl
+	build_netcdf
     build_jpeg
     build_libpng
     build_jsonc
@@ -243,7 +243,7 @@ function build_gdal {
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
-    -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF \
+    -DGDAL_BUILD_OPTIONAL_DRIVERS=ON \
     -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
     ${GEOS_CONFIG} \
     -DGDAL_USE_TIFF=ON \
@@ -267,7 +267,10 @@ function build_gdal {
     -DGDAL_USE_XERCESC=OFF \
     -DGDAL_USE_LIBXML2=OFF \
     -DGDAL_USE_POSTGRESQL=OFF \
-    -DGDAL_USE_ODBC=OFF
+    -DGDAL_USE_ODBC=OFF \
+    -DGDAL_ENABLE_DRIVER_AAIGRID=ON \
+    -DGDAL_USE_NETCDF=ON \
+    -DGDAL_ENABLE_DRIVER_NETCDF=ON
     cmake --build . -j4
     (if [ -n "$IS_OSX" ]; then sudo cmake --install . ; else cmake --install .; fi))
     if [ -n "$IS_OSX" ]; then
