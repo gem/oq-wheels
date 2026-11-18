@@ -200,7 +200,7 @@ function build_openssl {
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
     if [ -z "$IS_OSX" ]; then
-      dnf install -y brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates
+      dnf install -y brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates libpsl-devel
     fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
