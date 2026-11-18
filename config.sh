@@ -29,6 +29,7 @@ function fetch_unpack {
             # Otherwise download it.
             # curl -v --insecure -L $url > $out_archive
             echo "url of the archive $url"
+            echo "curl -v -L $url > $out_archive"
             curl -v -L $url > $out_archive
         fi
     fi
