@@ -191,10 +191,10 @@ function build_curl {
     if [ -e curl-stamp ]; then return; fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
+    build_zlib
     build_nghttp2
     build_openssl
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
-    #local flags="--prefix=$BUILD_PREFIX --with-libz --with-ssl"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zstd=$BUILD_PREFIX --with-ssl"
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
@@ -209,7 +209,7 @@ function build_pcre2 {
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-    build_curl
+    build_zlib
 	build_netcdf
     build_jpeg
     build_libpng
@@ -302,7 +302,6 @@ function pre_build {
         #sudo rm -rf /usr/local/lib/libcurl*
         if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
         fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-        build_zlib
         build_curl
         build_sqlite
         build_tiff
