@@ -327,7 +327,7 @@ function build_hdf5 {
         && ./configure --with-szlib=$BUILD_PREFIX --prefix=$BUILD_PREFIX \
         --enable-threadsafe --enable-unsupported --with-pthread=yes $HOST_CONFIGURE_FLAGS \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch hdf5-stamp
 }
 
