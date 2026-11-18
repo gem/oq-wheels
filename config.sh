@@ -32,6 +32,8 @@ function fetch_unpack {
             echo "curl -v -L $url > $out_archive"
             which curl
             sleep 3
+            curl -V
+            sleep 3
             curl -v -L $url > $out_archive
         fi
     fi
@@ -204,12 +206,17 @@ function build_curl {
 	build_new_zlib
     build_nghttp2
     build_openssl
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zlib=$BUILD_PREFIX --with-ssl"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zlib=$BUILD_PREFIX --with-openssl --with-libssh2 --with-brotli --with-zstd --with-libidn2"
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    if [ -z "$IS_OSX" ]; then
+        echo "configure LD library for curl"
+        echo "/usr/local/lib" > /etc/ld.so.conf.d/local-curl.conf
+        ldconfig
+    fi
     touch curl-stamp
 }
 
