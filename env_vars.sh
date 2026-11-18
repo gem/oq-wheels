@@ -18,9 +18,9 @@ TIFF_VERSION=4.7.2
 PCRE_VERSION=10.49
 PYOGRIO_VERSION=v0.13.0
 export MACOSX_DEPLOYMENT_TARGET=14.0
-if [ -z "$IS_OSX" ] || [ "$PLAT" == arm_64 ]; then
-    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
-fi
+#if [ -n "$IS_OSX" ] && [ "$PLAT" == "arm64" ]; then
+#    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+#fi
 export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export GDAL_CONFIG=/usr/local/bin/gdal-config
 export PACKAGE_DATA=1

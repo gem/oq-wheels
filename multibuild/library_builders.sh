@@ -88,7 +88,7 @@ function build_github {
     (cd $out_dir \
         && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS $configure_args \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
@@ -189,7 +189,7 @@ function build_bzip2 {
     fetch_unpack https://mirrors.kernel.org/sourceware/bzip2/bzip2-${BZIP2_VERSION}.tar.gz
     (cd bzip2-${BZIP2_VERSION} \
         && make -f Makefile-libbz2_so \
-        && make install PREFIX=$BUILD_PREFIX)
+        && if [ -n "$IS_OSX" ]; then sudo make install PREFIX=$BUILD_PREFIX; else make install PREFIX=$BUILD_PREFIX; fi)
     touch bzip2-stamp
 }
 
@@ -267,7 +267,7 @@ function build_giflib {
         fetch_unpack $url/$archive
         (cd $name_version \
             && make -j4 \
-            && make install PREFIX=$BUILD_PREFIX)
+            && if [ -n "$IS_OSX" ]; then sudo make install PREFIX=$BUILD_PREFIX; else make install PREFIX=$BUILD_PREFIX; fi)
         touch "${name}-stamp"
     fi
 }
@@ -351,7 +351,7 @@ function build_blosc {
     (cd c-blosc-${BLOSC_VERSION} \
         && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_INSTALL_LIBDIR=$BUILD_PREFIX/lib -DCMAKE_INSTALL_NAME_DIR=$BUILD_PREFIX/lib $HOST_CMAKE_FLAGS . \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch blosc-stamp
 }
 
@@ -365,7 +365,7 @@ function build_lzo {
     (cd lzo-${LZO_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX --enable-shared $HOST_CONFIGURE_FLAGS \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch lzo-stamp
 }
 
@@ -388,7 +388,7 @@ function build_curl {
         LIBS=-ldl ./configure $flags; else \
         ./configure $flags; fi\
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch curl-stamp
 }
 
@@ -411,9 +411,9 @@ function build_openssl {
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
-        && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX \
+        && ./config no-shared -fPIC --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openssl-stamp
 }
 
@@ -425,7 +425,7 @@ function build_netcdf {
     (cd netcdf-c-${NETCDF_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX --enable-dap $HOST_CONFIGURE_FLAGS \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch netcdf-stamp
 }
 
@@ -547,7 +547,8 @@ function build_cfitsio {
         fetch_unpack https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/${cfitsio_name_ver}.tar.gz
         (cd cfitsio \
             && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
-            && make shared && make install)
+            && make shared \ 
+            && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     fi
     touch cfitsio-stamp
 }
