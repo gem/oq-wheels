@@ -191,6 +191,7 @@ function build_openssl {
 
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
+    if [ -z "$IS_OSX" ]; then dnf -y install libpsl-devel; fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
     #build_zlib
