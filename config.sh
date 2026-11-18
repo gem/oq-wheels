@@ -15,6 +15,7 @@ function fetch_unpack {
     if [ -z "$url" ];then echo "url not defined"; exit 1; fi
     local archive_fname=${2:-$(basename $url)}
     local arch_sdir="${ARCHIVE_SDIR:-archives}"
+	echo "local archive name and sdir $archive_fname $arch_sdir"
     # Make the archive directory in case it doesn't exist
     mkdir -p $arch_sdir
     local out_archive="${arch_sdir}/${archive_fname}"

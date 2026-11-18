@@ -213,9 +213,11 @@ function untar {
     local in_fname=$1
     if [ -z "$in_fname" ];then echo "in_fname not defined"; exit 1; fi
     local extension=${in_fname##*.}
+	echo "extension is $extension"
     case $extension in
         tar) tar -xf $in_fname ;;
-        gz|tgz) tar -zxf $in_fname ;;
+        gz) tar -zxf $in_fname ;;
+        tgz) tar -zxf $in_fname ;;
         bz2) tar -jxf $in_fname ;;
         zip) unzip -qq $in_fname ;;
         xz) if [ -n "$IS_MACOS" ]; then
