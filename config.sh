@@ -84,7 +84,8 @@ function build_jsonc {
 
 function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
-    build_zlib
+    #build_zlib
+	build_new_zlib
     build_jpeg
     #if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
     ensure_xz
@@ -191,7 +192,8 @@ function build_curl {
     if [ -e curl-stamp ]; then return; fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
-    build_zlib
+    #build_zlib
+	build_new_zlib
     build_nghttp2
     build_openssl
     local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zstd=$BUILD_PREFIX --with-ssl"
@@ -209,7 +211,8 @@ function build_pcre2 {
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-    build_zlib
+    #build_zlib
+	build_new_zlib
 	build_netcdf
     build_jpeg
     build_libpng
