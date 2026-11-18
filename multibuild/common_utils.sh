@@ -214,6 +214,7 @@ function untar {
     if [ -z "$in_fname" ];then echo "in_fname not defined"; exit 1; fi
     local extension=${in_fname##*.}
 	echo "extension is $extension"
+	echo "archive name is $in_fname"
     case $extension in
         tar) tar -xf $in_fname ;;
         gz) tar -zxf $in_fname ;;
