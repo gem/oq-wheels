@@ -17,7 +17,7 @@ OPENSSL_HASH=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
 TIFF_VERSION=4.7.2
 PCRE_VERSION=10.49
 PYOGRIO_VERSION=v0.13.0
-export MACOSX_DEPLOYMENT_TARGET=14.0
+export MACOSX_DEPLOYMENT_TARGET=15.0
 #if [ -n "$IS_OSX" ] && [ "$PLAT" == "arm64" ]; then
 #    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 #fi
