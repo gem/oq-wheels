@@ -8,7 +8,7 @@ on:
         description: "tmate debugging enabled"
         required: false
         default: false
-#  pull_request:
+  pull_request:
 env:
   WHEEL_SDIR: wheelhouse
 jobs:
@@ -27,7 +27,6 @@ jobs:
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "2014"
       BUILD_DEPENDS: "wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
     steps:
@@ -60,7 +59,7 @@ jobs:
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
-      MB_ML_VER: "2014"
+      MB_ML_VER: "_2_28"
       BUILD_DEPENDS: "oldest-supported-numpy wheel numpy==2.2.6 build pip==25.2 Cython==3.1.4 setuptools==80.9.0 tomli==2.2.1 versioneer[toml]==0.28"
       TRAVIS_OS_NAME: ${{ matrix.os-name }}
     steps:
