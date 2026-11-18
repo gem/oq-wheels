@@ -280,7 +280,8 @@ function fetch_unpack {
             ln -s $our_archive $out_archive
         else
             # Otherwise download it.
-            curl -L $url > $out_archive
+            echo "curl -v -L $url > $out_archive "
+            curl -v -L $url > $out_archive
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
