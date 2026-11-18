@@ -158,7 +158,7 @@ function build_sqlite {
 
 function build_expat {
     if [ -e expat-stamp ]; then return; fi
-    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-${EXPAT_VERSION}.tar.bz2
+    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-${EXPAT_VERSION}.tar.gz
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
