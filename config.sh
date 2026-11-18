@@ -199,18 +199,20 @@ function build_openssl {
 
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
-    if [ -z "$IS_OSX" ]; then dnf -y install libpsl-devel; fi
+    if [ -z "$IS_OSX" ]; then
+      dnf install -y brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates
+    fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
     #build_zlib
 	build_new_zlib
     build_nghttp2
     build_openssl
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zlib=$BUILD_PREFIX --with-openssl --with-libssh2 --with-zstd --with-libidn2"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zlib=$BUILD_PREFIX --with-openssl --with-brotli --with-zstd --with-libidn2 --with-libssh2"
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
-        && make -j4 \
+        && make -j$(nproc) \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -z "$IS_OSX" ]; then
         echo "configure LD library for curl"
