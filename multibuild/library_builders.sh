@@ -547,8 +547,7 @@ function build_cfitsio {
         fetch_unpack https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/${cfitsio_name_ver}.tar.gz
         (cd cfitsio \
             && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
-            && make shared \ 
-            && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+            && make shared && make install)
     fi
     touch cfitsio-stamp
 }
