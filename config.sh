@@ -148,6 +148,7 @@ function build_proj {
 function build_sqlite {
     if [ -e sqlite-stamp ]; then return; fi
     fetch_unpack https://www.sqlite.org/2026/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
+    CFLAGS="$CFLAGS -DSQLITE_ENABLE_RTREE=1 -DSQLITE_ENABLE_COLUMN_METADATA=1"
     (cd sqlite-autoconf-${SQLITE_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \

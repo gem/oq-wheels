@@ -340,7 +340,7 @@ function build_libaec {
     (cd $root_name \
         && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch libaec-stamp
 }
 
