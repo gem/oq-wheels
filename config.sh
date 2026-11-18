@@ -176,6 +176,7 @@ function build_nghttp2 {
 
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
+    if [ -z "$IS_OSX" ]; then dnf install perl-core; fi
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
