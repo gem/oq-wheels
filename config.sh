@@ -32,12 +32,12 @@ function fetch_unpack {
             # Otherwise download it.
             # curl -v --insecure -L $url > $out_archive
             echo "url of the archive $url"
-            echo "curl -v -L $url > $out_archive"
-            which curl
             sleep 3
             if [ -z "$IS_OSX" ]; then
+               echo 'wget -v -O "$out_archive" "$url" '
                wget -v -O "$out_archive" "$url"
             else
+               echo 'curl -v -L $url > $out_archive'
                curl -v -L $url > $out_archive
             fi
         fi
