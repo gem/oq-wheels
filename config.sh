@@ -11,10 +11,14 @@ function fetch_unpack {
     #
     # If `archive_fname` not specified then use basename from `url`
     # If `archive_fname` already present at download location, use that instead.
+    if [ -z "$IS_OSX" ]; then
+      dnf install -y wget
+    fi
     local url=$1
     if [ -z "$url" ];then echo "url not defined"; exit 1; fi
     local archive_fname=${2:-$(basename $url)}
     local arch_sdir="${ARCHIVE_SDIR:-archives}"
+	echo "local archive name and sdir $archive_fname $arch_sdir"
     # Make the archive directory in case it doesn't exist
     mkdir -p $arch_sdir
     local out_archive="${arch_sdir}/${archive_fname}"
@@ -26,7 +30,16 @@ function fetch_unpack {
             ln -s $our_archive $out_archive
         else
             # Otherwise download it.
-            curl -v --insecure -L $url > $out_archive
+            # curl -v --insecure -L $url > $out_archive
+            echo "url of the archive $url"
+            sleep 3
+            if [ -z "$IS_OSX" ]; then
+               echo 'wget -v -O "$out_archive" "$url" '
+               wget -v -O "$out_archive" "$url"
+            else
+               echo 'curl -v -L $url > $out_archive'
+               curl -v -L $url > $out_archive
+            fi
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
@@ -84,7 +97,8 @@ function build_jsonc {
 
 function build_tiff {
     if [ -e tiff-stamp ]; then return; fi
-    build_zlib
+    #build_zlib
+	build_new_zlib
     build_jpeg
     #if [ -n "$IS_OSX" ]; then brew install curl; else echo "compilation on ML" ; fi
     ensure_xz
@@ -143,7 +157,8 @@ function build_proj {
 
 function build_sqlite {
     if [ -e sqlite-stamp ]; then return; fi
-    fetch_unpack https://www.sqlite.org/2023/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
+    fetch_unpack https://www.sqlite.org/2026/sqlite-autoconf-${SQLITE_VERSION}.tar.gz
+    CFLAGS="$CFLAGS -DSQLITE_ENABLE_RTREE=1 -DSQLITE_ENABLE_COLUMN_METADATA=1"
     (cd sqlite-autoconf-${SQLITE_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -154,7 +169,7 @@ function build_sqlite {
 
 function build_expat {
     if [ -e expat-stamp ]; then return; fi
-    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-${EXPAT_VERSION}.tar.bz2
+    fetch_unpack https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-${EXPAT_VERSION}.tar.gz
     (cd expat-${EXPAT_VERSION} \
         && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 \
@@ -176,10 +191,11 @@ function build_nghttp2 {
 
 function build_openssl {
     if [ -e openssl-stamp ]; then return; fi
+    if [ -z "$IS_OSX" ]; then dnf -y install perl-core; fi
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
-        && ./config no-ssl2 -fPIC --prefix=$BUILD_PREFIX \
+        && ./config -fPIC --prefix=$BUILD_PREFIX \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openssl-stamp
@@ -188,17 +204,26 @@ function build_openssl {
 
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
+    if [ -z "$IS_OSX" ]; then
+      dnf install -y wget brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates libpsl-devel
+    fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
+    #build_zlib
+	build_new_zlib
     build_nghttp2
     build_openssl
-    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-libz --with-ssl"
-    #local flags="--prefix=$BUILD_PREFIX --with-libz --with-ssl"
+    local flags="--prefix=$BUILD_PREFIX --with-nghttp2=$BUILD_PREFIX --with-zlib=$BUILD_PREFIX --with-openssl --with-brotli --with-zstd --with-libidn2 --with-libssh2"
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    if [ -z "$IS_OSX" ]; then
+        echo "configure LD library for curl"
+        echo "/usr/local/lib" > /etc/ld.so.conf.d/local-curl.conf
+        ldconfig
+    fi
     touch curl-stamp
 }
 
@@ -208,7 +233,8 @@ function build_pcre2 {
 
 function build_gdal {
     if [ -e gdal-stamp ]; then return; fi
-    build_curl
+    #build_zlib
+	build_new_zlib
 	build_netcdf
     build_jpeg
     build_libpng
@@ -301,7 +327,6 @@ function pre_build {
         #sudo rm -rf /usr/local/lib/libcurl*
         if [ -n "$IS_OSX" ]; then sudo rm -rf /usr/local/lib/libcurl* ; else rm -rf /usr/local/lib/libcurl* ; fi
         fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
-        build_zlib
         build_curl
         build_sqlite
         build_tiff
