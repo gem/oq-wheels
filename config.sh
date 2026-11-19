@@ -217,7 +217,7 @@ function build_curl {
     #fetch_unpack https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz
     (cd curl-${CURL_VERSION} \
         && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib:$BUILD_PREFIX/lib64 ./configure $flags \
-        && make -j$(nproc) \
+        && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     if [ -z "$IS_OSX" ]; then
         echo "configure LD library for curl"
