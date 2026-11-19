@@ -11,6 +11,9 @@ function fetch_unpack {
     #
     # If `archive_fname` not specified then use basename from `url`
     # If `archive_fname` already present at download location, use that instead.
+    if [ -z "$IS_OSX" ]; then
+      dnf install -y wget
+    fi
     local url=$1
     if [ -z "$url" ];then echo "url not defined"; exit 1; fi
     local archive_fname=${2:-$(basename $url)}
@@ -32,9 +35,14 @@ function fetch_unpack {
             echo "curl -v -L $url > $out_archive"
             which curl
             sleep 3
-            curl -V
-            sleep 3
-            curl -v -L $url > $out_archive
+            if [ -z "$IS_OSX" ]; then
+               wget -v -O "$out_archive" "$url"
+            else
+               curl -v -L $url > $out_archive
+            fi
+fi
+
+
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
@@ -200,7 +208,7 @@ function build_openssl {
 function build_curl {
     if [ -e curl-stamp ]; then return; fi
     if [ -z "$IS_OSX" ]; then
-      dnf install -y brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates libpsl-devel
+      dnf install -y wget brotli-devel libzstd-devel libidn2-devel libssh2-devel ca-certificates libpsl-devel
     fi
     CFLAGS="$CFLAGS -g -O2"
     CXXFLAGS="$CXXFLAGS -g -O2"
