@@ -40,9 +40,6 @@ function fetch_unpack {
             else
                curl -v -L $url > $out_archive
             fi
-fi
-
-
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
