@@ -117,6 +117,11 @@ function build_proj {
     build_sqlite
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
+    if [ -z "$IS_OSX" ]; then
+        PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+        echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+        ldconfig
+    fi
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
 	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
@@ -244,16 +249,21 @@ function build_gdal {
     build_sqlite
     build_expat
     build_geos
+    if [ -z "$IS_OSX" ]; then
+        PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+        echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+        ldconfig
+    fi
 
     EXPAT_PREFIX=$BUILD_PREFIX
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
 
-    if [ -n "$IS_OSX" ]; then
-        GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
-    else
-        GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
-    fi
+   # if [ -n "$IS_OSX" ]; then
+   #     GEOS_CONFIG="-DGDAL_USE_GEOS=OFF"
+   # else
+   #     GEOS_CONFIG="-DGDAL_USE_GEOS=ON"
+   # fi
 
     local cmake=cmake
     fetch_unpack http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz
@@ -262,16 +272,17 @@ function build_gdal {
 	cd build
 	# build using cmake
     cmake .. \
-    -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
-    -DCMAKE_INCLUDE_PATH=$BUILD_PREFIX/include \
-    -DCMAKE_LIBRARY_PATH=$BUILD_PREFIX/lib \
-    -DCMAKE_PROGRAM_PATH=$BUILD_PREFIX/bin \
+    -DCMAKE_INSTALL_PREFIX="$BUILD_PREFIX" \
+    -DCMAKE_PREFIX_PATH="$BUILD_PREFIX;/usr/local" \
+    -DCMAKE_INCLUDE_PATH="$BUILD_PREFIX/include;/usr/local/include" \
+    -DCMAKE_LIBRARY_PATH="$BUILD_PREFIX/lib64;$BUILD_PREFIX/lib;/usr/local/lib64;/usr/local/lib" \
+    -DCMAKE_PROGRAM_PATH="$BUILD_PREFIX/bin;/usr/local/bin" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DGDAL_BUILD_OPTIONAL_DRIVERS=ON \
     -DOGR_BUILD_OPTIONAL_DRIVERS=ON \
-    ${GEOS_CONFIG} \
+    -DGDAL_USE_GEOS=ON \
     -DGDAL_USE_TIFF=ON \
     -DGDAL_USE_TIFF_INTERNAL=OFF \
     -DGDAL_USE_GEOTIFF_INTERNAL=ON \
@@ -420,6 +431,12 @@ function build_wheel_cmd {
 	if [ "$REPO_DIR" == "pyogrio" ]; then
         # setting git safe directory is required for properly building wheels when
         # git >= 2.35.3
+        echo "=== env vars for pyogrio wheel build ==="
+        env | grep -E "^(PYOGRIO_PACKAGE_DATA|GDAL_DATA|GDAL_CONFIG|GDAL_VERSION|GDAL_INCLUDE_PATH|GDAL_LIBRARY_PATH|PROJ_DATA|PROJ_LIB|PROJ_DIR|PROJ_WHEEL|PROJ_NETWORK|PATH)=" | sort
+        echo "=== GDAL_DATA contents ==="
+        ls -la "$GDAL_DATA" 2>/dev/null || echo "GDAL_DATA=$GDAL_DATA does not exist"
+        echo "=== PROJ_LIB contents ==="
+        ls -la "$PROJ_LIB" 2>/dev/null || echo "PROJ_LIB=$PROJ_LIB does not exist"
 		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "geopandas" ]; then
