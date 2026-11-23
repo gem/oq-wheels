@@ -29,6 +29,10 @@ export PROJ_DIR=/usr/local/
 export PROJ_DATA=${PROJ_DIR}share/proj
 export PROJ_WHEEL=true
 export PROJ_NETWORK=ON
+# Bundle GDAL/PROJ data files into the pyogrio wheel (see setup.py)
+export PYOGRIO_PACKAGE_DATA=1
+export GDAL_DATA=/usr/local/share/gdal
+export PROJ_LIB=/usr/local/share/proj
 #export SETUPTOOLS_USE_DISTUTILS=stdlib
 if [[ "$REPO_DIR" == "pyproj" ]]; then
  export PROJ_DIR=${GITHUB_WORKSPACE}/pyproj/pyproj/proj_dir

@@ -431,6 +431,12 @@ function build_wheel_cmd {
 	if [ "$REPO_DIR" == "pyogrio" ]; then
         # setting git safe directory is required for properly building wheels when
         # git >= 2.35.3
+        echo "=== env vars for pyogrio wheel build ==="
+        env | grep -E "^(PYOGRIO_PACKAGE_DATA|GDAL_DATA|GDAL_CONFIG|GDAL_VERSION|GDAL_INCLUDE_PATH|GDAL_LIBRARY_PATH|PROJ_DATA|PROJ_LIB|PROJ_DIR|PROJ_WHEEL|PROJ_NETWORK|PATH)=" | sort
+        echo "=== GDAL_DATA contents ==="
+        ls -la "$GDAL_DATA" 2>/dev/null || echo "GDAL_DATA=$GDAL_DATA does not exist"
+        echo "=== PROJ_LIB contents ==="
+        ls -la "$PROJ_LIB" 2>/dev/null || echo "PROJ_LIB=$PROJ_LIB does not exist"
 		(cd $repo_dir &&  git config --global --add safe.directory "*" && $cmd $wheelhouse)
 	fi
 	if [ "$REPO_DIR" == "geopandas" ]; then
