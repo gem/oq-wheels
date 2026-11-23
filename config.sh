@@ -266,7 +266,7 @@ function build_gdal {
     -DCMAKE_PREFIX_PATH="$BUILD_PREFIX;/usr/local" \
     -DCMAKE_INCLUDE_PATH="$BUILD_PREFIX/include;/usr/local/include" \
     -DCMAKE_LIBRARY_PATH="$BUILD_PREFIX/lib64;$BUILD_PREFIX/lib;/usr/local/lib64;/usr/local/lib" \
-    -DCMAKE_PROGRAM_PATH="$BUILD_PREFIX/bin;/usr/local/bin"
+    -DCMAKE_PROGRAM_PATH="$BUILD_PREFIX/bin;/usr/local/bin" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
