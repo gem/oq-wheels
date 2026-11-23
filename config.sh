@@ -117,9 +117,11 @@ function build_proj {
     build_sqlite
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
     CXXFLAGS="$CXXFLAGS -DPROJ_RENAME_SYMBOLS -DPROJ_INTERNAL_CPP_NAMESPACE -g -O2"
-    PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
-    echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
-    ldconfig
+    if [ -z "$IS_OSX" ]; then
+        PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+        echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+        ldconfig
+    fi
     if [ -e proj-stamp ]; then return; fi
     local cmake=cmake
 	echo "env: $PROJ_DIR and build prefix ${BUILD_PREFIX}"
@@ -247,9 +249,11 @@ function build_gdal {
     build_sqlite
     build_expat
     build_geos
-    PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
-    echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
-    ldconfig
+    if [ -z "$IS_OSX" ]; then
+        PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$BUILD_PREFIX/lib64/pkgconfig:$BUILD_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+        echo -e "/usr/local/lib64\n/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+        ldconfig
+    fi
 
     EXPAT_PREFIX=$BUILD_PREFIX
     CFLAGS="$CFLAGS -DPROJ_RENAME_SYMBOLS -g -O2"
