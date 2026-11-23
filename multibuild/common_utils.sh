@@ -1,6 +1,6 @@
 #!/bin/bash
 # Utilities for both OSX and Docker Linux
-# Python should be on the PATH
+# python or python3 should be on the PATH
 
 # Only source common_utils once
 if [ -n "$COMMON_UTILS_SOURCED" ]; then
@@ -30,14 +30,14 @@ else
   # In the manylinux_2_24 image, based on Debian9, "python" is not installed
   # so link in something for the various system calls before PYTHON_EXE is set
   which python || export PATH=/opt/python/cp39-cp39/bin:$PATH
-fi
 
-if [ "$MB_ML_LIBC" == "musllinux" ]; then
-  IS_ALPINE=1;
-  MB_ML_VER=${MB_ML_VER:-"_1_1"}
-else
-  # Default Manylinux version
-  MB_ML_VER=${MB_ML_VER:_2_24}
+  if [ "$MB_ML_LIBC" == "musllinux" ]; then
+    IS_ALPINE=1;
+    MB_ML_VER=${MB_ML_VER:-"_1_2"}
+  else
+    # Default Manylinux version
+    MB_ML_VER=${MB_ML_VER:-2014}
+  fi
 fi
 
 # Work round bug in travis xcode image described at
@@ -78,20 +78,31 @@ function stop_spinner {
     >&2 echo "Building libraries finished."
 }
 
+function any_python {
+    for cmd in $PYTHON_EXE python3 python; do
+        if [ -n "$(type -t $cmd)" ]; then
+            echo $cmd
+            return
+        fi
+    done
+    echo "Could not find python or python3"
+    exit 1
+}
+
 function abspath {
     # Can work with any Python; need not be our installed Python.
-    python3 -c "import os.path; print(os.path.abspath('$1'))"
+    $(any_python) -c "import os.path; print(os.path.abspath('$1'))"
 }
 
 function relpath {
     # Path of first input relative to second (or $PWD if not specified)
     # Can work with any Python; need not be our installed Python.
-    python3 -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))"
+    $(any_python) -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))"
 }
 
 function realpath {
     # Can work with any Python; need not be our installed Python.
-    python3 -c "import os; print(os.path.realpath('$1'))"
+    $(any_python) -c "import os; print(os.path.realpath('$1'))"
 }
 
 function lex_ver {
@@ -202,9 +213,12 @@ function untar {
     local in_fname=$1
     if [ -z "$in_fname" ];then echo "in_fname not defined"; exit 1; fi
     local extension=${in_fname##*.}
+	echo "extension is $extension"
+	echo "archive name is $in_fname"
     case $extension in
         tar) tar -xf $in_fname ;;
-        gz|tgz) tar -zxf $in_fname ;;
+        gz) tar -zxf $in_fname ;;
+        tgz) tar -zxf $in_fname ;;
         bz2) tar -jxf $in_fname ;;
         zip) unzip -qq $in_fname ;;
         xz) if [ -n "$IS_MACOS" ]; then
@@ -266,7 +280,8 @@ function fetch_unpack {
             ln -s $our_archive $out_archive
         else
             # Otherwise download it.
-            curl -L $url > $out_archive
+            echo "curl -v -L $url > $out_archive "
+            curl -v -L $url > $out_archive
         fi
     fi
     # Unpack archive, refreshing contents, echoing dir and file
@@ -277,6 +292,14 @@ function fetch_unpack {
         untar ../$out_archive && \
         ls -1d * &&
         rsync --delete -ah * ..)
+
+    # If a patch exists, apply it
+    if [ -e "${PATCH_DIR}/${archive_fname}.patch" ]; then
+        # The arch_tmp folder will contain the name of folder that was just
+        # unpacked from the archive. Apply the patch in that directory.
+        local package_dir=$(ls -1c arch_tmp)
+        patch --force --quiet -i "${PATCH_DIR}/${archive_fname}.patch" -p0 -d $package_dir
+    fi
 }
 
 function clean_code {
@@ -315,9 +338,9 @@ function build_wheel_cmd {
     [ -z "$repo_dir" ] && echo "repo_dir not defined" && exit 1
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
     mkdir -p "$wheelhouse"
-    #start_spinner
+    start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    #stop_spinner
+    stop_spinner
     if [ -n "$BUILD_DEPENDS" ]; then
         pip install $(pip_opts) $BUILD_DEPENDS
     fi
@@ -327,15 +350,6 @@ function build_wheel_cmd {
 
 function pip_wheel_cmd {
     local abs_wheelhouse=$1
-    if [[ "$REPO_DIR" == "gdal" ]]; then
-      python -vv -m build -n -w . -o $abs_wheelhouse
-    fi
-    if [[ "$REPO_DIR" == "pyogrio" ]]; then
-      python -vv -m build -w . -o $abs_wheelhouse
-    fi
-    if [[ "$REPO_DIR" == "geopandas" ]]; then
-      python -vv -m build -w . -o $abs_wheelhouse
-    fi
     pip wheel $(pip_opts) -w $abs_wheelhouse --no-deps .
 }
 
@@ -393,13 +407,13 @@ function build_index_wheel_cmd {
     # Discard first argument to pass remainder to pip
     shift
     local wheelhouse=$(abspath ${WHEEL_SDIR:-wheelhouse})
-    #start_spinner
+    start_spinner
     if [ -n "$(is_function "pre_build")" ]; then pre_build; fi
-    #stop_spinner
+    stop_spinner
     if [ -n "$BUILD_DEPENDS" ]; then
-        pip install $(pip_opts) $@ $BUILD_DEPENDS
+        $PIP_CMD install $(pip_opts) $@ $BUILD_DEPENDS
     fi
-    pip wheel $(pip_opts) $@ -w $wheelhouse --no-deps $project_spec
+    $PIP_CMD wheel $(pip_opts) $@ -w $wheelhouse --no-deps $project_spec
     repair_wheelhouse $wheelhouse
 }
 
@@ -414,14 +428,13 @@ function pip_opts {
 function get_os {
     # Report OS as given by uname
     # Use any Python that comes to hand.
-    python3 -c 'import platform; print(platform.uname()[0])'
+    $(any_python) -c 'import platform; print(platform.uname()[0])'
 }
 
 function get_platform {
     # Report platform as given by uname
     # Use any Python that comes to hand.
-    #python3 -c 'import platform; print(platform.uname()[4])'
-    python -c 'import platform; print(platform.uname()[4])'
+    $(any_python) -c 'import platform; print(platform.uname()[4])'
 }
 
 if [ "$(get_platform)" == x86_64 ] || \

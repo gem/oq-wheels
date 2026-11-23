@@ -2,7 +2,7 @@ name: (Windows) Build GDAL Wheels
 on:
   push:
     branches: [ main ]
-  pull_request:
+  #pull_request:
   workflow_dispatch:
 jobs:
   build-windows-wheels:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -32,12 +32,12 @@ jobs:
           #1. Find the Correct Snapshot
           #Legacy packages and their respective indices are stored at: https://download.osgeo.org/osgeo4w/v2/snapshots/.
           #
-          #You will need to navigate through that list and look for the folder with the date timestamp (YYYYMMDD-HHMMSS) when GDAL 3.13.1-1 and PROJ 9.8.1-1 were available.
+          #You will need to navigate through that list and look for the folder with the date timestamp (YYYYMMDD-HHMMSS) when GDAL 3.13.3-4 and PROJ 9.8.1-1 were available.
           #
           #How to Verify Manually:
           #Go to https://download.osgeo.org/osgeo4w/v2/snapshots/.
           #
-          #Scroll down and look for a folder with the June 2026 prefix (e.g., 20260606-XXXXXX or later).
+          #Scroll down and look for a folder with the November 2026 prefix (e.g., 20261118-XXXXXX or later).
           #
           #Enter the folder, navigate to /x86_64/, and click on the setup.ini file (this is the repository index).
           #
@@ -52,7 +52,7 @@ jobs:
           "--no-startmenu", `
           "--root", "C:\OSGeo4W", `
           "--local-package-dir", "C:\OSGeo4W-Packages", `
-          "--site", "https://download.osgeo.org/osgeo4w/v2/snapshots/20260629-095933", `
+          "--site", "https://download.osgeo.org/osgeo4w/v2/snapshots/20261118-041123", `
           "--packages", "gdal,gdal-devel,proj,proj-devel" `
           -Wait -NoNewWindow
 
@@ -86,12 +86,12 @@ jobs:
           # 3. Build PyProj
           [System.Environment]::SetEnvironmentVariable("PATH", "C:\OSGeo4W\bin;" + [System.Environment]::GetEnvironmentVariable("PATH", "Process"), "Process")
           $env:PROJ_DIR = "C:\OSGeo4W"
-          $env:PROJ_DATA = "C:\OSGeo4W"
-          $env:GDAL_DATA = "C:\OSGeo4W"
+          $env:PROJ_DATA = "C:\OSGeo4W\share\proj"
+          $env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
           $env:INCLUDE = "C:\OSGeo4W\include"
           $env:LIB = "C:\OSGeo4W\lib"
-          $env:GDAL_VERSION = "3.13.1"
-          $GDAL_VERSION = "3.13.1"
+          $env:GDAL_VERSION = "3.13.3"
+          $GDAL_VERSION = "3.13.3"
           python -m pip install --upgrade pip setuptools wheel delvewheel
           python -m pip install cython numpy==2.2.6 versioneer packaging
           python -m pip wheel GDAL==$GDAL_VERSION --no-build-isolation -v --wheel-dir=.\dist_unrepaired

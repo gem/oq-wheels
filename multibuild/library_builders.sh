@@ -12,21 +12,21 @@ OPENBLAS_LIB_URL="https://anaconda.org/multibuild-wheels-staging/openblas-libs"
 # Recipes for building some libraries
 OPENBLAS_VERSION="${OPENBLAS_VERSION:-0.3.10}"
 # We use system zlib by default - see build_new_zlib
-ZLIB_VERSION="${ZLIB_VERSION:-1.2.10}"
-LIBPNG_VERSION="${LIBPNG_VERSION:-1.6.37}"
+ZLIB_VERSION="${ZLIB_VERSION:-1.3.1}"
+LIBPNG_VERSION="${LIBPNG_VERSION:-1.6.50}"
 BZIP2_VERSION="${BZIP2_VERSION:-1.0.7}"
 FREETYPE_VERSION="${FREETYPE_VERSION:-2.11.0}"
 TIFF_VERSION="${TIFF_VERSION:-4.1.0}"
 JPEG_VERSION="${JPEG_VERSION:-9b}"
-JPEGTURBO_VERSION="${JPEGTURBO_VERSION:-2.1.3}"
+JPEGTURBO_VERSION="${JPEGTURBO_VERSION:-3.1.0}"
 OPENJPEG_VERSION="${OPENJPEG_VERSION:-2.1}"
 LCMS2_VERSION="${LCMS2_VERSION:-2.9}"
-GIFLIB_VERSION="${GIFLIB_VERSION:-5.1.3}"
-LIBWEBP_VERSION="${LIBWEBP_VERSION:-0.5.0}"
-XZ_VERSION="${XZ_VERSION:-5.2.2}"
+GIFLIB_VERSION="${GIFLIB_VERSION:-5.1.4}"
+LIBWEBP_VERSION="${LIBWEBP_VERSION:-1.4.0}"
+XZ_VERSION="${XZ_VERSION:-5.8.1}"
 LIBYAML_VERSION="${LIBYAML_VERSION:-0.2.2}"
 SZIP_VERSION="${SZIP_VERSION:-2.1.1}"
-HDF5_VERSION="${HDF5_VERSION:-1.14.6}"
+HDF5_VERSION="${HDF5_VERSION:-1.14.5}"
 LIBAEC_VERSION="${LIBAEC_VERSION:-1.0.4}"
 LZO_VERSION=${LZO_VERSION:-2.10}
 LZF_VERSION="${LZF_VERSION:-3.6}"
@@ -43,9 +43,9 @@ FLEX_VERSION=${FLEX_VERSION:-2.6.4}
 BISON_VERSION=${BISON_VERSION:-3.0.4}
 FFTW_VERSION=${FFTW_VERSION:-3.3.7}
 CFITSIO_VERSION=${CFITSIO_VERSION:-3450}
-OPENSSL_ROOT=${OPENSSL_ROOT:-openssl-1.1.1l}
+OPENSSL_ROOT=${OPENSSL_ROOT:-openssl-1.1.1w}
 # Hash from https://www.openssl.org/source/openssl-1.1.1?.tar.gz.sha256
-OPENSSL_HASH=${OPENSSL_HASH:-0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1}
+OPENSSL_HASH=${OPENSSL_HASH:-cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8}
 OPENSSL_DOWNLOAD_URL=${OPENSSL_DOWNLOAD_URL:-https://www.openssl.org/source}
 
 
@@ -66,11 +66,12 @@ function build_simple {
     fi
     local name_version="${name}-${version}"
     local archive=${name_version}.${ext}
+    echo "url and archive are $url/$archive"
     fetch_unpack $url/$archive
-	(cd $name_version \
-    && ./configure --prefix=$BUILD_PREFIX $configure_args \
-    && make -j4 \
-    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    (cd $name_version \
+        && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS $configure_args \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
@@ -85,9 +86,9 @@ function build_github {
     fi
     local out_dir=$(fetch_unpack "https://github.com/${path}/archive/${tag_name}.tar.gz")
     (cd $out_dir \
-        && ./configure --prefix=$BUILD_PREFIX $configure_args \
+        && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS $configure_args \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch "${name}-stamp"
 }
 
@@ -149,26 +150,29 @@ function build_zlib {
 function build_new_zlib {
     # Careful, this one may cause yum to segfault
     # Fossils directory should also contain latest
-    build_simple zlib $ZLIB_VERSION https://zlib.net/fossils
+    build_simple zlib $ZLIB_VERSION https://github.com/madler/zlib/releases/download/v1.4/
 }
 
 function build_jpeg {
     if [ -e jpeg-stamp ]; then return; fi
-    fetch_unpack https://ijg.org/files/jpegsrc.v${JPEG_VERSION}.tar.gz
-	(cd jpeg-${JPEG_VERSION} \
-    && ./configure --prefix=$BUILD_PREFIX \
-    && make -j4 \
-    && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
+    fetch_unpack http://ijg.org/files/jpegsrc.v${JPEG_VERSION}.tar.gz
+    (cd jpeg-${JPEG_VERSION} \
+        && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch jpeg-stamp
 }
 
 function build_libjpeg_turbo {
     if [ -e jpeg-stamp ]; then return; fi
     local cmake=$(get_modern_cmake)
-    fetch_unpack https://download.sourceforge.net/libjpeg-turbo/libjpeg-turbo-${JPEGTURBO_VERSION}.tar.gz
+    fetch_unpack https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/${JPEGTURBO_VERSION}/libjpeg-turbo-${JPEGTURBO_VERSION}.tar.gz
     (cd libjpeg-turbo-${JPEGTURBO_VERSION} \
-        && $cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_INSTALL_LIBDIR=$BUILD_PREFIX/lib . \
-        && make install)
+        && $cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX \
+            -DCMAKE_INSTALL_LIBDIR=$BUILD_PREFIX/lib -DCMAKE_INSTALL_NAME_DIR=$BUILD_PREFIX/lib \
+            $HOST_CMAKE_FLAGS . \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
 
     # Prevent build_jpeg
     touch jpeg-stamp
@@ -185,7 +189,7 @@ function build_bzip2 {
     fetch_unpack https://mirrors.kernel.org/sourceware/bzip2/bzip2-${BZIP2_VERSION}.tar.gz
     (cd bzip2-${BZIP2_VERSION} \
         && make -f Makefile-libbz2_so \
-        && make install PREFIX=$BUILD_PREFIX)
+        && if [ -n "$IS_OSX" ]; then sudo make install PREFIX=$BUILD_PREFIX; else make install PREFIX=$BUILD_PREFIX; fi)
     touch bzip2-stamp
 }
 
@@ -197,21 +201,23 @@ function build_tiff {
 }
 
 function get_modern_cmake {
-    # Install cmake >= 2.8
+    # Install cmake >= 2.8 if it isn't installed
     local cmake=cmake
-    if [ -n "$IS_MACOS" ]; then
-        brew install cmake > /dev/null
-    elif [ -n "$IS_ALPINE" ]; then
-        apk add cmake > /dev/null
-    elif [[ $MB_ML_VER == "_2_24" ]]; then
-        # debian:9 based distro
-        apt-get install -y cmake
-    else
-        if [ "`yum search cmake | grep ^cmake28\.`" ]; then
-            cmake=cmake28
+    if ! which $cmake > /dev/null; then
+        if [ -n "$IS_MACOS" ]; then
+            brew install cmake > /dev/null
+        elif [ -n "$IS_ALPINE" ]; then
+            apk add cmake > /dev/null
+        elif [[ $MB_ML_VER == "_2_24" ]]; then
+            # debian:9 based distro
+            apt-get install -y cmake
+        else
+            if [ "`yum search cmake | grep ^cmake28\.`" ]; then
+                cmake=cmake28
+            fi
+            # centos based distro
+            yum_install $cmake > /dev/null
         fi
-        # centos based distro
-        yum_install $cmake > /dev/null
     fi
     echo $cmake
 }
@@ -234,8 +240,9 @@ function build_openjpeg {
     fi
     local out_dir=$(fetch_unpack https://github.com/uclouvain/openjpeg/archive/${archive_prefix}${OPENJPEG_VERSION}.tar.gz)
     (cd $out_dir \
-        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX . \
-        && make install)
+        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_INSTALL_LIBDIR=$BUILD_PREFIX/lib -DCMAKE_INSTALL_NAME_DIR=$BUILD_PREFIX/lib $HOST_CMAKE_FLAGS . \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openjpeg-stamp
 }
 
@@ -247,7 +254,7 @@ function build_lcms2 {
 function build_giflib {
     local name=giflib
     local version=$GIFLIB_VERSION
-    local url=https://downloads.sourceforge.net/project/giflib
+    local url=https://sourceforge.net/projects/giflib/files
     if [ $(lex_ver $GIFLIB_VERSION) -lt $(lex_ver 5.1.5) ]; then
         build_simple $name $version $url
     else
@@ -260,13 +267,13 @@ function build_giflib {
         fetch_unpack $url/$archive
         (cd $name_version \
             && make -j4 \
-            && make install)
+            && if [ -n "$IS_OSX" ]; then sudo make install PREFIX=$BUILD_PREFIX; else make install PREFIX=$BUILD_PREFIX; fi)
         touch "${name}-stamp"
     fi
 }
 
 function build_xz {
-    build_simple xz $XZ_VERSION https://tukaani.org/xz
+    build_simple xz $XZ_VERSION https://github.com/tukaani-project/xz/releases/download/v$XZ_VERSION
 }
 
 function ensure_xz {
@@ -311,14 +318,14 @@ function build_hdf5 {
     build_zlib
     # libaec is a drop-in replacement for szip
     build_libaec
-    local hdf5_url=https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
-    local short=$(echo $HDF5_VERSION | awk -F "." '{printf "%d.%d", $1, $2}')
-    #fetch_unpack $hdf5_url/hdf5-$short/hdf5-$HDF5_VERSION.tar.gz
-    fetch_unpack https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
+    local hdf5_url=https://support.hdfgroup.org/releases/hdf5
+    local short=$(echo $HDF5_VERSION | awk -F "." '{printf "v%d_%d", $1, $2}')
+    local long=$(echo $HDF5_VERSION | awk -F "." '{printf "v%d_%d_%d", $1, $2, $3}')
+    fetch_unpack $hdf5_url/$short/$long/downloads/hdf5-$HDF5_VERSION.tar.gz
     (cd hdf5-$HDF5_VERSION \
         && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_PREFIX/lib \
         && ./configure --with-szlib=$BUILD_PREFIX --prefix=$BUILD_PREFIX \
-        --enable-threadsafe --enable-unsupported --with-pthread=yes \
+        --enable-threadsafe --enable-unsupported --with-pthread=yes $HOST_CONFIGURE_FLAGS \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch hdf5-stamp
@@ -331,8 +338,8 @@ function build_libaec {
     # Note URL will change for each version
     fetch_unpack https://gitlab.dkrz.de/k202009/libaec/uploads/ea0b7d197a950b0c110da8dfdecbb71f/${tar_name}
     (cd $root_name \
-        && ./configure --prefix=$BUILD_PREFIX \
-        && make \
+        && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
+        && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch libaec-stamp
 }
@@ -342,14 +349,9 @@ function build_blosc {
     local cmake=$(get_modern_cmake)
     fetch_unpack https://github.com/Blosc/c-blosc/archive/v${BLOSC_VERSION}.tar.gz
     (cd c-blosc-${BLOSC_VERSION} \
-        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX . \
-        && make install)
-    if [ -n "$IS_MACOS" ]; then
-        # Fix blosc library id bug
-        for lib in $(ls ${BUILD_PREFIX}/lib/libblosc*.dylib); do
-            install_name_tool -id $lib $lib
-        done
-    fi
+        && $cmake -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_INSTALL_LIBDIR=$BUILD_PREFIX/lib -DCMAKE_INSTALL_NAME_DIR=$BUILD_PREFIX/lib $HOST_CMAKE_FLAGS . \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch blosc-stamp
 }
 
@@ -361,9 +363,9 @@ function build_lzo {
     if [ -e lzo-stamp ]; then return; fi
     fetch_unpack https://www.oberhumer.com/opensource/lzo/download/lzo-${LZO_VERSION}.tar.gz
     (cd lzo-${LZO_VERSION} \
-        && ./configure --prefix=$BUILD_PREFIX --enable-shared \
-        && make \
-        && make install)
+        && ./configure --prefix=$BUILD_PREFIX --enable-shared $HOST_CONFIGURE_FLAGS \
+        && make -j4 \
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch lzo-stamp
 }
 
@@ -386,7 +388,7 @@ function build_curl {
         LIBS=-ldl ./configure $flags; else \
         ./configure $flags; fi\
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch curl-stamp
 }
 
@@ -409,9 +411,9 @@ function build_openssl {
     fetch_unpack ${OPENSSL_DOWNLOAD_URL}/${OPENSSL_ROOT}.tar.gz
     check_sha256sum $ARCHIVE_SDIR/${OPENSSL_ROOT}.tar.gz ${OPENSSL_HASH}
     (cd ${OPENSSL_ROOT} \
-        && ./config no-ssl2 no-shared -fPIC --prefix=$BUILD_PREFIX \
+        && ./config no-shared -fPIC --prefix=$BUILD_PREFIX \
         && make -j4 \
-        && make install)
+        && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch openssl-stamp
 }
 
@@ -421,7 +423,7 @@ function build_netcdf {
     build_curl
     fetch_unpack https://github.com/Unidata/netcdf-c/archive/v${NETCDF_VERSION}.tar.gz
     (cd netcdf-c-${NETCDF_VERSION} \
-        && ./configure --prefix=$BUILD_PREFIX --enable-dap \
+        && ./configure --prefix=$BUILD_PREFIX --enable-dap $HOST_CONFIGURE_FLAGS \
         && make -j4 \
         && if [ -n "$IS_OSX" ]; then sudo make install; else make install; fi)
     touch netcdf-stamp
@@ -544,7 +546,7 @@ function build_cfitsio {
         local cfitsio_name_ver=cfitsio${CFITSIO_VERSION}
         fetch_unpack https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/${cfitsio_name_ver}.tar.gz
         (cd cfitsio \
-            && ./configure --prefix=$BUILD_PREFIX \
+            && ./configure --prefix=$BUILD_PREFIX $HOST_CONFIGURE_FLAGS \
             && make shared && make install)
     fi
     touch cfitsio-stamp
