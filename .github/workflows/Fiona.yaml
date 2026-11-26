@@ -23,7 +23,7 @@ jobs:
         platform: ["arm64"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.10.1+gem261118
+      BUILD_COMMIT: 1.10.1_gem
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
@@ -55,7 +55,7 @@ jobs:
         platform: ["x86_64"]
     env:
       REPO_DIR: Fiona
-      BUILD_COMMIT: 1.10.1+gem261118
+      BUILD_COMMIT: 1.10.1_gem
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
