@@ -23,7 +23,7 @@ jobs:
         platform: ["arm64"]
     env:
       REPO_DIR: rasterio
-      BUILD_COMMIT: 1.5.2+gem261118
+      BUILD_COMMIT: 1.5.2_gem
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
@@ -55,7 +55,7 @@ jobs:
         platform: ["x86_64"]
     env:
       REPO_DIR: rasterio
-      BUILD_COMMIT: 1.5.2+gem261118
+      BUILD_COMMIT: 1.5.2_gem
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
       MB_ML_VER: "_2_28"
