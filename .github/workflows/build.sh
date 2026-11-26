@@ -15,7 +15,7 @@ echo "::group::Get code of project: $REPO_DIR"
 	  git checkout ${BUILD_COMMIT}
   fi
   if [[ "$REPO_DIR" == "Fiona" ]]; then
-	  git clone https://github.com/Toblerity/Fiona.git
+	  git clone https://github.com/gem/Fiona.git
 	  cd Fiona
 	  git checkout ${BUILD_COMMIT}
   fi
