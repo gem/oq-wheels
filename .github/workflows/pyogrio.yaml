@@ -23,7 +23,7 @@ jobs:
         platform: ["arm64"]
     env:
       REPO_DIR: pyogrio
-      BUILD_COMMIT: v0.13.0
+      BUILD_COMMIT: v0.13.0+gem261118
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
@@ -55,7 +55,7 @@ jobs:
         platform: ["x86_64"]
     env:
       REPO_DIR: pyogrio
-      BUILD_COMMIT: v0.13.0
+      BUILD_COMMIT: v0.13.0+gem261118
       WHEEL_SDIR: wheelhouse
       PLAT: "${{ matrix.platform }}"
       MB_PYTHON_VERSION: "${{ matrix.python }}"
