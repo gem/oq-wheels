@@ -25,7 +25,7 @@ If you want to download `.whl` files using the `artifacts.bash` script, make sur
 If you want to find all `.whl` files in subdirectories and copy them to a remote destination using `find`, `xargs`, and `scp`, follow these steps:
 
 ```sh
-find /path/to/search -type f -name "*.whl" -print0 | xargs -0 -I {} scp <option_of_scp> {} user@remote_host:/path/to/destination/
+find /path/to/search -type f -name "*.whl" -exec sh -c 'rsync -av -e "ssh -p 332" "$@" user@remote_host:/path/to/destination/' _ {} +
 ```
 
 ### Explanation:

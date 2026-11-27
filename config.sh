@@ -416,11 +416,14 @@ function build_wheel_cmd {
     	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
     fi
 	if [ "$REPO_DIR" == "gdal" ]; then
-		pip download GDAL==${GDAL_VERSION}
-		echo "Control the DATA"
-		tar xzvf gdal-${GDAL_VERSION}.tar.gz
-		cd gdal-${GDAL_VERSION}
-		$cmd $wheelhouse
+		#pip download GDAL==${GDAL_VERSION}
+		#echo "Control the DATA"
+		#tar xzvf gdal-${GDAL_VERSION}.tar.gz
+		#cd gdal-${GDAL_VERSION}
+        sleep 60
+        pwd
+    	(cd $repo_dir/swig/python && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+		#$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
     	(cd $repo_dir && $cmd $wheelhouse)
