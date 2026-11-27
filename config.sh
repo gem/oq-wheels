@@ -420,7 +420,9 @@ function build_wheel_cmd {
 		#echo "Control the DATA"
 		#tar xzvf gdal-${GDAL_VERSION}.tar.gz
 		#cd gdal-${GDAL_VERSION}
-    	(cd $repo_dir && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+        sleep 60
+        pwd
+    	(cd $repo_dir/swig && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
 		#$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
