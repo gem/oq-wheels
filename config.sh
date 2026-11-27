@@ -422,7 +422,7 @@ function build_wheel_cmd {
 		#cd gdal-${GDAL_VERSION}
         sleep 60
         pwd
-    	(cd $repo_dir/swig && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
+    	(cd $repo_dir/swig/python && GDAL_VERSION=$GDAL_VERSION $cmd $wheelhouse)
 		#$cmd $wheelhouse
 	fi
 	if [ "$REPO_DIR" == "pyproj" ]; then
